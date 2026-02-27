@@ -6,6 +6,27 @@ This folder contains comprehensive Data Flow Diagrams for the DeepSceneLoc proje
 
 ## 📋 Available Diagrams
 
+### **⭐ DFD Level 1 - PlantUML SVG (Recommended for GitHub)**
+**File:** `dfd.svg`  
+**Format:** SVG (Scalable Vector Graphic)  
+**Purpose:** High-quality, publication-ready diagram for GitHub display
+
+**View on GitHub:**
+
+![DFD Level 1](dfd.svg)
+
+**Features:**
+- ✅ Scalable (no quality loss when zooming)
+- ✅ Professional appearance
+- ✅ Perfect rendering on GitHub
+- ✅ Shows all 7 processes, 5 data stores, complete data flows
+- ✅ Color-coded: Blue (runtime), Green (training), Orange (future)
+- ✅ Includes legend and annotations
+
+**Best for:** GitHub README, presentations, project reports, Week 5 sign-off
+
+---
+
 ### **1. DFD Level 0 - Context Diagram**
 **File:** `DFD_LEVEL_0_CONTEXT.md`  
 **Format:** Mermaid (renders on GitHub)  
@@ -20,10 +41,10 @@ This folder contains comprehensive Data Flow Diagrams for the DeepSceneLoc proje
 
 ---
 
-### **2. DFD Level 1 - Main System Processes**
+### **2. DFD Level 1 - Main System Processes (Mermaid)**
 **File:** `DFD_LEVEL_1_MAIN_PROCESSES.md`  
 **Format:** Mermaid (renders on GitHub)  
-**Purpose:** Detailed view of all major processes and data stores
+**Purpose:** Interactive markdown version with detailed annotations
 
 **Shows:**
 - 7 main processes (Dataset Prep, Preprocessing, Stage 1, Stage 2, Training, Display, Evaluation)
@@ -63,10 +84,12 @@ This folder contains comprehensive Data Flow Diagrams for the DeepSceneLoc proje
 
 ---
 
-### **4. DFD PlantUML File**
+### **4. DFD PlantUML Source File**
 **File:** `DFD_PLANTUML.puml`  
 **Format:** PlantUML source code  
-**Purpose:** Professional diagram generation for reports/presentations
+**Purpose:** Source file for generating the SVG diagram above
+
+**Note:** The `dfd.svg` file was generated from this PlantUML file.
 
 **Features:**
 - Clean, publication-ready output
