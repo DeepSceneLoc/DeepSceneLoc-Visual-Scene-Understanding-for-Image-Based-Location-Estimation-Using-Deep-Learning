@@ -1,0 +1,123 @@
+# DeepSceneLoc Configuration File
+
+# Project Settings
+project:
+  name: "DeepSceneLoc"
+  version: "1.0.0"
+  description: "Visual Scene Understanding for Image-Based Location Estimation"
+
+# Dataset Configuration
+dataset:
+  name: "Places365"
+  subset: "outdoor"
+  num_classes: 5
+  classes:
+    - "Urban"
+    - "Rural"
+    - "Coastal"
+    - "Mountain"
+    - "Forest"
+  
+  # Data splits
+  split_ratios:
+    train: 0.70
+    val: 0.15
+    test: 0.15
+  
+  # Paths (relative to project root)
+  paths:
+    raw: "data/raw"
+    processed: "data/processed"
+    train: "data/processed/train"
+    val: "data/processed/val"
+    test: "data/processed/test"
+
+# Preprocessing Configuration
+preprocessing:
+  image_size: 224
+  normalize:
+    mean: [0.485, 0.456, 0.406]  # ImageNet statistics
+    std: [0.229, 0.224, 0.225]
+  
+  # Data augmentation (training only)
+  augmentation:
+    horizontal_flip: true
+    rotation_degrees: 15
+    color_jitter:
+      brightness: 0.2
+      contrast: 0.2
+      saturation: 0.2
+      hue: 0.1
+
+# Model Configuration
+model:
+  # Baseline model
+  baseline:
+    name: "ResNet50"
+    architecture: "resnet50"
+    pretrained: true
+    num_classes: 5
+    freeze_layers: 0  # 0 = fine-tune all layers
+  
+  # Advanced models (Semester 2)
+  advanced:
+    - name: "EfficientNet-B0"
+      architecture: "efficientnet_b0"
+      pretrained: true
+    - name: "Vision Transformer"
+      architecture: "vit_base_patch16_224"
+      pretrained: true
+
+# Training Configuration
+training:
+  # Baseline training (Week 5)
+  baseline:
+    batch_size: 32
+    num_epochs: 20
+    learning_rate: 0.001
+    optimizer: "adam"
+    scheduler: "step"
+    step_size: 7
+    gamma: 0.1
+    
+  # Hardware
+  device: "cuda"  # "cuda" or "cpu"
+  num_workers: 4
+  pin_memory: true
+  
+  # Checkpointing
+  save_frequency: 5  # Save every N epochs
+  early_stopping:
+    patience: 5
+    min_delta: 0.001
+
+# Evaluation Configuration
+evaluation:
+  batch_size: 64
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1_score"
+    - "confusion_matrix"
+
+# Paths
+paths:
+  models: "models"
+  checkpoints: "models/checkpoints"
+  results: "results"
+  logs: "logs"
+  notebooks: "notebooks"
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/training.log"
+
+# Resources (Google Colab Free Tier)
+resources:
+  gpu: "Tesla T4"  # Typical free Colab GPU
+  ram: "12GB"
+  disk: "100GB"
+  session_timeout: "12 hours"
