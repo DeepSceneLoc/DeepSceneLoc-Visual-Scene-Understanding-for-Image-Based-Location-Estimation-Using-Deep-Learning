@@ -1,11 +1,5 @@
 @startuml DeepSceneLoc_DFD_Level_1
 
-!define PROCESS_COLOR #4A90E2
-!define FUTURE_COLOR #FFA500
-!define DATASTORE_COLOR #FFE4B5
-!define ENTITY_COLOR #D3D3D3
-!define TRAINING_COLOR #90EE90
-
 ' Title
 title DeepSceneLoc - Data Flow Diagram (Level 1)\nMain System Processes
 
@@ -16,32 +10,32 @@ database "Places365\nDataset\n(50GB)" as places365 <<External Entity>>
 cloud "Google Gemini\nAPI" as gemini <<External Entity>>
 
 ' === Main Runtime Processes (Blue) ===
-rectangle "**Process 2**\nImage Preprocessing\n---\n• Resize 224x224\n• Normalize\n• Augmentation\n• To Tensor" as P2 PROCESS_COLOR
+rectangle "**Process 2**\nImage Preprocessing\n---\n• Resize 224x224\n• Normalize\n• Augmentation\n• To Tensor" as P2 #4A90E2
 
-rectangle "**Process 3**\nStage 1: Scene Classification\n---\n• ResNet-50\n• 5 Categories\n• Confidence Scores" as P3 PROCESS_COLOR
+rectangle "**Process 3**\nStage 1: Scene Classification\n---\n• ResNet-50\n• 5 Categories\n• Confidence Scores" as P3 #4A90E2
 
-rectangle "**Process 6**\nDisplay Results\n---\n• Format output\n• Show confidence\n• User interface" as P6 PROCESS_COLOR
+rectangle "**Process 6**\nDisplay Results\n---\n• Format output\n• Show confidence\n• User interface" as P6 #4A90E2
 
-' === Future Process (Orange - Dashed) ===
-rectangle "**Process 4**\nStage 2: Exact Location\n---\n• Gemini AI\n• Landmark detection\n• GPS coordinates" as P4 FUTURE_COLOR #line.dashed
+' === Future Process (Orange) ===
+rectangle "**Process 4**\nStage 2: Exact Location\n---\n• Gemini AI\n• Landmark detection\n• GPS coordinates\n(Semester 2 - Future)" as P4 #FFA500
 
 ' === Training/Development Processes (Green) ===
-rectangle "**Process 1**\nDataset Preparation\n---\n• Download\n• Validate\n• Split 70/20/10\n• Organize" as P1 TRAINING_COLOR
+rectangle "**Process 1**\nDataset Preparation\n---\n• Download\n• Validate\n• Split 70/20/10\n• Organize" as P1 #90EE90
 
-rectangle "**Process 5**\nModel Training\n---\n• Transfer Learning\n• Backpropagation\n• Checkpointing\n• Early Stopping" as P5 TRAINING_COLOR
+rectangle "**Process 5**\nModel Training\n---\n• Transfer Learning\n• Backpropagation\n• Checkpointing\n• Early Stopping" as P5 #90EE90
 
-rectangle "**Process 7**\nEvaluation & Metrics\n---\n• Test set inference\n• Confusion matrix\n• Accuracy, F1-score" as P7 TRAINING_COLOR
+rectangle "**Process 7**\nEvaluation & Metrics\n---\n• Test set inference\n• Confusion matrix\n• Accuracy, F1-score" as P7 #90EE90
 
 ' === Data Stores ===
-database "**D1**\nStructured Dataset\n---\ntrain/val/test\n~50GB" as D1 DATASTORE_COLOR
+database "**D1**\nStructured Dataset\n---\ntrain/val/test\n~50GB" as D1 #FFE4B5
 
-database "**D2**\nPretrained Weights\n---\nImageNet ResNet-50\n~100MB" as D2 DATASTORE_COLOR
+database "**D2**\nPretrained Weights\n---\nImageNet ResNet-50\n~100MB" as D2 #FFE4B5
 
-database "**D3**\nModel Checkpoints\n---\nbest/latest/final\n~100MB each" as D3 DATASTORE_COLOR
+database "**D3**\nModel Checkpoints\n---\nbest/latest/final\n~100MB each" as D3 #FFE4B5
 
-database "**D4**\nTraining History\n---\nJSON logs\nloss/accuracy curves" as D4 DATASTORE_COLOR
+database "**D4**\nTraining History\n---\nJSON logs\nloss/accuracy curves" as D4 #FFE4B5
 
-database "**D5**\nEvaluation Results\n---\nMetrics, matrices\nReports" as D5 DATASTORE_COLOR
+database "**D5**\nEvaluation Results\n---\nMetrics, matrices\nReports" as D5 #FFE4B5
 
 ' ========================================
 ' === RUNTIME FLOW (Blue paths) ===
@@ -52,19 +46,19 @@ P2 --> P3 : Preprocessed Tensor\n(1x3x224x224)
 
 P3 --> P6 : Scene Category +\nConfidence (0-1)
 
-P3 .down.> P4 : Scene Context +\nOriginal Image
+P3 ..down..> P4 : Scene Context +\nOriginal Image
 note right of P4
   **Semester 2**
   (Weeks 11-13)
   Dashed = Future
 end note
 
-P4 .down.> P6 : Landmark, City,\nCountry, GPS
+P4 ..down..> P6 : Landmark, City,\nCountry, GPS
 
 P6 --> user : Final Results\n(Stage 1 + Stage 2)
 
-P4 .right.> gemini : API Query:\nImage + Context
-gemini .left.> P4 : Location Data:\nJSON response
+P4 ..right..> gemini : API Query:\nImage + Context
+gemini ..left..> P4 : Location Data:\nJSON response
 
 D3 -right-> P3 : Load\nbest_model.pth
 
