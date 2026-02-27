@@ -1,8 +1,16 @@
 # Semester 1 Planning - DeepSceneLoc
-## Week-by-Week Execution Plan (30% Completion)
+## Weeks 1-7 Execution Plan
+## Purpose: Build scene classification foundation for exact location detection
 
-### Overview
-This semester focuses on project foundation, setup, dataset preparation, and establishing a baseline model. All work uses only free and open resources.
+### <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg> Overview
+
+This semester focuses on project foundation, setup, dataset preparation, and establishing a baseline scene classification model. This lays the groundwork for Semester 2's exact location detection enhancement.
+
+**Context:** Part of 16-week project structure
+- Semester 1 (Weeks 1-7): Scene classification (5 categories)
+- Semester 2 (Weeks 8-16): Exact location detection with AI integration
+
+**All work uses only free and open resources.**
 
 ---
 

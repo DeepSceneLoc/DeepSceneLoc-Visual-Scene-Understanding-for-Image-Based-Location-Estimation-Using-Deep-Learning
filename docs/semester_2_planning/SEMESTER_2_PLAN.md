@@ -1,11 +1,20 @@
 # Semester 2 Planning - DeepSceneLoc
-## Phase-Wise Implementation Plan (70% Completion)
+## Purpose: **Get the Exact Place on Earth from Any Image**
+## Weeks 8-16 Implementation Plan
 
-### Overview
-This semester focuses on advanced model development, comparative analysis, and research-quality implementation. By the end of this semester, the project will be feature-complete and viva-ready.
+### <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg> Overview
 
-**Duration:** 12 weeks before August submission
-**Objective:** 70% project completion with research-level depth
+This semester focuses on advanced model development, exact location detection through AI integration, and comprehensive evaluation.
+
+**Duration:** 9 weeks (Weeks 8-16 of 16-week project)
+**Objective:** Hybrid system that identifies exact places on Earth
+
+**CRITICAL ENHANCEMENT: Weeks 11-13**
+- Week 11: Gemini AI Integration for exact location detection
+- Week 12: Hybrid system development (scene + location)
+- Week 13: Hybrid system evaluation and testing
+
+**NOTE:** This document outlines the detailed technical implementation. Phases below map to specific weeks. For AI integration details, see weeks 11-13 in the 16_WEEK_PROGRESS_TRACKING.md document.
 
 ---
 

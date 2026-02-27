@@ -3,8 +3,13 @@
 ## Project Title
 Visual Scene Understanding for Image-Based Location Estimation Using Deep Learning
 
+## Project Purpose
+**Get the exact place on Earth from any image** using a hybrid two-stage AI system.
+
 ## Project Goal
-Develop a deep learning system that estimates location categories (Urban, Rural, Coastal, Mountain, Forest) from images without using GPS, EXIF data, or metadata - using only visual scene understanding.
+**Semester 1:** Develop scene classification system (Urban, Rural, Coastal, Mountain, Forest) using deep learning models.
+
+**Semester 2:** Integrate AI for exact location detection - identify specific places, landmarks, cities, countries, and GPS coordinates from any image without using GPS, EXIF data, or metadata.
 
 ## Constraints
 - Only free and open-source tools
@@ -14,14 +19,18 @@ Develop a deep learning system that estimates location categories (Urban, Rural,
 - No paid services
 
 ## Key Features
-- Semantic location categorization
-- Visual scene analysis
-- Deep learning-based classification
+- **Stage 1:** Semantic scene categorization (5 categories)
+- **Stage 2:** Exact location detection (landmarks, coordinates, city/country)
+- Hybrid AI system combining custom models + commercial AI
+- Visual scene analysis without GPS/metadata
+- Deep learning-based classification (ResNet-50, EfficientNet, ViT)
 - Comparative model analysis
-- Scene embedding representation
+- AI integration (Gemini API for Weeks 11-13)
 
 ## Project Duration
-Two semesters (30% current semester, 70% next semester)
+16 weeks total:
+- **Semester 1 (Weeks 1-7):** Scene classification foundation
+- **Semester 2 (Weeks 8-16):** Exact location detection with AI integration
 
 ## Target Location Categories
 1. Urban - cities, downtown areas, streets
