@@ -1,4 +1,4 @@
-# Semester 1 Planning - DeepSceneLoc
+﻿# Semester 1 Planning - DeepSceneLoc
 ## Weeks 1-7 Execution Plan
 ## Purpose: Build scene classification foundation for exact location detection
 

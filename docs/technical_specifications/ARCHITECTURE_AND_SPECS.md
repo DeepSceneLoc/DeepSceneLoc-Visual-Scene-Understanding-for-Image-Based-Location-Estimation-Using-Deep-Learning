@@ -1,4 +1,4 @@
-# Technical Specifications and Architecture
+﻿# Technical Specifications and Architecture
 
 ## System Architecture Overview
 

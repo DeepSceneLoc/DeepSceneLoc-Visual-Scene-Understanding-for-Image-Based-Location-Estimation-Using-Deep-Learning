@@ -1,4 +1,4 @@
-# Results Tracking and Metrics Log
+﻿# Results Tracking and Metrics Log
 
 **Project Purpose:** Get the exact place on Earth from any image
 

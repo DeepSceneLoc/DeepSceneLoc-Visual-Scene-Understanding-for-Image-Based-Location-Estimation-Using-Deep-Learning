@@ -1,4 +1,4 @@
-# Team Task Allocation - Complete Project (16 Weeks)
+﻿# Team Task Allocation - Complete Project (16 Weeks)
 ## DeepSceneLoc Project
 
 **Team Size:** 4 members

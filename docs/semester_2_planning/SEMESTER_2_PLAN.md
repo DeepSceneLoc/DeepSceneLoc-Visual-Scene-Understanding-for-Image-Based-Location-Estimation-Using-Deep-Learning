@@ -1,4 +1,4 @@
-# Semester 2 Planning - DeepSceneLoc
+﻿# Semester 2 Planning - DeepSceneLoc
 ## Purpose: **Get the Exact Place on Earth from Any Image**
 ## Weeks 8-16 Implementation Plan
 

@@ -195,7 +195,7 @@ class Trainer:
                 self.best_val_acc = val_acc
                 self.best_epoch = epoch
                 self.save_checkpoint(epoch, is_best=True)
-                print(f"  ✓ Best model saved (Val Acc: {val_acc:.2f}%)")
+                print(f"  [OK] Best model saved (Val Acc: {val_acc:.2f}%)")
             
             # Save periodic checkpoint
             if epoch % save_frequency == 0:

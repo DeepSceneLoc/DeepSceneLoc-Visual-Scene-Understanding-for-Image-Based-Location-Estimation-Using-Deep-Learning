@@ -1,4 +1,4 @@
-# DeepSceneLoc - Semester 1 Review Presentation
+﻿# DeepSceneLoc - Semester 1 Review Presentation
 
 **DeepSceneLoc: Visual Scene Understanding for Image-Based Location Estimation Using Deep Learning**
 
@@ -30,10 +30,10 @@ March 2026
 **Can we estimate the location category of an image from visual scene understanding alone?**
 
 ### Key Constraints
-- ❌ No GPS coordinates
-- ❌ No EXIF metadata
-- ❌ No textual information
-- ✅ Only visual scene features
+- [ERROR] No GPS coordinates
+- [ERROR] No EXIF metadata
+- [ERROR] No textual information
+- [OK] Only visual scene features
 
 ### Why This Matters
 - Privacy-preserving location estimation
@@ -362,36 +362,36 @@ Layer 2: Linear(512 → 5)
 
 ### Semester 1 Timeline (7 Weeks)
 
-**Week 1:** Project Setup & Scope Freeze ✅
+**Week 1:** Project Setup & Scope Freeze [OK]
 - GitHub repository created
 - Documentation structure established
 - Scope defined: 5 categories, no GPS
 
-**Week 2:** Literature Review ✅
+**Week 2:** Literature Review [OK]
 - Studied 7 core papers (Places365, PlaNet, ViT, etc.)
 - Documented key insights and methodologies
 
-**Week 3:** Dataset Preparation ✅
+**Week 3:** Dataset Preparation [OK]
 - Mapped Places365 (365 → 5 categories)
 - Created train/val/test splits (70/15/15)
 - Verified data integrity
 
-**Week 4:** Preprocessing Pipeline ✅
+**Week 4:** Preprocessing Pipeline [OK]
 - Implemented custom Dataset class
 - Built augmentation pipeline
 - Created efficient DataLoaders
 
-**Week 5:** Model Training ✅
+**Week 5:** Model Training [OK]
 - Implemented ResNet-50 baseline
 - Trained for 20 epochs
 - Saved best model checkpoint
 
-**Week 6:** Evaluation & Analysis ✅
+**Week 6:** Evaluation & Analysis [OK]
 - Calculated all metrics
 - Generated confusion matrix
 - Analyzed error patterns
 
-**Week 7:** Documentation & Review ✅
+**Week 7:** Documentation & Review [OK]
 - Updated README and documentation
 - Created visualizations
 - Prepared this presentation

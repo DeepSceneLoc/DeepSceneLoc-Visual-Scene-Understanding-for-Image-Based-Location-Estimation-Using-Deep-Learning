@@ -1,4 +1,4 @@
-# Weekly Progress Tracking - Semester 1
+﻿# Weekly Progress Tracking - Semester 1
 ## DeepSceneLoc Project
 
 **Project Period:** 7 weeks (January 20 - March 7, 2026)
@@ -8,45 +8,45 @@
 
 ## Week 1: Project Setup & Scope Freeze
 **Duration:** January 20-26, 2026
-**Status:** [  ] Not Started | [  ] In Progress | [  ] Complete
+**Status:** [[OK]] Complete
 
 ### Deliverables Checklist
 
 #### Krishan Yadav (12 hours planned)
-- [ ] Create GitHub repository
-- [ ] Setup repository structure
-- [ ] Create and configure README.md
-- [ ] Add LICENSE file
-- [ ] Write problem statement (1-2 pages)
-- [ ] Write project motivation
-- [ ] Coordinate team assignments
-- [ ] Setup communication channels
+- [[OK]] Create GitHub repository
+- [[OK]] Setup repository structure
+- [[OK]] Create and configure README.md
+- [[OK]] Add LICENSE file
+- [[OK]] Write problem statement (1-2 pages)
+- [[OK]] Write project motivation
+- [[OK]] Coordinate team assignments
+- [[OK]] Setup communication channels
 
-**Hours Completed:** __ / 12 | **Blockers:** ___________
+**Hours Completed:** 12 / 12 | **Blockers:** None
 
 #### Aditi Sah (8 hours planned)
-- [ ] Review problem statement
-- [ ] Provide feedback on scope
-- [ ] Document literature review plan
-- [ ] Prepare for Week 2
+- [[OK]] Review problem statement
+- [[OK]] Provide feedback on scope
+- [[OK]] Document literature review plan
+- [[OK]] Prepare for Week 2
 
-**Hours Completed:** __ / 8 | **Blockers:** ___________
+**Hours Completed:** 8 / 8 | **Blockers:** None
 
 #### Anuj Kondawar (8 hours planned)
-- [ ] Review scope requirements
-- [ ] Plan preprocessing pipeline architecture
-- [ ] Document data requirements
-- [ ] Prepare technical planning
+- [[OK]] Review scope requirements
+- [[OK]] Plan preprocessing pipeline architecture
+- [[OK]] Document data requirements
+- [[OK]] Prepare technical planning
 
-**Hours Completed:** __ / 8 | **Blockers:** ___________
+**Hours Completed:** 8 / 8 | **Blockers:** None
 
 #### Jensi Paneliya (6 hours planned)
-- [ ] Review scope and requirements
-- [ ] Plan model and evaluation approach
-- [ ] Document training strategy
-- [ ] Prepare documentation plan
+- [[OK]] Review scope and requirements
+- [[OK]] Plan model and evaluation approach
+- [[OK]] Document training strategy
+- [[OK]] Prepare documentation plan
 
-**Hours Completed:** __ / 6 | **Blockers:** ___________
+**Hours Completed:** 6 / 6 | **Blockers:** None
 
 ---
 

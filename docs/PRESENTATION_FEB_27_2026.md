@@ -1,4 +1,4 @@
-# DeepSceneLoc - Week 5 Sign-off Presentation
+﻿# DeepSceneLoc - Week 5 Sign-off Presentation
 ## February 27, 2026
 
 **Project:** DeepSceneLoc - Visual Scene Understanding for Image-Based Location Estimation

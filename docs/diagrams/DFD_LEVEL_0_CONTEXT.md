@@ -1,12 +1,12 @@
-# DFD Level 0 - Context Diagram
+﻿# DFD Level 0 - Context Diagram
 ## DeepSceneLoc System Overview
 
 ```mermaid
 graph TB
     User[👤 User/Developer]
-    System[🎯 DeepSceneLoc System<br/>Image-Based Location Estimation]
-    Dataset[(📦 Places365 Dataset<br/>50GB)]
-    GeminiAPI[☁️ Google Gemini API<br/>Semester 2]
+    System[ DeepSceneLoc System<br/>Image-Based Location Estimation]
+    Dataset[(Data Places365 Dataset<br/>50GB)]
+    GeminiAPI[Cloud Google Gemini API<br/>Semester 2]
     GitHub[📁 GitHub Repository<br/>Version Control]
     
     User -->|Upload Image| System

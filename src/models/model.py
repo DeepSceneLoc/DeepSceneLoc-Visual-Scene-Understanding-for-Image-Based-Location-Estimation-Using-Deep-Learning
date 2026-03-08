@@ -191,7 +191,7 @@ def test_models():
     out = model(x)
     print(f"   Input shape: {x.shape}")
     print(f"   Output shape: {out.shape}")
-    print(f"   ✓ ResNet-50 working correctly")
+    print(f"   [OK] ResNet-50 working correctly")
     
     # Test EfficientNet
     print("\n2. Testing EfficientNet-B0...")
@@ -199,11 +199,11 @@ def test_models():
         model = create_model('efficientnet_b0', num_classes=5, pretrained=False)
         out = model(x)
         print(f"   Output shape: {out.shape}")
-        print(f"   ✓ EfficientNet-B0 working correctly")
+        print(f"   [OK] EfficientNet-B0 working correctly")
     except Exception as e:
         print(f"   Note: {e}")
     
-    print("\n✓ Model definitions ready!")
+    print("\n[OK] Model definitions ready!")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-# DeepSceneLoc - Data Flow Diagrams (DFDs)
+﻿# DeepSceneLoc - Data Flow Diagrams (DFDs)
 
 This folder contains comprehensive Data Flow Diagrams for the DeepSceneLoc project, illustrating the complete system architecture from data preparation through inference and location detection.
 

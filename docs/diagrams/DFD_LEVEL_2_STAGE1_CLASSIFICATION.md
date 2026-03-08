@@ -1,4 +1,4 @@
-# DFD Level 2 - Stage 1 Scene Classification (Detailed)
+﻿# DFD Level 2 - Stage 1 Scene Classification (Detailed)
 ## Process 3 Decomposition: ResNet-50 Classification Pipeline
 
 ```mermaid
@@ -7,16 +7,16 @@ graph TB
     Input[Preprocessed Tensor<br/>from Process 2<br/>Shape: 1x3x224x224]
     
     %% Subprocesses with validation
-    P3_1[Process 3.1:<br/>🔍 Validate Input Tensor]
+    P3_1[Process 3.1:<br/>Validate Input Tensor]
     D1{Valid Shape?<br/>1x3x224x224}
-    P3_2[Process 3.2:<br/>📦 Load Model Architecture]
-    P3_3[Process 3.3:<br/>⚙️ Load Checkpoint Weights]
+    P3_2[Process 3.2:<br/>Data Load Model Architecture]
+    P3_3[Process 3.3:<br/>Config Load Checkpoint Weights]
     D2{Checkpoint<br/>Exists?}
-    P3_4[Process 3.4:<br/>🧮 Forward Pass<br/>Backbone + Head]
-    P3_5[Process 3.5:<br/>📊 Apply Softmax]
+    P3_4[Process 3.4:<br/>Forward Pass<br/>Backbone + Head]
+    P3_5[Process 3.5:<br/> Apply Softmax]
     D3{Probabilities<br/>Sum = 1.0?}
-    P3_6[Process 3.6:<br/>🎯 Extract Top-3 Predictions]
-    P3_7[Process 3.7:<br/>✅ Confidence Validation]
+    P3_6[Process 3.6:<br/> Extract Top-3 Predictions]
+    P3_7[Process 3.7:<br/>[OK] Confidence Validation]
     D4{Confidence<br/>> Threshold?}
     P3_8[Process 3.8:<br/>📤 Format Output]
     
@@ -25,10 +25,10 @@ graph TB
     DS_Config[(Config:<br/>categories.json<br/>thresholds)]
     
     %% Error Handling
-    Error1[❌ Error: Invalid Tensor]
-    Error2[⚠️ Use Pretrained Weights<br/>Demo Mode]
-    Error3[❌ Error: Softmax Failed]
-    Error4[⚠️ Low Confidence Warning]
+    Error1[[ERROR] Error: Invalid Tensor]
+    Error2[[WARN] Use Pretrained Weights<br/>Demo Mode]
+    Error3[[ERROR] Error: Softmax Failed]
+    Error4[[WARN] Low Confidence Warning]
     
     %% Output
     Output[Scene Category + Confidence<br/>to Process 6]
@@ -98,10 +98,10 @@ graph TB
 **Purpose:** Ensure preprocessed tensor meets model requirements
 
 **Validation Checks:**
-- ✅ Data type: torch.FloatTensor or torch.cuda.FloatTensor
-- ✅ Shape: Exactly [1, 3, 224, 224] (batch=1, RGB=3, H=224, W=224)
-- ✅ Value range: Normalized (typically -2 to +2 after ImageNet normalization)
-- ✅ No NaN or Inf values
+- [OK] Data type: torch.FloatTensor or torch.cuda.FloatTensor
+- [OK] Shape: Exactly [1, 3, 224, 224] (batch=1, RGB=3, H=224, W=224)
+- [OK] Value range: Normalized (typically -2 to +2 after ImageNet normalization)
+- [OK] No NaN or Inf values
 
 **Decision D1:** Valid Shape?
 - **YES →** Continue to Process 3.2
@@ -148,14 +148,14 @@ if tensor.shape != (1, 3, 224, 224):
 checkpoint = torch.load('checkpoints/best_model.pth')
 model.load_state_dict(checkpoint['model_state_dict'])
 model.eval()
-status = "✅ Fine-tuned Model Loaded"
+status = "[OK] Fine-tuned Model Loaded"
 ```
 
 **Path 2: NO (Use pretrained only - Demo Mode)**
 ```python
 # Only ImageNet pretrained backbone, untrained head
 model.eval()
-status = "⚠️ Using Pretrained Backbone (Demo Mode)"
+status = "[WARN] Using Pretrained Backbone (Demo Mode)"
 ```
 
 **Checkpoint File Structure:**
@@ -284,7 +284,7 @@ if max_confidence > 0.3:
 ```python
 else:
     confidence_level = "Low"
-    warning = "⚠️ Uncertain prediction. Consider image quality or try different image."
+    warning = "[WARN] Uncertain prediction. Consider image quality or try different image."
 ```
 
 **Confidence Interpretation:**
@@ -319,7 +319,7 @@ else:
         'Rural': 0.030,
         'Urban': 0.002
     },
-    'model_status': '✅ Fine-tuned Model',
+    'model_status': '[OK] Fine-tuned Model',
     'processing_time_ms': 75,
     'warnings': []
 }
@@ -333,21 +333,21 @@ else:
 
 ### **Success Path (Green):**
 ```
-Input Tensor → Validate ✅ → Load Model → Load Checkpoint ✅ → 
-Forward Pass → Softmax ✅ → Top-3 → High Confidence ✅ → 
+Input Tensor → Validate [OK] → Load Model → Load Checkpoint [OK] → 
+Forward Pass → Softmax [OK] → Top-3 → High Confidence [OK] → 
 Format → Output
 ```
 
 ### **Demo Mode Path (Orange):**
 ```
-Input Tensor → Validate ✅ → Load Model → No Checkpoint ⚠️ → 
-Use Pretrained → Forward Pass → Softmax ✅ → Top-3 → 
+Input Tensor → Validate [OK] → Load Model → No Checkpoint [WARN] → 
+Use Pretrained → Forward Pass → Softmax [OK] → Top-3 → 
 Moderate Confidence → Format → Output
 ```
 
 ### **Error Path (Red):**
 ```
-Input Tensor → Validate ❌ → Error: Invalid Shape → 
+Input Tensor → Validate [ERROR] → Error: Invalid Shape → 
 Return Error Message to User
 ```
 

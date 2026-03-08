@@ -268,7 +268,7 @@ def test_preprocessing_pipeline(data_dir: str = "data/processed"):
         print(f"   Note: Dataset not found or empty. Error: {e}")
         print(f"   This is expected if data hasn't been prepared yet.")
     
-    print("\n✓ Preprocessing pipeline module ready!")
+    print("\n[OK] Preprocessing pipeline module ready!")
     print("  Usage: from src.preprocessing.pipeline import create_dataloaders")
 
 
