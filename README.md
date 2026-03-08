@@ -63,7 +63,7 @@ DeepSceneLoc is a two-stage hybrid system for location estimation from images:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 DeepSceneLoc/
@@ -116,7 +116,7 @@ DeepSceneLoc/
 
 ---
 
-## 🛠️ Installation
+##  Installation
 
 ### Prerequisites
 - Python 3.8+
@@ -166,7 +166,7 @@ splitter.split_dataset(
 
 ---
 
-## 🏋️ Training
+##  Training
 
 ### Quick Start
 
@@ -308,7 +308,7 @@ print(f"Confidence: {probabilities[0][predicted_class].item():.2%}")
 
 ---
 
-## 📚 Documentation
+##  Documentation
 
 Detailed documentation available in `/docs`:
 - [Project Overview](docs/PROJECT_OVERVIEW.md)
@@ -366,7 +366,7 @@ See [Literature Review](docs/literature_review/RESEARCH_PAPERS_AND_REFERENCES.md
 
 ---
 
-## 📜 License
+##  License
 
 Proprietary License - Academic Project
 
@@ -374,13 +374,13 @@ This project is developed for academic purposes. All rights reserved.
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 This is an academic project developed by a dedicated team. For questions or collaboration inquiries, please contact the team.
 
 ---
 
-## 📧 Contact
+##  Contact
 
 - **Repository:** https://github.com/DeepSceneLoc/DeepSceneLoc-Visual-Scene-Understanding-for-Image-Based-Location-Estimation-Using-Deep-Learning
 - **Issues:** Use GitHub Issues for bug reports or feature requests
