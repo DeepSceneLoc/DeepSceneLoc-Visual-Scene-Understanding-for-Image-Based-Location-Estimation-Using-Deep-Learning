@@ -1,6 +1,8 @@
 # DeepSceneLoc
 ## Visual Scene Understanding for Image-Based Location Estimation Using Deep Learning
 
+<img width="1732" height="1127" alt="Dark" src="https://github.com/user-attachments/assets/72444ebc-e560-43fe-8bff-2fe51f3c399e" />
+
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-orange.svg)](https://pytorch.org/)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
