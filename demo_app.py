@@ -26,11 +26,11 @@ CATEGORIES = ['Coastal', 'Forest', 'Mountain', 'Rural', 'Urban']
 
 # Category descriptions
 CATEGORY_INFO = {
-    'Coastal': '🌊 Beaches, harbors, seaside, ocean views',
-    'Forest': '🌲 Dense vegetation, woodland, jungle areas',
-    'Mountain': '⛰️ Peaks, highlands, mountain terrain, valleys',
-    'Rural': '🌾 Farmland, countryside, villages, agricultural areas',
-    'Urban': '🏙️ Cities, streets, buildings, urban infrastructure'
+    'Coastal': 'Beaches, harbors, seaside, ocean views',
+    'Forest': 'Dense vegetation, woodland, jungle areas',
+    'Mountain': 'Peaks, highlands, mountain terrain, valleys',
+    'Rural': 'Farmland, countryside, villages, agricultural areas',
+    'Urban': 'Cities, streets, buildings, urban infrastructure'
 }
 
 
@@ -59,15 +59,15 @@ class DemoModel:
                 checkpoint = torch.load('models/checkpoints/best_model.pth', 
                                        map_location=self.device)
                 self.model.load_state_dict(checkpoint['model_state_dict'])
-                self.model_status = "✅ Trained Model Loaded"
+                self.model_status = "[OK] Trained Model Loaded"
             except:
-                self.model_status = "⚠️ Using Pretrained Backbone (Demo Mode)"
+                self.model_status = "[WARN] Using Pretrained Backbone (Demo Mode)"
         except:
             # Fallback: create simple model for demo
             import torchvision.models as models
             self.model = models.resnet50(pretrained=True)
             self.model.fc = nn.Linear(2048, 5)
-            self.model_status = "⚠️ Demo Model (Architecture Preview)"
+            self.model_status = "[WARN] Demo Model (Architecture Preview)"
         
         self.model.to(self.device)
         self.model.eval()
@@ -120,7 +120,7 @@ def predict_location(image):
     
     # Format result text
     result_text = f"""
-## 🎯 Predicted Location: **{top_category}**
+## Predicted Location: **{top_category}**
 **Confidence:** {top_confidence:.2%}
 
 ### Category Info:
@@ -144,12 +144,12 @@ def predict_location(image):
 with gr.Blocks(title="DeepSceneLoc - Location Estimator", theme=gr.themes.Soft()) as demo:
     
     gr.Markdown("""
-    # 🌍 DeepSceneLoc
+    # DeepSceneLoc
     ## Visual Scene Understanding for Image-Based Location Estimation
     
     Upload an image to predict its semantic location category using deep learning.
     
-    **Categories:** Coastal 🌊 | Forest 🌲 | Mountain ⛰️ | Rural 🌾 | Urban 🏙️
+    **Categories:** Coastal | Forest | Mountain | Rural | Urban
     """)
     
     with gr.Row():
@@ -161,7 +161,7 @@ with gr.Blocks(title="DeepSceneLoc - Location Estimator", theme=gr.themes.Soft()
                 sources=["upload", "webcam", "clipboard"]
             )
             
-            predict_btn = gr.Button("🔍 Predict Location", variant="primary", size="lg")
+            predict_btn = gr.Button("Predict Location", variant="primary", size="lg")
             
             gr.Markdown("""
             ### About This Project
@@ -189,7 +189,7 @@ with gr.Blocks(title="DeepSceneLoc - Location Estimator", theme=gr.themes.Soft()
             )
     
     # Examples
-    gr.Markdown("### 📸 Try These Examples:")
+    gr.Markdown("### Try These Examples:")
     gr.Examples(
         examples=[
             # These would be paths to sample images
@@ -215,7 +215,7 @@ with gr.Blocks(title="DeepSceneLoc - Location Estimator", theme=gr.themes.Soft()
     gr.Markdown("""
     ---
     
-    ### 🔬 Technical Details
+    ### Technical Details
     - **Architecture:** ResNet-50 with custom classification head (2048 → 512 → 5)
     - **Training:** Transfer learning from ImageNet pretrained weights
     - **Dataset:** Places365 outdoor subset mapped to 5 categories
@@ -233,8 +233,8 @@ if __name__ == "__main__":
     print(f"Device: {demo_model.device}")
     print(f"Categories: {', '.join(CATEGORIES)}")
     print("="*60)
-    print("\n🚀 Launching Gradio interface...")
-    print("📱 Access the demo at the URL shown below\n")
+    print("\nLaunching Gradio interface...")
+    print("Access the demo at the URL shown below\n")
     
     # Launch with share=True to get public URL for mentor demo
     demo.launch(

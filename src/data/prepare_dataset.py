@@ -288,5 +288,5 @@ if __name__ == "__main__":
     splitter = DatasetSplitter(train_ratio=0.70, val_ratio=0.15, test_ratio=0.15)
     print(f"   Split ratios: Train={splitter.train_ratio:.0%}, Val={splitter.val_ratio:.0%}, Test={splitter.test_ratio:.0%}")
     
-    print("\n✓ Dataset preparation module ready!")
+    print("\n[OK] Dataset preparation module ready!")
     print("  Run with: python -m src.data.prepare_dataset")

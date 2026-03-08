@@ -1,4 +1,4 @@
-# 16-Week Progress Tracking with Mentor Sign-Offs
+﻿# 16-Week Progress Tracking with Mentor Sign-Offs
 ## DeepSceneLoc Project - Complete Timeline
 
 **Project Duration:** 16 weeks (January 20 - May 15, 2026)

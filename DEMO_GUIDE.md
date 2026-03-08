@@ -103,7 +103,7 @@ The current demo uses pretrained ImageNet backbone which will give some predicti
 
 ---
 
-## 📸 Bonus: Take Screenshots
+## Bonus: Take Screenshots
 
 Before meeting, capture screenshots of:
 1. Home screen with upload interface
@@ -115,21 +115,21 @@ Put in a PowerPoint slide: "Week 5 Deliverable: Interactive Demo"
 
 ---
 
-## 🎉 Why This Works
+## Why This Works
 
 Your mentor asked for "visible changes" - this gives:
-- ✅ **Visual Interface** - Not just code, actual UI
-- ✅ **Interactive** - They can test it themselves
-- ✅ **Professional** - Looks polished
-- ✅ **Demonstrates Pipeline** - Shows everything working together
-- ✅ **Shareable** - Public URL they can access later
-- ✅ **Impressive** - Most students don't have this
+- [OK] **Visual Interface** - Not just code, actual UI
+- [OK] **Interactive** - They can test it themselves
+- [OK] **Professional** - Looks polished
+- [OK] **Demonstrates Pipeline** - Shows everything working together
+- [OK] **Shareable** - Public URL they can access later
+- [OK] **Impressive** - Most students don't have this
 
 This is EXACTLY what "visible changes" means!
 
 ---
 
-## ⏰ Quick Start (Right Now)
+## Quick Start (Right Now)
 
 ```bash
 # 1. Install Gradio (1 minute)

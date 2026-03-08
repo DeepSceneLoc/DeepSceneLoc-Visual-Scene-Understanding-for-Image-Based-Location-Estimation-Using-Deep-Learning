@@ -1,4 +1,4 @@
-# DeepSceneLoc - Project Overview
+﻿# DeepSceneLoc - Project Overview
 
 ## Project Title
 Visual Scene Understanding for Image-Based Location Estimation Using Deep Learning

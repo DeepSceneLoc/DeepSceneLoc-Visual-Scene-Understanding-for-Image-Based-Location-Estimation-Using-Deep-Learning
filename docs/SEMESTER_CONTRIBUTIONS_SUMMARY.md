@@ -1,4 +1,4 @@
-# Semester Contributions Summary
+﻿# Semester Contributions Summary
 ## DeepSceneLoc Project - 16 Weeks
 
 **Last Updated:** February 27, 2026  

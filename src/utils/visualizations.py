@@ -337,7 +337,7 @@ def create_all_visualizations(
     else:
         print(f"   Warning: {history_path} not found, skipping training history")
     
-    print(f"\n✓ All visualizations saved to {output_dir}")
+    print(f"\n[OK] All visualizations saved to {output_dir}")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-# Research Paper Summary and References
+﻿# Research Paper Summary and References
 
 ## Core Research Papers (Must-Have Foundation)
 

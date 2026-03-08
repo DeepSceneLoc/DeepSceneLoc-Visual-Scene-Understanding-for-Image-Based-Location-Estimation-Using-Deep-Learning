@@ -15,7 +15,7 @@ try:
     GEMINI_AVAILABLE = True
 except ImportError:
     GEMINI_AVAILABLE = False
-    print("⚠️  google-generativeai not installed. Run: pip install google-generativeai")
+    print("[WARN] google-generativeai not installed. Run: pip install google-generativeai")
 
 
 class GeminiLocationAnalyzer:
@@ -46,7 +46,7 @@ class GeminiLocationAnalyzer:
         genai.configure(api_key=self.api_key)
         self.model = genai.GenerativeModel('gemini-1.5-flash')
         
-        print("✓ Gemini AI initialized successfully")
+        print("[OK] Gemini AI initialized successfully")
     
     def analyze_location(
         self, 
@@ -228,38 +228,38 @@ Be specific if you recognize the place. If you cannot determine the exact locati
         location = analysis_result['exact_location']
         confidence = analysis_result['confidence']
         
-        # Confidence emoji
-        conf_emoji = {
-            'high': '🎯',
-            'medium': '🤔',
-            'low': '❓'
-        }.get(confidence, '❓')
+        # Confidence indicator
+        conf_indicator = {
+            'high': '[HIGH]',
+            'medium': '[MEDIUM]',
+            'low': '[LOW]'
+        }.get(confidence, '[LOW]')
         
-        summary = f"{conf_emoji} **Location Identified**\n\n"
+        summary = f"{conf_indicator} **Location Identified**\n\n"
         
         if location != 'Unknown' and 'cannot determine' not in location.lower():
-            summary += f"📍 **{location}**\n\n"
+            summary += f"**{location}**\n\n"
             
             if analysis_result.get('city') and analysis_result['city'] != 'Unknown':
-                summary += f"🏙️ City: {analysis_result['city']}\n"
+                summary += f"City: {analysis_result['city']}\n"
             if analysis_result.get('country') and analysis_result['country'] != 'Unknown':
-                summary += f"🌍 Country: {analysis_result['country']}\n"
+                summary += f"Country: {analysis_result['country']}\n"
             if analysis_result.get('region') and analysis_result['region'] != 'Unknown':
-                summary += f"🗺️ Region: {analysis_result['region']}\n"
+                summary += f"Region: {analysis_result['region']}\n"
             
             if analysis_result.get('latitude') and analysis_result.get('longitude'):
                 lat = analysis_result['latitude']
                 lon = analysis_result['longitude']
-                summary += f"\n📌 Coordinates: {lat:.4f}°, {lon:.4f}°\n"
-                summary += f"🔗 [View on Google Maps](https://www.google.com/maps?q={lat},{lon})\n"
+                summary += f"\nCoordinates: {lat:.4f}°, {lon:.4f}°\n"
+                summary += f"[View on Google Maps](https://www.google.com/maps?q={lat},{lon})\n"
             
             if analysis_result.get('landmarks'):
                 landmarks_str = ', '.join(analysis_result['landmarks'])
-                summary += f"\n🏛️ Landmarks: {landmarks_str}\n"
+                summary += f"\nLandmarks: {landmarks_str}\n"
         else:
-            summary += f"📍 **Exact location could not be determined**\n\n"
+            summary += f"**Exact location could not be determined**\n\n"
             if analysis_result.get('region') != 'Unknown':
-                summary += f"🗺️ Estimated Region: {analysis_result['region']}\n"
+                summary += f"Estimated Region: {analysis_result['region']}\n"
         
         summary += f"\n**Confidence:** {confidence.upper()}\n"
         summary += f"\n**Analysis:**\n{analysis_result['description']}"
@@ -275,7 +275,7 @@ def test_gemini_integration():
     # Check if API key is available
     api_key = os.getenv('GEMINI_API_KEY')
     if not api_key:
-        print("❌ GEMINI_API_KEY not set in environment variables")
+        print("[ERROR] GEMINI_API_KEY not set in environment variables")
         print("\nTo use Gemini integration:")
         print("1. Get API key from: https://makersuite.google.com/app/apikey")
         print("2. Set environment variable: set GEMINI_API_KEY=your_key_here")
@@ -283,11 +283,11 @@ def test_gemini_integration():
     
     try:
         analyzer = GeminiLocationAnalyzer(api_key)
-        print("✓ Gemini API initialized successfully")
-        print("✓ Ready to analyze images for exact locations")
+        print("[OK] Gemini API initialized successfully")
+        print("[OK] Ready to analyze images for exact locations")
         return True
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"[ERROR] {e}")
         return False
 
 

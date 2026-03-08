@@ -1,24 +1,24 @@
-# DFD Level 1 - Main System Processes
+﻿# DFD Level 1 - Main System Processes
 ## DeepSceneLoc: Complete Processing Pipeline
 
 ```mermaid
 graph TB
     %% External Entities
     User[👤 User]
-    Developer[👨‍💻 Developer]
-    Places365[(📦 Places365<br/>Dataset)]
-    GeminiAPI[☁️ Gemini API]
+    Developer[User Developer]
+    Places365[(Data Places365<br/>Dataset)]
+    GeminiAPI[Cloud Gemini API]
     
     %% Main Processes - Runtime (Blue)
-    P1[Process 1:<br/>📥 Dataset Preparation]
-    P2[Process 2:<br/>🔧 Image Preprocessing]
+    P1[Process 1:<br/>Input Dataset Preparation]
+    P2[Process 2:<br/>Process Image Preprocessing]
     P3[Process 3:<br/>🧠 Stage 1: Scene Classification<br/>ResNet-50]
-    P4[Process 4:<br/>🌍 Stage 2: Exact Location<br/>Gemini AI Integration]
-    P6[Process 6:<br/>📊 Display Results]
+    P4[Process 4:<br/>Location Stage 2: Exact Location<br/>Gemini AI Integration]
+    P6[Process 6:<br/> Display Results]
     
     %% Development Processes (Green)
-    P5[Process 5:<br/>🏋️ Model Training<br/>Transfer Learning]
-    P7[Process 7:<br/>📈 Evaluation & Metrics]
+    P5[Process 5:<br/>Training Model Training<br/>Transfer Learning]
+    P7[Process 7:<br/>Metrics Evaluation & Metrics]
     
     %% Data Stores
     DS1[(D1: Structured<br/>Dataset<br/>train/val/test)]
@@ -81,7 +81,7 @@ graph TB
 
 ## Process Descriptions
 
-### **Process 1: Dataset Preparation** (Week 3 - Complete ✅)
+### **Process 1: Dataset Preparation** (Week 3 - Complete [OK])
 **Input:** Raw images from Places365  
 **Processing:**
 - Download 50GB dataset
@@ -95,7 +95,7 @@ graph TB
 
 ---
 
-### **Process 2: Image Preprocessing** (Week 4 - Complete ✅)
+### **Process 2: Image Preprocessing** (Week 4 - Complete [OK])
 **Input:** Raw image (from User OR Dataset)  
 **Processing:**
 - Validate format (JPG/PNG/JPEG only)
@@ -110,7 +110,7 @@ graph TB
 
 ---
 
-### **Process 3: Stage 1 - Scene Classification** (Week 5 - Infrastructure Complete ✅)
+### **Process 3: Stage 1 - Scene Classification** (Week 5 - Infrastructure Complete [OK])
 **Input:** Preprocessed tensor  
 **Processing:**
 - Load ResNet-50 with custom classification head
@@ -176,11 +176,11 @@ graph TB
 - Trained model weights → D3
 - Training history (loss, accuracy per epoch) → D4
 
-**Status:** Infrastructure complete ✅, training execution in Week 6
+**Status:** Infrastructure complete [OK], training execution in Week 6
 
 ---
 
-### **Process 6: Display Results** (Complete ✅)
+### **Process 6: Display Results** (Complete [OK])
 **Input:**
 - Stage 1: Scene category + confidence
 - Stage 2: Location details (future)
@@ -223,8 +223,8 @@ graph TB
 
 | ID | Name | Contents | Size | Status |
 |----|------|----------|------|--------|
-| **D1** | Structured Dataset | Places365 images (train/val/test splits) | ~50GB | ✅ Complete |
-| **D2** | Pretrained Weights | ImageNet ResNet-50 weights | ~100MB | ✅ Available |
+| **D1** | Structured Dataset | Places365 images (train/val/test splits) | ~50GB | [OK] Complete |
+| **D2** | Pretrained Weights | ImageNet ResNet-50 weights | ~100MB | [OK] Available |
 | **D3** | Model Checkpoints | best/latest/final model files | ~100MB each | ⏳ After training |
 | **D4** | Training History | JSON logs with loss/accuracy curves | ~1-5KB | ⏳ After training |
 | **D5** | Evaluation Results | Metrics, confusion matrices, reports | ~10-50MB | ⏳ Week 7 |
