@@ -321,7 +321,7 @@ Detailed documentation available in `/docs`:
 
 ---
 
-## 👥 Team
+## Team
 
 **DeepSceneLoc Development Team**
 - Krishan Yadav - Technical Lead, Model Training & Evaluation
@@ -354,7 +354,7 @@ Detailed documentation available in `/docs`:
 
 ---
 
-## 🔬 Research Foundation
+## Research Foundation
 
 This project builds upon:
 - **Places365** (Zhou et al.) - Scene recognition dataset
