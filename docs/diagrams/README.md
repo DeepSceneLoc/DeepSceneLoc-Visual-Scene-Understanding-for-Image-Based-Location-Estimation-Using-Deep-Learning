@@ -4,9 +4,9 @@ This folder contains comprehensive Data Flow Diagrams for the DeepSceneLoc proje
 
 ---
 
-## 📋 Available Diagrams
+##  Available Diagrams
 
-### **⭐ DFD Level 1 - PlantUML SVG (Recommended for GitHub)**
+### ** DFD Level 1 - PlantUML SVG (Recommended for GitHub)**
 **File:** `dfd.svg`  
 **Format:** SVG (Scalable Vector Graphic)  
 **Purpose:** High-quality, publication-ready diagram for GitHub display
@@ -16,12 +16,12 @@ This folder contains comprehensive Data Flow Diagrams for the DeepSceneLoc proje
 ![DFD Level 1](dfd.svg)
 
 **Features:**
-- ✅ Scalable (no quality loss when zooming)
-- ✅ Professional appearance
-- ✅ Perfect rendering on GitHub
-- ✅ Shows all 7 processes, 5 data stores, complete data flows
-- ✅ Color-coded: Blue (runtime), Green (training), Orange (future)
-- ✅ Includes legend and annotations
+-  Scalable (no quality loss when zooming)
+-  Professional appearance
+-  Perfect rendering on GitHub
+-  Shows all 7 processes, 5 data stores, complete data flows
+-  Color-coded: Blue (runtime), Green (training), Orange (future)
+-  Includes legend and annotations
 
 **Best for:** GitHub README, presentations, project reports, Week 5 sign-off
 
@@ -101,29 +101,29 @@ This folder contains comprehensive Data Flow Diagrams for the DeepSceneLoc proje
 
 ---
 
-## 🎨 Diagram Color Coding
+##  Diagram Color Coding
 
 All diagrams use consistent color schemes:
 
 | Color | Hex Code | Meaning | Usage |
 |-------|----------|---------|-------|
-| 🔵 **Blue (Solid)** | `#4A90E2` | Runtime processes | Working features (Semester 1) |
-| 🟢 **Green (Solid)** | `#90EE90` | Training/Dev processes | Development infrastructure |
-| 🟠 **Orange (Dashed)** | `#FFA500` | Future implementation | Semester 2 planned features |
-| 🟤 **Tan** | `#FFE4B5` | Data stores | Persistent storage (databases, files) |
-| ⚫ **Gray** | `#D3D3D3` | External entities | Users, APIs, external systems |
-| 🔴 **Red** | `#FF6B6B` | Critical errors | Error handling, failures |
-| 🟡 **Yellow** | `#FFD700` | Decision nodes | Validation checks, branching |
+|  **Blue (Solid)** | `#4A90E2` | Runtime processes | Working features (Semester 1) |
+|  **Green (Solid)** | `#90EE90` | Training/Dev processes | Development infrastructure |
+|  **Orange (Dashed)** | `#FFA500` | Future implementation | Semester 2 planned features |
+|  **Tan** | `#FFE4B5` | Data stores | Persistent storage (databases, files) |
+|  **Gray** | `#D3D3D3` | External entities | Users, APIs, external systems |
+|  **Red** | `#FF6B6B` | Critical errors | Error handling, failures |
+|  **Yellow** | `#FFD700` | Decision nodes | Validation checks, branching |
 
 ---
 
-## 🚀 How to View the Diagrams
+##  How to View the Diagrams
 
 ### **Option 1: View on GitHub (Easiest)**
 1. Navigate to this folder on GitHub
 2. Click on any `.md` file (e.g., `DFD_LEVEL_1_MAIN_PROCESSES.md`)
 3. GitHub automatically renders Mermaid diagrams
-4. ✅ **No tools required!**
+4.  **No tools required!**
 
 **Pros:** Instant viewing, no installation  
 **Cons:** Limited customization
@@ -190,7 +190,7 @@ plantuml -tpdf DFD_PLANTUML.puml
 
 ---
 
-## 📐 DFD Symbol Reference
+##  DFD Symbol Reference
 
 ### **Standard DFD Notation**
 
@@ -211,7 +211,7 @@ plantuml -tpdf DFD_PLANTUML.puml
 
 ---
 
-## 📊 Which Diagram to Use When
+##  Which Diagram to Use When
 
 | Scenario | Recommended Diagram | Why |
 |----------|---------------------|-----|
@@ -225,14 +225,14 @@ plantuml -tpdf DFD_PLANTUML.puml
 
 ---
 
-## 🔄 Diagram Maintenance
+##  Diagram Maintenance
 
 ### **When to Update:**
-- ✅ New process added (e.g., data augmentation module)
-- ✅ Data flow changes (e.g., new checkpoint format)
-- ✅ Status changes (e.g., Semester 2 features completed)
-- ✅ Error handling updated
-- ✅ Performance optimizations affecting architecture
+-  New process added (e.g., data augmentation module)
+-  Data flow changes (e.g., new checkpoint format)
+-  Status changes (e.g., Semester 2 features completed)
+-  Error handling updated
+-  Performance optimizations affecting architecture
 
 ### **Update Checklist:**
 1. Modify Mermaid code in `.md` files
@@ -247,7 +247,7 @@ plantuml -tpdf DFD_PLANTUML.puml
 
 ---
 
-## 📚 Additional Resources
+##  Additional Resources
 
 ### **Mermaid Documentation**
 - Official Docs: [mermaid.js.org](https://mermaid.js.org/)
@@ -265,15 +265,15 @@ plantuml -tpdf DFD_PLANTUML.puml
 
 ---
 
-## 🎯 Quick Start Guide
+##  Quick Start Guide
 
 **For Today's Meeting (February 27, 2026):**
 
-1. ✅ Open `DFD_LEVEL_1_MAIN_PROCESSES.md` on GitHub
-2. ✅ Show mentor the complete system flow
-3. ✅ Point out blue (working) vs orange (future) processes
-4. ✅ Highlight Process 3 (Stage 1) as Week 5 deliverable
-5. ✅ Explain data stores D1-D5 status
+1.  Open `DFD_LEVEL_1_MAIN_PROCESSES.md` on GitHub
+2.  Show mentor the complete system flow
+3.  Point out blue (working) vs orange (future) processes
+4.  Highlight Process 3 (Stage 1) as Week 5 deliverable
+5.  Explain data stores D1-D5 status
 
 **Key Talking Points:**
 - "Blue processes are working (Weeks 1-5 complete)"
@@ -283,7 +283,7 @@ plantuml -tpdf DFD_PLANTUML.puml
 
 ---
 
-## 🛠️ Troubleshooting
+##  Troubleshooting
 
 ### **Mermaid Not Rendering on GitHub**
 - Ensure ` ```mermaid ` syntax is correct (lowercase, triple backticks)
@@ -305,7 +305,7 @@ plantuml -tpdf DFD_PLANTUML.puml
 
 ---
 
-## 📝 Credits
+##  Credits
 
 **Created by:** DeepSceneLoc Team  
 **Date:** February 27, 2026  
@@ -319,7 +319,7 @@ plantuml -tpdf DFD_PLANTUML.puml
 
 ---
 
-## 📄 License
+##  License
 
 These diagrams are part of the DeepSceneLoc project and are subject to the project's proprietary license. See `LICENSE` file in project root.
 
@@ -328,4 +328,4 @@ These diagrams are part of the DeepSceneLoc project and are subject to the proje
 ---
 
 **Last Updated:** February 27, 2026  
-**Status:** Week 5 - Baseline Model Infrastructure Complete ✅
+**Status:** Week 5 - Baseline Model Infrastructure Complete 
