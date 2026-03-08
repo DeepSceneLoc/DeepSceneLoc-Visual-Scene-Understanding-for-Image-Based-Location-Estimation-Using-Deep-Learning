@@ -150,7 +150,7 @@
 - RESULTS_LOG.md - AI integration tracking
 
 ### GitHub Repository
-**URL:** https://github.com/KrishanYadav333/DeepSceneLoc-Visual-Scene-Understanding-for-Image-Based-Location-Estimation-Using-Deep-Learning
+**URL:** https://github.com/DeepSceneLoc/DeepSceneLoc-Visual-Scene-Understanding-for-Image-Based-Location-Estimation-Using-Deep-Learning
 
 **Latest Commit:** Today (February 27, 2026)
 - 31 files changed
@@ -351,6 +351,6 @@
 **Team DeepSceneLoc**
 - Krishan Yadav, Aditi Sah, Anuj Kondawar, Jensi Paneliya
 
-**Project Repository:** https://github.com/KrishanYadav333/DeepSceneLoc-Visual-Scene-Understanding-for-Image-Based-Location-Estimation-Using-Deep-Learning
+**Project Repository:** https://github.com/DeepSceneLoc/DeepSceneLoc-Visual-Scene-Understanding-for-Image-Based-Location-Estimation-Using-Deep-Learning
 
 **Demo:** http://localhost:7860 (Running now)

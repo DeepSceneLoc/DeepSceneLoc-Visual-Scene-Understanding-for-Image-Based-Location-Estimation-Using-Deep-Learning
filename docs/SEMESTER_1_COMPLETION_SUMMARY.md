@@ -402,7 +402,7 @@
 
 ---
 
-**Repository:** https://github.com/KrishanYadav333/DeepSceneLoc  
+**Repository:** https://github.com/DeepSceneLoc/DeepSceneLoc-Visual-Scene-Understanding-for-Image-Based-Location-Estimation-Using-Deep-Learning  
 **Branch:** main  
 **Last Commit:** February 26, 2026  
 **Next Milestone:** Semester 2 Week 1 (EfficientNet Implementation)
