@@ -124,8 +124,8 @@ DeepSceneLoc/
 
 ```bash
 # Clone repository
-git clone https://github.com/KrishanYadav333/DeepSceneLoc.git
-cd DeepSceneLoc
+git clone https://github.com/DeepSceneLoc/DeepSceneLoc-Visual-Scene-Understanding-for-Image-Based-Location-Estimation-Using-Deep-Learning.git
+cd DeepSceneLoc-Visual-Scene-Understanding-for-Image-Based-Location-Estimation-Using-Deep-Learning
 
 # Create virtual environment (optional but recommended)
 python -m venv venv
@@ -194,8 +194,8 @@ from google.colab import drive
 drive.mount('/content/drive')
 
 # Clone repository and install
-!git clone https://github.com/KrishanYadav333/DeepSceneLoc.git
-%cd DeepSceneLoc
+!git clone https://github.com/DeepSceneLoc/DeepSceneLoc-Visual-Scene-Understanding-for-Image-Based-Location-Estimation-Using-Deep-Learning.git
+%cd DeepSceneLoc-Visual-Scene-Understanding-for-Image-Based-Location-Estimation-Using-Deep-Learning
 !pip install -r requirements.txt
 
 # Run training (automatically uses GPU if available)
@@ -379,7 +379,7 @@ This is an academic project developed by a dedicated team. For questions or coll
 
 ## 📧 Contact
 
-- **Repository:** https://github.com/KrishanYadav333/DeepSceneLoc
+- **Repository:** https://github.com/DeepSceneLoc/DeepSceneLoc-Visual-Scene-Understanding-for-Image-Based-Location-Estimation-Using-Deep-Learning
 - **Issues:** Use GitHub Issues for bug reports or feature requests
 
 ---
