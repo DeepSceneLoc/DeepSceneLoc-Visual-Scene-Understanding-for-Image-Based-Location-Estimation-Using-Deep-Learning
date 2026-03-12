@@ -48,7 +48,7 @@ def main():
         copy_files=args.copy,
     )
 
-    print(f"\n✓ Split complete → {args.out}/{{train,val,test}}/<Category>/")
+    print(f"\nSplit complete -> {args.out}/{{train,val,test}}/<Category>/")
     print("  Ready to train:  python run_training.py")
 
 
