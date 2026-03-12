@@ -7,6 +7,10 @@ Week 5 - Model Training (Krishan Yadav - Lead)
 import torch
 import torch.nn as nn
 import torchvision.models as models
+from torchvision.models import (
+    ResNet50_Weights,
+    EfficientNet_B0_Weights,
+)
 from typing import Optional
 
 
@@ -26,7 +30,8 @@ class DeepSceneLocResNet50(nn.Module):
         super(DeepSceneLocResNet50, self).__init__()
         
         # Load pretrained ResNet-50
-        self.backbone = models.resnet50(pretrained=pretrained)
+        _weights = ResNet50_Weights.IMAGENET1K_V2 if pretrained else None
+        self.backbone = models.resnet50(weights=_weights)
         
         # Freeze layers if specified
         if freeze_layers > 0:
@@ -84,7 +89,8 @@ class DeepSceneLocEfficientNet(nn.Module):
         super(DeepSceneLocEfficientNet, self).__init__()
         
         # Load pretrained EfficientNet-B0
-        self.backbone = models.efficientnet_b0(pretrained=pretrained)
+        _weights = EfficientNet_B0_Weights.IMAGENET1K_V1 if pretrained else None
+        self.backbone = models.efficientnet_b0(weights=_weights)
         
         # Get number of features
         num_features = self.backbone.classifier[1].in_features
@@ -191,7 +197,7 @@ def test_models():
     out = model(x)
     print(f"   Input shape: {x.shape}")
     print(f"   Output shape: {out.shape}")
-    print(f"   [OK] ResNet-50 working correctly")
+    print(f"    ResNet-50 working correctly")
     
     # Test EfficientNet
     print("\n2. Testing EfficientNet-B0...")
@@ -199,11 +205,11 @@ def test_models():
         model = create_model('efficientnet_b0', num_classes=5, pretrained=False)
         out = model(x)
         print(f"   Output shape: {out.shape}")
-        print(f"   [OK] EfficientNet-B0 working correctly")
+        print(f"    EfficientNet-B0 working correctly")
     except Exception as e:
         print(f"   Note: {e}")
     
-    print("\n[OK] Model definitions ready!")
+    print("\n Model definitions ready!")
 
 
 if __name__ == "__main__":

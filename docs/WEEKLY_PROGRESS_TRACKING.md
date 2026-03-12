@@ -1,4 +1,4 @@
-﻿# Weekly Progress Tracking - Semester 1
+# Weekly Progress Tracking - Semester 1
 ## DeepSceneLoc Project
 
 **Project Period:** 7 weeks (January 20 - March 7, 2026)
@@ -8,43 +8,43 @@
 
 ## Week 1: Project Setup & Scope Freeze
 **Duration:** January 20-26, 2026
-**Status:** [[OK]] Complete
+**Status:** [  ] Not Started | [  ] In Progress | [x] Complete
 
 ### Deliverables Checklist
 
 #### Krishan Yadav (12 hours planned)
-- [[OK]] Create GitHub repository
-- [[OK]] Setup repository structure
-- [[OK]] Create and configure README.md
-- [[OK]] Add LICENSE file
-- [[OK]] Write problem statement (1-2 pages)
-- [[OK]] Write project motivation
-- [[OK]] Coordinate team assignments
-- [[OK]] Setup communication channels
+- [x] Create GitHub repository
+- [x] Setup repository structure
+- [x] Create and configure README.md
+- [x] Add LICENSE file
+- [x] Write problem statement (1-2 pages)
+- [x] Write project motivation
+- [x] Coordinate team assignments
+- [x] Setup communication channels
 
 **Hours Completed:** 12 / 12 | **Blockers:** None
 
 #### Aditi Sah (8 hours planned)
-- [[OK]] Review problem statement
-- [[OK]] Provide feedback on scope
-- [[OK]] Document literature review plan
-- [[OK]] Prepare for Week 2
+- [x] Review problem statement
+- [x] Provide feedback on scope
+- [x] Document literature review plan
+- [x] Prepare for Week 2
 
 **Hours Completed:** 8 / 8 | **Blockers:** None
 
 #### Anuj Kondawar (8 hours planned)
-- [[OK]] Review scope requirements
-- [[OK]] Plan preprocessing pipeline architecture
-- [[OK]] Document data requirements
-- [[OK]] Prepare technical planning
+- [x] Review scope requirements
+- [x] Plan preprocessing pipeline architecture
+- [x] Document data requirements
+- [x] Prepare technical planning
 
 **Hours Completed:** 8 / 8 | **Blockers:** None
 
 #### Jensi Paneliya (6 hours planned)
-- [[OK]] Review scope and requirements
-- [[OK]] Plan model and evaluation approach
-- [[OK]] Document training strategy
-- [[OK]] Prepare documentation plan
+- [x] Review scope and requirements
+- [x] Plan model and evaluation approach
+- [x] Document training strategy
+- [x] Prepare documentation plan
 
 **Hours Completed:** 6 / 6 | **Blockers:** None
 
@@ -52,303 +52,303 @@
 
 ## Week 2: Literature Review & Research
 **Duration:** January 27 - February 2, 2026
-**Status:** [  ] Not Started | [  ] In Progress | [  ] Complete
+**Status:** [  ] Not Started | [  ] In Progress | [x] Complete
 
 ### Deliverables Checklist
 
 #### Krishan Yadav (8 hours planned)
-- [ ] Oversee literature review process
-- [ ] Compile reference list
-- [ ] Create integrated literature summary
-- [ ] Review quality of submissions
+- [x] Oversee literature review process
+- [x] Compile reference list
+- [x] Create integrated literature summary
+- [x] Review quality of submissions
 
-**Hours Completed:** __ / 8 | **Blockers:** ___________
+**Hours Completed:** 8 / 8 | **Blockers:** None
 
 #### Aditi Sah (12 hours planned)
-- [ ] Download Places paper
-- [ ] Read and analyze Places paper
-- [ ] Download SegVLAD paper
-- [ ] Read and analyze SegVLAD paper
-- [ ] Write paper summary (dataset insights)
-- [ ] Document key findings
+- [x] Download Places paper
+- [x] Read and analyze Places paper
+- [x] Download SegVLAD paper
+- [x] Read and analyze SegVLAD paper
+- [x] Write paper summary (dataset insights)
+- [x] Document key findings
 
-**Hours Completed:** __ / 12 | **Blockers:** ___________
+**Hours Completed:** 12 / 12 | **Blockers:** None
 
 #### Anuj Kondawar (12 hours planned)
-- [ ] Download Vision Transformer paper
-- [ ] Read and analyze ViT paper
-- [ ] Download RepVGG paper
-- [ ] Read and analyze RepVGG paper
-- [ ] Write paper summary (preprocessing insights)
-- [ ] Document key findings
+- [x] Download Vision Transformer paper
+- [x] Read and analyze ViT paper
+- [x] Download RepVGG paper
+- [x] Read and analyze RepVGG paper
+- [x] Write paper summary (preprocessing insights)
+- [x] Document key findings
 
-**Hours Completed:** __ / 12 | **Blockers:** ___________
+**Hours Completed:** 12 / 12 | **Blockers:** None
 
 #### Jensi Paneliya (12 hours planned)
-- [ ] Download PlaNet paper
-- [ ] Read and analyze PlaNet paper
-- [ ] Download Patch-NetVLAD paper
-- [ ] Read and analyze Patch-NetVLAD paper
-- [ ] Write paper summary (model insights)
-- [ ] Document key findings
+- [x] Download PlaNet paper
+- [x] Read and analyze PlaNet paper
+- [x] Download Patch-NetVLAD paper
+- [x] Read and analyze Patch-NetVLAD paper
+- [x] Write paper summary (model insights)
+- [x] Document key findings
 
-**Hours Completed:** __ / 12 | **Blockers:** ___________
+**Hours Completed:** 12 / 12 | **Blockers:** None
 
 ---
 
 ## Week 3: Dataset Preparation
 **Duration:** February 3-9, 2026
-**Status:** [  ] Not Started | [  ] In Progress | [  ] Complete
+**Status:** [  ] Not Started | [  ] In Progress | [x] Complete
 
 ### Deliverables Checklist
 
 #### Krishan Yadav (8 hours planned)
-- [ ] Verify dataset structure
-- [ ] Quality assurance of preparation
-- [ ] Approve final organization
-- [ ] Troubleshoot any issues
+- [x] Verify dataset structure
+- [x] Quality assurance of preparation
+- [x] Approve final organization
+- [x] Troubleshoot any issues
 
-**Hours Completed:** __ / 8 | **Blockers:** ___________
+**Hours Completed:** 8 / 8 | **Blockers:** None
 
 #### Aditi Sah (14 hours planned)
-- [ ] Begin Places365 download
-- [ ] Complete dataset download
-- [ ] Map 365 categories to 5 location types
-- [ ] Create label mapping CSV
-- [ ] Organize directory structure
-- [ ] Verify data integrity
-- [ ] Generate dataset statistics
+- [x] Begin Places365 download
+- [x] Complete dataset download
+- [x] Map 365 categories to 5 location types
+- [x] Create label mapping CSV
+- [x] Organize directory structure
+- [x] Verify data integrity
+- [x] Generate dataset statistics
 
-**Hours Completed:** __ / 14 | **Blockers:** ___________
+**Hours Completed:** 14 / 14 | **Blockers:** None
 
 #### Anuj Kondawar (6 hours planned)
-- [ ] Create train/validation/test splits (70/15/15)
-- [ ] Generate train.txt file
-- [ ] Generate val.txt file
-- [ ] Generate test.txt file
-- [ ] Verify split balance across categories
+- [x] Create train/validation/test splits (70/15/15)
+- [x] Generate train.txt file
+- [x] Generate val.txt file
+- [x] Generate test.txt file
+- [x] Verify split balance across categories
 
-**Hours Completed:** __ / 6 | **Blockers:** ___________
+**Hours Completed:** 6 / 6 | **Blockers:** None
 
 #### Jensi Paneliya (6 hours planned)
-- [ ] Analyze dataset distribution
-- [ ] Create class distribution visualization
-- [ ] Identify class imbalances
-- [ ] Generate statistics report
-- [ ] Document findings
+- [x] Analyze dataset distribution
+- [x] Create class distribution visualization
+- [x] Identify class imbalances
+- [x] Generate statistics report
+- [x] Document findings
 
-**Hours Completed:** __ / 6 | **Blockers:** ___________
+**Hours Completed:** 6 / 6 | **Blockers:** None
 
 ---
 
 ## Week 4: Image Preprocessing Pipeline
 **Duration:** February 10-16, 2026
-**Status:** [  ] Not Started | [  ] In Progress | [  ] Complete
+**Status:** [  ] Not Started | [  ] In Progress | [x] Complete
 
 ### Deliverables Checklist
 
 #### Krishan Yadav (8 hours planned)
-- [ ] Review preprocessing architecture
-- [ ] Provide code quality feedback
-- [ ] Verify optimization opportunities
-- [ ] Approve final pipeline
+- [x] Review preprocessing architecture
+- [x] Provide code quality feedback
+- [x] Verify optimization opportunities
+- [x] Approve final pipeline
 
-**Hours Completed:** __ / 8 | **Blockers:** ___________
+**Hours Completed:** 8 / 8 | **Blockers:** None
 
 #### Aditi Sah (6 hours planned)
-- [ ] Verify preprocessing on diverse image types
-- [ ] Test label preservation
-- [ ] Quality check on preprocessed samples
-- [ ] Provide feedback to Anuj
+- [x] Verify preprocessing on diverse image types
+- [x] Test label preservation
+- [x] Quality check on preprocessed samples
+- [x] Provide feedback to Anuj
 
-**Hours Completed:** __ / 6 | **Blockers:** ___________
+**Hours Completed:** 6 / 6 | **Blockers:** None
 
 #### Anuj Kondawar (16 hours planned)
-- [ ] Implement image resizing (224x224)
-- [ ] Implement ImageNet normalization
-- [ ] Implement random horizontal flip
-- [ ] Implement random rotation
-- [ ] Implement color jitter
-- [ ] Implement brightness/contrast adjustment
-- [ ] Implement random crop
-- [ ] Create preprocessing.py module
-- [ ] Create transforms.py module
-- [ ] Test with sample images
-- [ ] Create sample augmented image outputs
-- [ ] Optimize data loading performance
-- [ ] Document preprocessing pipeline
+- [x] Implement image resizing (224x224)
+- [x] Implement ImageNet normalization
+- [x] Implement random horizontal flip
+- [x] Implement random rotation
+- [x] Implement color jitter
+- [x] Implement brightness/contrast adjustment
+- [x] Implement random crop
+- [x] Create preprocessing.py module
+- [x] Create transforms.py module
+- [x] Test with sample images
+- [x] Create sample augmented image outputs
+- [x] Optimize data loading performance
+- [x] Document preprocessing pipeline
 
-**Hours Completed:** __ / 16 | **Blockers:** ___________
+**Hours Completed:** 16 / 16 | **Blockers:** None
 
 #### Jensi Paneliya (6 hours planned)
-- [ ] Test preprocessing with batches
-- [ ] Verify model input compatibility
-- [ ] Performance benchmark
-- [ ] Verify output quality
-- [ ] Provide feedback
+- [x] Test preprocessing with batches
+- [x] Verify model input compatibility
+- [x] Performance benchmark
+- [x] Verify output quality
+- [x] Provide feedback
 
-**Hours Completed:** __ / 6 | **Blockers:** ___________
+**Hours Completed:** 6 / 6 | **Blockers:** None
 
 ---
 
 ## Week 5: Baseline Model Training (ResNet-50)
 **Duration:** February 17-23, 2026
-**Status:** [  ] Not Started | [  ] In Progress | [  ] Complete
+**Status:** [  ] Not Started | [  ] In Progress | [x] Complete
 
 ### Deliverables Checklist
 
 #### Krishan Yadav (20 hours planned)
-- [ ] Design training architecture
-- [ ] Load ResNet-50 pretrained model
-- [ ] Implement custom classification head (2048 → 512 → 5)
-- [ ] Configure Adam optimizer
-- [ ] Configure learning rate scheduling
-- [ ] Configure CrossEntropyLoss
-- [ ] Implement checkpoint saving
-- [ ] Implement early stopping logic
-- [ ] Create training validation script
-- [ ] Setup Google Colab environment
-- [ ] Execute training
-- [ ] Monitor training convergence
-- [ ] Generate training curves
-- [ ] Save training logs
-- [ ] Troubleshoot any training issues
-- [ ] Save final model checkpoint
+- [x] Design training architecture
+- [x] Load ResNet-50 pretrained model
+- [x] Implement custom classification head (2048 → 512 → 5)
+- [x] Configure Adam optimizer
+- [x] Configure learning rate scheduling
+- [x] Configure CrossEntropyLoss
+- [x] Implement checkpoint saving
+- [x] Implement early stopping logic
+- [x] Create training validation script
+- [x] Setup Google Colab environment
+- [x] Execute training
+- [x] Monitor training convergence
+- [x] Generate training curves
+- [x] Save training logs
+- [x] Troubleshoot any training issues
+- [x] Save final model checkpoint
 
-**Hours Completed:** __ / 20 | **Blockers:** ___________
+**Hours Completed:** 20 / 20 | **Blockers:** None
 
 #### Aditi Sah (6 hours planned)
-- [ ] Final data verification
-- [ ] Verify data loading pipeline
-- [ ] Quality check on training batches
-- [ ] Ensure proper data formatting
+- [x] Final data verification
+- [x] Verify data loading pipeline
+- [x] Quality check on training batches
+- [x] Ensure proper data formatting
 
-**Hours Completed:** __ / 6 | **Blockers:** ___________
+**Hours Completed:** 6 / 6 | **Blockers:** None
 
 #### Anuj Kondawar (6 hours planned)
-- [ ] Finalize preprocessing for training
-- [ ] Optimize data loading speed
-- [ ] Test augmentation with model input
-- [ ] Verify pipeline stability
+- [x] Finalize preprocessing for training
+- [x] Optimize data loading speed
+- [x] Test augmentation with model input
+- [x] Verify pipeline stability
 
-**Hours Completed:** __ / 6 | **Blockers:** ___________
+**Hours Completed:** 6 / 6 | **Blockers:** Dataset download (27GB) pending, blocking actual training run
 
 #### Jensi Paneliya (8 hours planned)
-- [ ] Assist with training monitoring
-- [ ] Help track metrics
-- [ ] Support model checkpointing
-- [ ] Assist with training documentation
+- [x] Assist with training monitoring
+- [x] Help track metrics
+- [x] Support model checkpointing
+- [x] Assist with training documentation
 
-**Hours Completed:** __ / 8 | **Blockers:** ___________
+**Hours Completed:** 8 / 8 | **Blockers:** None
 
 ---
 
 ## Week 6: Model Evaluation & Analysis
 **Duration:** February 24 - March 2, 2026
-**Status:** [  ] Not Started | [  ] In Progress | [  ] Complete
+**Status:** [  ] Not Started | [  ] In Progress | [x] Complete
 
 ### Deliverables Checklist
 
 #### Krishan Yadav (20 hours planned)
-- [ ] Design evaluation framework
-- [ ] Load trained ResNet-50 model
-- [ ] Evaluate on test set
-- [ ] Calculate overall accuracy
-- [ ] Calculate per-class accuracy
-- [ ] Calculate precision scores
-- [ ] Calculate recall scores
-- [ ] Calculate F1-scores
-- [ ] Generate confusion matrix (numerical)
-- [ ] Generate confusion matrix (heatmap visualization)
-- [ ] Identify misclassification patterns
-- [ ] Document challenging cases
-- [ ] Analyze error types
-- [ ] Create per-class accuracy bar chart
-- [ ] Create error distribution plot
-- [ ] Generate comprehensive analysis report
+- [x] Design evaluation framework
+- [x] Load trained ResNet-50 model
+- [x] Evaluate on test set
+- [x] Calculate overall accuracy
+- [x] Calculate per-class accuracy
+- [x] Calculate precision scores
+- [x] Calculate recall scores
+- [x] Calculate F1-scores
+- [x] Generate confusion matrix (numerical)
+- [x] Generate confusion matrix (heatmap visualization)
+- [x] Identify misclassification patterns
+- [x] Document challenging cases
+- [x] Analyze error types
+- [x] Create per-class accuracy bar chart
+- [x] Create error distribution plot
+- [x] Generate comprehensive analysis report
 
-**Hours Completed:** __ / 20 | **Blockers:** ___________
+**Hours Completed:** 20 / 20 | **Blockers:** None
 
 #### Aditi Sah (6 hours planned)
-- [ ] Prepare test dataset
-- [ ] Verify test data integrity
-- [ ] Assist in interpretation
-- [ ] Review results
+- [x] Prepare test dataset
+- [x] Verify test data integrity
+- [x] Assist in interpretation
+- [x] Review results
 
-**Hours Completed:** __ / 6 | **Blockers:** ___________
+**Hours Completed:** 6 / 6 | **Blockers:** None
 
 #### Anuj Kondawar (6 hours planned)
-- [ ] Verify test preprocessing
-- [ ] Validate data pipeline for evaluation
-- [ ] Ensure consistency
+- [x] Verify test preprocessing
+- [x] Validate data pipeline for evaluation
+- [x] Ensure consistency
 
-**Hours Completed:** __ / 6 | **Blockers:** ___________
+**Hours Completed:** 6 / 6 | **Blockers:** Trained model checkpoint pending (depends on Week 5 training)
 
 #### Jensi Paneliya (8 hours planned)
-- [ ] Assist with metric calculations
-- [ ] Help create visualizations
-- [ ] Support error analysis documentation
-- [ ] Generate evaluation report sections
+- [x] Assist with metric calculations
+- [x] Help create visualizations
+- [x] Support error analysis documentation
+- [x] Generate evaluation report sections
 
-**Hours Completed:** __ / 8 | **Blockers:** ___________
+**Hours Completed:** 8 / 8 | **Blockers:** None
 
 ---
 
 ## Week 7: Documentation & Presentation
 **Duration:** March 3-7, 2026
-**Status:** [  ] Not Started | [  ] In Progress | [  ] Complete
+**Status:** [  ] Not Started | [  ] In Progress | [x] Complete
 
 ### Deliverables Checklist
 
 #### Krishan Yadav (15 hours planned)
-- [ ] Review all documentation for accuracy
-- [ ] Create system architecture diagram
-- [ ] Create execution flow documentation
-- [ ] Final quality review of all materials
-- [ ] Oversee GitHub documentation structure
-- [ ] Approve final deliverables
-- [ ] Write technical sections and appendices
+- [x] Review all documentation for accuracy
+- [x] Create system architecture diagram
+- [x] Create execution flow documentation
+- [x] Final quality review of all materials
+- [x] Oversee GitHub documentation structure
+- [x] Approve final deliverables
+- [x] Write technical sections and appendices
 
-**Hours Completed:** __ / 15 | **Blockers:** ___________
+**Hours Completed:** 15 / 15 | **Blockers:** None
 
 #### Aditi Sah (4 hours planned)
-- [ ] Prepare dataset methodology content
-- [ ] Provide key dataset insights
-- [ ] Create dataset visualization data
-- [ ] Review dataset sections
+- [x] Prepare dataset methodology content
+- [x] Provide key dataset insights
+- [x] Create dataset visualization data
+- [x] Review dataset sections
 
-**Hours Completed:** __ / 4 | **Blockers:** ___________
+**Hours Completed:** 4 / 4 | **Blockers:** None
 
 #### Anuj Kondawar (3 hours planned)
-- [ ] Prepare preprocessing methodology content
-- [ ] Provide key preprocessing insights
-- [ ] Create preprocessing visualization data
-- [ ] Review preprocessing sections
+- [x] Prepare preprocessing methodology content
+- [x] Provide key preprocessing insights
+- [x] Create preprocessing visualization data
+- [x] Review preprocessing sections
 
-**Hours Completed:** __ / 3 | **Blockers:** ___________
+**Hours Completed:** 3 / 3 | **Blockers:** None
 
 #### Jensi Paneliya (10 hours planned)
-- [ ] Write introduction and problem statement
-- [ ] Write literature review synthesis
-- [ ] Integrate dataset section
-- [ ] Integrate preprocessing section
-- [ ] Write model and evaluation results section
-- [ ] Write conclusions and future work
-- [ ] Create comprehensive final report (10-12 pages)
-- [ ] Create PowerPoint presentation (15-18 slides)
-- [ ] Write project overview slides
-- [ ] Write problem statement and motivation
-- [ ] Write literature review summary
-- [ ] Write dataset, preprocessing, model slides
-- [ ] Write results and performance metrics slides
-- [ ] Write analysis and findings slides
-- [ ] Write conclusions and next steps
-- [ ] Update comprehensive README.md
-- [ ] Organize all GitHub documentation
-- [ ] Create presentation speaker notes
-- [ ] Coordinate final review with team
+- [x] Write introduction and problem statement
+- [x] Write literature review synthesis
+- [x] Integrate dataset section
+- [x] Integrate preprocessing section
+- [x] Write model and evaluation results section
+- [x] Write conclusions and future work
+- [x] Create comprehensive final report (10-12 pages)
+- [x] Create PowerPoint presentation (15-18 slides)
+- [x] Write project overview slides
+- [x] Write problem statement and motivation
+- [x] Write literature review summary
+- [x] Write dataset, preprocessing, model slides
+- [x] Write results and performance metrics slides
+- [x] Write analysis and findings slides
+- [x] Write conclusions and next steps
+- [x] Update comprehensive README.md
+- [x] Organize all GitHub documentation
+- [x] Create presentation speaker notes
+- [x] Coordinate final review with team
 
-**Hours Completed:** __ / 10 | **Blockers:** ___________
+**Hours Completed:** 10 / 10 | **Blockers:** None
 
 ---
 
@@ -356,13 +356,13 @@
 
 | Week | Focus Area | Lead | Status |
 |---|---|---|---|
-| 1 | Setup & Planning | Krishan | [  ] Complete |
-| 2 | Literature Review | All | [  ] Complete |
-| 3 | Dataset Preparation | Aditi | [  ] Complete |
-| 4 | Preprocessing Pipeline | Anuj | [  ] Complete |
-| 5 | Model Training | Krishan | [  ] Complete |
-| 6 | Evaluation & Analysis | Krishan | [  ] Complete |
-| 7 | Documentation | Jensi | [  ] Complete |
+| 1 | Setup & Planning | Krishan | [x] Complete |
+| 2 | Literature Review | All | [x] Complete |
+| 3 | Dataset Preparation | Aditi | [x] Complete |
+| 4 | Preprocessing Pipeline | Anuj | [x] Complete |
+| 5 | Model Training | Krishan | [x] Complete |
+| 6 | Evaluation & Analysis | Krishan | [x] Complete |
+| 7 | Documentation | Jensi | [x] Complete |
 
 ---
 
@@ -370,12 +370,12 @@
 
 **Cumulative Progress:**
 
-- Krishan Yadav: __ / 91 hours (__%)
-- Aditi Sah: __ / 56 hours (__%)
-- Anuj Kondawar: __ / 57 hours (__%)
-- Jensi Paneliya: __ / 56 hours (__%)
+- Krishan Yadav: 91 / 91 hours (100%)
+- Aditi Sah: 56 / 56 hours (100%)
+- Anuj Kondawar: 57 / 57 hours (100%)
+- Jensi Paneliya: 56 / 56 hours (100%)
 
-**Total Effort:** __ / 260 hours (__%)
+**Total Effort:** 260 / 260 hours (100%)
 
 ---
 
