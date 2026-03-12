@@ -34,7 +34,7 @@ if str(ROOT) not in sys.path:
 
 from src.models.model import create_model
 from src.models.train import Trainer
-from src.preprocessing.pipeline import create_dataloaders, validate_preprocessing
+from src.preprocessing.pipeline import create_dataloaders, test_preprocessing_pipeline
 from src.evaluation.evaluate import ModelEvaluator
 from src.utils.visualizations import create_all_visualizations
 
@@ -95,7 +95,7 @@ def main():
     # ── Validate preprocessing ────────────────────────────────────────────────
     if not args.eval_only:
         print("[Step 1/4] Validating preprocessing pipeline ...")
-        validate_preprocessing(data_dir=args.data, split="val", num_samples=5)
+        test_preprocessing_pipeline(data_dir=args.data)
 
     # ── Data loaders ─────────────────────────────────────────────────────────
     print("[Step 2/4] Building data loaders ...")
