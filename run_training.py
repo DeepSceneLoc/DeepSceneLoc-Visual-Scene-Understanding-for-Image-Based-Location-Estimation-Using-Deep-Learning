@@ -1,5 +1,5 @@
 """
-Training Entry Point — ResNet-50 Baseline (Weeks 5-7)
+Training Entry Point - ResNet-50 Baseline (Weeks 5-7)
 Krishan Yadav (Lead) | Anuj Kondawar (Pipeline) | Aditi Sah (Data) | Jensi Paneliya (Eval)
 
 Trains the ResNet-50 scene classifier on the prepared Places365 subset,
@@ -27,7 +27,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import StepLR
 
-# ── Project root on sys.path ──────────────────────────────────────────────────
+# - Project root on sys.path -
 ROOT = Path(__file__).parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -39,7 +39,7 @@ from src.evaluation.evaluate import ModelEvaluator
 from src.utils.visualizations import create_all_visualizations
 
 
-# ── CLI ───────────────────────────────────────────────────────────────────────
+# - CLI -
 def parse_args():
     p = argparse.ArgumentParser(description="Train ResNet-50 scene classifier")
     p.add_argument("--data",    default="data/processed",  help="Processed dataset root")
@@ -56,7 +56,7 @@ def parse_args():
     return p.parse_args()
 
 
-# ── Device ────────────────────────────────────────────────────────────────────
+# - Device -
 def get_device() -> torch.device:
     if torch.cuda.is_available():
         dev = torch.device("cuda")
@@ -65,11 +65,11 @@ def get_device() -> torch.device:
         print(f"  GPU : {name}  ({vram:.1f} GB VRAM)")
     else:
         dev = torch.device("cpu")
-        print("  GPU : not available — training on CPU (will be slow)")
+        print("  GPU : not available - training on CPU (will be slow)")
     return dev
 
 
-# ── Main ──────────────────────────────────────────────────────────────────────
+# - Main -
 def main():
     args = parse_args()
     device = get_device()
@@ -81,7 +81,7 @@ def main():
     RESULTS_DIR = "results"
 
     print("\n" + "=" * 60)
-    print("DeepSceneLoc — ResNet-50 Training")
+    print("DeepSceneLoc - ResNet-50 Training")
     print("=" * 60)
     print(f"  Data    : {args.data}")
     print(f"  Epochs  : {args.epochs}")
@@ -92,12 +92,12 @@ def main():
     print(f"  Dry-run : {args.dry_run}")
     print("=" * 60 + "\n")
 
-    # ── Validate preprocessing ────────────────────────────────────────────────
+    # - Validate preprocessing -
     if not args.eval_only:
         print("[Step 1/4] Validating preprocessing pipeline ...")
         test_preprocessing_pipeline(data_dir=args.data)
 
-    # ── Data loaders ─────────────────────────────────────────────────────────
+    # - Data loaders -
     print("[Step 2/4] Building data loaders ...")
     # Windows multiprocessing: if workers>0 causes spawn errors, fall back to 0
     num_workers = args.workers
@@ -127,7 +127,7 @@ def main():
     print(f"  Val   batches : {len(val_loader)}")
     print(f"  Test  batches : {len(test_loader)}")
 
-    # ── Model ─────────────────────────────────────────────────────────────────
+    # - Model -
     print(f"\n[Step 3/4] Building model ({args.model}) ...")
     model = create_model(model_name=args.model, num_classes=NUM_CLASSES, pretrained=True)
     total_params = sum(p.numel() for p in model.parameters())
@@ -135,7 +135,7 @@ def main():
     print(f"  Total params    : {total_params:,}")
     print(f"  Trainable params: {trainable:,}")
 
-    # ── Resume from checkpoint ────────────────────────────────────────────────
+    # - Resume from checkpoint -
     start_epoch = 1
     best_val_acc = 0.0
     if args.resume:
@@ -161,7 +161,7 @@ def main():
         _run_evaluation(model, test_loader, CLASS_NAMES, device, RESULTS_DIR, LOG_DIR)
         return
 
-    # ── Training ──────────────────────────────────────────────────────────────
+    # - Training -
     print(f"\n[Step 4/4] Training ...")
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-4)
@@ -197,7 +197,7 @@ def main():
     num_epochs = max(1, args.epochs - (start_epoch - 1))
     trainer.train(num_epochs=num_epochs, save_frequency=5)
 
-    # ── Post-training evaluation ──────────────────────────────────────────────
+    # - Post-training evaluation -
     if not args.dry_run:
         print("\n" + "=" * 60)
         print("Post-training evaluation on test set ...")
@@ -224,7 +224,7 @@ def _run_evaluation(model, test_loader, class_names, device, results_dir, log_di
     metrics_path = metrics_dir / "resnet50_evaluation.json"
     with open(metrics_path, "w") as f:
         json.dump(metrics, f, indent=2)
-    print(f"\n  Metrics saved → {metrics_path}")
+    print(f"\n  Metrics saved -> {metrics_path}")
 
     # Misclassification analysis
     evaluator.print_confusion_analysis()
@@ -286,3 +286,4 @@ def _patch_trainer_dry_run(trainer: "Trainer", max_batches: int = 5):
 
 if __name__ == "__main__":
     main()
+
