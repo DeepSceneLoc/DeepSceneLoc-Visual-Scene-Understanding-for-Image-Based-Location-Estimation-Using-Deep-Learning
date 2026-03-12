@@ -38,6 +38,7 @@ ENV/
 # Dataset (too large for git)
 data/raw/
 data/processed/
+data/processed_raw/
 data/downloads/
 *.zip
 *.tar.gz
@@ -54,6 +55,7 @@ models/*.pt
 results/temp/
 results/cache/
 *.log
+logs/
 
 # IDE
 .vscode/
