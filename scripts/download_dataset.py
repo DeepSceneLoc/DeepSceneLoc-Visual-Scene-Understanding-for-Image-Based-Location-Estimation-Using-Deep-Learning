@@ -121,48 +121,58 @@ def download_via_kaggle(dataset_slug: str, output_dir: Path) -> Path:
 
 def create_demo_dataset(output_dir: Path, samples_per_class: int = 50):
     """
-    Create a tiny demo dataset using torchvision STL10 images (free download)
-    re-labelled into the 5 project categories — useful for pipeline smoke-tests
-    without requiring 27 GB of Places365.
+    Create a tiny demo dataset using CIFAR-10 images (~60 MB download).
+
+    CIFAR-10 classes are mapped to the 5 project location categories:
+      Mountain <- airplane
+      Urban    <- automobile, truck
+      Forest   <- bird, dog
+      Rural    <- cat, deer, horse
+      Coastal  <- frog, ship
 
     The demo dataset is NOT Places365 — only for testing the training pipeline.
     """
     try:
         import torchvision.datasets as tvd
-        import torchvision.transforms as T
         from PIL import Image as PILImage
-        import numpy as np
     except ImportError:
         print("torchvision not installed — cannot create demo dataset.")
-        return
+        sys.exit(1)
 
-    print("  Creating demo dataset from STL10 (unlabelled split) ...")
-    raw_stl = output_dir / "_stl10_raw"
-    raw_stl.mkdir(parents=True, exist_ok=True)
+    # CIFAR-10 class index -> location category
+    CIFAR10_TO_LOCATION: Dict[int, str] = {
+        0: "Mountain",  # airplane
+        1: "Urban",     # automobile
+        2: "Forest",    # bird
+        3: "Rural",     # cat
+        4: "Rural",     # deer
+        5: "Forest",    # dog
+        6: "Coastal",   # frog
+        7: "Rural",     # horse
+        8: "Coastal",   # ship
+        9: "Urban",     # truck
+    }
 
-    dataset = tvd.STL10(root=str(raw_stl), split="unlabeled",
-                        download=True,
-                        transform=T.Resize((256, 256)))
+    print("  Downloading CIFAR-10 (~60 MB) ...")
+    raw_dir = output_dir / "_cifar10_raw"
+    raw_dir.mkdir(parents=True, exist_ok=True)
 
-    cats = ["Coastal", "Forest", "Mountain", "Rural", "Urban"]
-    per_class = 0
-    class_idx = 0
-    saved: Dict[str, int] = {c: 0 for c in cats}
+    dataset = tvd.CIFAR10(root=str(raw_dir), train=True, download=True, transform=None)
 
-    for i, (img, _) in enumerate(dataset):
-        if class_idx >= len(cats):
+    saved: Dict[str, int] = {c: 0 for c in LOCATION_MAPPING}
+    for cat in LOCATION_MAPPING:
+        (output_dir / cat).mkdir(parents=True, exist_ok=True)
+
+    print(f"  Sampling up to {samples_per_class} images per location category ...")
+    for img, label in tqdm(dataset, desc="Saving demo images"):
+        loc_cat = CIFAR10_TO_LOCATION[label]
+        if saved[loc_cat] >= samples_per_class:
+            continue
+        dest = output_dir / loc_cat / f"{loc_cat}_{saved[loc_cat]:05d}.jpg"
+        img.resize((224, 224)).save(dest, quality=90)
+        saved[loc_cat] += 1
+        if all(v >= samples_per_class for v in saved.values()):
             break
-        cat = cats[class_idx]
-        dest = output_dir / cat
-        dest.mkdir(exist_ok=True)
-        img_path = dest / f"{cat}_{saved[cat]:05d}.jpg"
-        if hasattr(img, "save"):
-            img.save(img_path)
-        else:
-            PILImage.fromarray(np.array(img)).save(img_path)
-        saved[cat] += 1
-        if saved[cat] >= samples_per_class:
-            class_idx += 1
 
     print(f"  Demo dataset ready at {output_dir}")
     for c, n in saved.items():
