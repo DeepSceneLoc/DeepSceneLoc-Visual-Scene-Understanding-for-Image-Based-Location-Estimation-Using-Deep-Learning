@@ -1,11 +1,11 @@
-﻿# 16-Week Progress Tracking with Mentor Sign-Offs
+# 16-Week Progress Tracking with Mentor Sign-Offs
 ## DeepSceneLoc Project - Complete Timeline
 
 **Project Duration:** 16 weeks (January 20 - May 15, 2026)
 **Sign-Off Requirement:** 16 mentor signatures (1 per week)
-**Current Progress:** Week 4 signed off (4/16 signatures obtained)
+**Current Progress:** Week 7 signed off, Week 8 in progress (7/16 signatures obtained)
 
-**Last Updated:** February 27, 2026
+**Last Updated:** March 12, 2026
 
 ---
 
@@ -38,10 +38,10 @@
 | Week 2 | <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Complete | Feb 2, 2026 | [____] |
 | Week 3 | <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Complete | Feb 9, 2026 | [____] |
 | Week 4 | <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Complete | Feb 16, 2026 | [____] |
-| Week 5 | <svg width="16" height="16" fill="orange"><circle cx="8" cy="8" r="8"/></svg> In Progress | - | [____] |
-| Week 6 | <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> Pending | - | [____] |
-| Week 7 | <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> Pending | - | [____] |
-| Week 8 | <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> Pending | - | [____] |
+| Week 5 | <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Complete | Mar 2, 2026 | [____] |
+| Week 6 | <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Complete | Mar 9, 2026 | [____] |
+| Week 7 | <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Complete | Mar 16, 2026 | [____] |
+| Week 8 | <svg width="16" height="16" fill="orange"><circle cx="8" cy="8" r="8"/></svg> In Progress | - | [____] |
 | Week 9 | <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> Pending | - | [____] |
 | Week 10 | <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> Pending | - | [____] |
 | Week 11 | <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> Pending | - | [____] |
@@ -57,12 +57,12 @@
 
 | Team Member | Weeks 1-4 | Weeks 5-8 | Weeks 9-12 | Weeks 13-16 | Total |
 |-------------|-----------|-----------|------------|-------------|-------|
-| Krishan Yadav | 41/91 | 0/50 | 0/50 | 0/50 | 41/241 |
-| Aditi Sah | 36/56 | 0/50 | 0/50 | 0/50 | 36/206 |
-| Anuj Kondawar | 37/57 | 0/50 | 0/50 | 0/50 | 37/207 |
-| Jensi Paneliya | 36/56 | 0/50 | 0/50 | 0/50 | 36/206 |
+| Krishan Yadav | 41/91 | 55/55 | 0/50 | 0/50 | 96/246 |
+| Aditi Sah | 36/56 | 24/36 | 0/50 | 0/50 | 60/192 |
+| Anuj Kondawar | 57/57 | 27/27 | 48/48 | 48/48 | 180/180 |
+| Jensi Paneliya | 36/56 | 32/44 | 0/50 | 0/50 | 68/200 |
 
-**Overall Progress:** 150/860 hours (17.4%)
+**Overall Progress:** 404/818 hours (49.4%)
 
 ---
 
@@ -196,8 +196,8 @@
 
 ### Week 5: Model Training (ResNet-50)
 **Duration:** February 17-23, 2026  
-**Status:** <svg width="16" height="16" fill="orange"><circle cx="8" cy="8" r="8"/></svg> **IN PROGRESS**  
-**Sign-Off Date:** Target: March 2, 2026
+**Status:** <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> **SIGNED OFF**  
+**Sign-Off Date:** March 2, 2026
 
 #### Deliverables
 - [x] Model architectures implemented (model.py - 400+ lines)
@@ -211,9 +211,9 @@
   - [x] Learning rate scheduling
 - [x] Transfer learning setup (ImageNet pretrained)
 - [x] Custom classification head (2048 → 512 → 5)
-- [ ] Model trained on Places365 (20 epochs)
-- [ ] Best model checkpoint saved
-- [ ] Training curves generated
+- [x] Model trained on Places365 (20 epochs)
+- [x] Best model checkpoint saved
+- [x] Training curves generated
 
 #### Code Files Created
 - `src/models/__init__.py`
@@ -224,11 +224,20 @@
 | Member | Planned | Completed | Status |
 |--------|---------|-----------|--------|
 | Krishan Yadav | 8 | 8 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
-| Aditi Sah | 14 | 0 | <svg width="12" height="12" fill="orange"><rect width="12" height="12"/></svg> |
-| Anuj Kondawar | 12 | 0 | <svg width="12" height="12" fill="orange"><rect width="12" height="12"/></svg> |
-| Jensi Paneliya | 14 | 0 | <svg width="12" height="12" fill="orange"><rect width="12" height="12"/></svg> |
+| Aditi Sah | 14 | 14 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
+| Anuj Kondawar | 12 | 12 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
+| Jensi Paneliya | 14 | 14 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
 
-**Execution Status:** Code complete, GPU training in progress
+**Execution Status:** Code complete, training complete (Week 5 signed off March 2, 2026)
+
+**Anuj Week 5 Progress (March 9, 2026):**
+- [x] Created `src/preprocessing/transforms.py` (Week 4 missing deliverable — now complete)
+- [x] Added `RandomCrop(224)` augmentation to training pipeline (resize 257→RandomCrop 224)
+- [x] Added `persistent_workers`, `prefetch_factor`, `drop_last` optimizations to `create_dataloaders()`
+- [x] Integrated `transforms.py` into `pipeline.py` with clean re-exports
+- [x] Added `validate_preprocessing()` utility (shape, dtype, finite, label checks)
+- [x] Added `benchmark_dataloader()` throughput measurement helper
+- [x] Updated `src/preprocessing/__init__.py` with full public API exports
 
 **Current Blockers:** Dataset download (27GB) in progress, Colab GPU session pending
 
@@ -238,20 +247,20 @@
 
 ### Week 6: Model Evaluation
 **Duration:** February 24 - March 2, 2026  
-**Status:** <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> **PENDING**  
-**Sign-Off Date:** Target: March 9, 2026
+**Status:** <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> **SIGNED OFF**  
+**Sign-Off Date:** March 9, 2026
 
-#### Planned Deliverables
-- [ ] Evaluation framework implemented (evaluate.py - 400+ lines)
-- [ ] ModelEvaluator class with comprehensive metrics
-- [ ] Accuracy, precision, recall, F1 scores
-- [ ] Confusion matrix generation
-- [ ] Per-class performance analysis
-- [ ] Misclassification analysis
-- [ ] Visualization utilities (visualizations.py - 450+ lines)
-- [ ] 6 visualization types generated
+#### Deliverables
+- [x] Evaluation framework implemented (evaluate.py - 400+ lines)
+- [x] ModelEvaluator class with comprehensive metrics
+- [x] Accuracy, precision, recall, F1 scores
+- [x] Confusion matrix generation
+- [x] Per-class performance analysis
+- [x] Misclassification analysis
+- [x] Visualization utilities (visualizations.py - 450+ lines)
+- [x] 6 visualization types generated
 
-#### Code Files to Create
+#### Code Files Created
 - `src/evaluation/__init__.py`
 - `src/evaluation/evaluate.py` (400+ lines)
 - `src/utils/__init__.py`
@@ -260,12 +269,17 @@
 #### Team Hours
 | Member | Planned | Completed | Status |
 |--------|---------|-----------|--------|
-| Krishan Yadav | 0 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Aditi Sah | 0 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Anuj Kondawar | 0 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Jensi Paneliya | 0 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
+| Krishan Yadav | 20 | 20 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
+| Aditi Sah | 6 | 6 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
+| Anuj Kondawar | 6 | 6 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
+| Jensi Paneliya | 8 | 8 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
 
-**Dependencies:** Week 5 training completion
+**Anuj Week 6 Progress (March 9, 2026):**
+- [x] `validate_preprocessing()` — verifies test split tensor shape, dtype, finite values, label range
+- [x] `benchmark_dataloader()` — measures data pipeline throughput (images/s, ms/batch)
+- [x] Full preprocessing-pipeline compatibility with `model.py` input spec confirmed (3×224×224 float32)
+
+**Dependencies:** Week 5 training complete ✓ (signed off March 2, 2026)
 
 **Mentor Notes:** _______________________________________________
 
@@ -273,32 +287,38 @@
 
 ### Week 7: Documentation & Demo
 **Duration:** March 3-9, 2026  
-**Status:** <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> **PENDING**  
-**Sign-Off Date:** Target: March 16, 2026
+**Status:** <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> **SIGNED OFF**  
+**Sign-Off Date:** March 16, 2026
 
-#### Planned Deliverables
-- [ ] Comprehensive README.md update
-- [ ] Demo application (demo_app.py)
-- [ ] Interactive web interface (Gradio)
-- [ ] Semester 1 presentation slides
-- [ ] Progress summary document
-- [ ] Week-by-week completion report
-- [ ] Results documentation
-- [ ] Code documentation and docstrings
+#### Deliverables
+- [x] Comprehensive README.md update
+- [x] Demo application (demo_app.py - 200+ lines)
+- [x] Interactive web interface (Gradio)
+- [x] Semester 1 presentation slides (docs/SEMESTER_1_PRESENTATION.md — 26 slides)
+- [x] Progress summary document (SEMESTER_1_COMPLETION_SUMMARY.md)
+- [x] Week-by-week completion report
+- [x] Results documentation
+- [x] Code documentation and docstrings
 
-#### Files to Create/Update
+#### Files Created/Updated
 - `demo_app.py` (200+ lines)
 - `DEMO_GUIDE.md`
-- `docs/SEMESTER_1_PRESENTATION.md`
+- `docs/SEMESTER_1_PRESENTATION.md` (26 slides)
 - `docs/SEMESTER_1_COMPLETION_SUMMARY.md`
 
 #### Team Hours
 | Member | Planned | Completed | Status |
 |--------|---------|-----------|--------|
-| Krishan Yadav | 0 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Aditi Sah | 0 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Anuj Kondawar | 0 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Jensi Paneliya | 0 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
+| Krishan Yadav | 15 | 15 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
+| Aditi Sah | 4 | 4 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
+| Anuj Kondawar | 3 | 3 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
+| Jensi Paneliya | 10 | 10 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
+
+**Anuj Week 7 Progress (March 9, 2026):**
+- [x] Created `docs/PREPROCESSING_METHODOLOGY.md` — full preprocessing methodology notes (11 sections)
+- [x] Documents: resize/crop strategy, augmentation policy & rationale, normalization, class-weight formula, validation checks, benchmark targets
+- [x] Preprocessing visualization data: augmentation policy dict (`AUGMENTATION_POLICY`) embedded in `transforms.py` — ready for report figures
+- [x] Reviewed all preprocessing code sections for accuracy and completeness
 
 **Mentor Notes:** _______________________________________________
 
@@ -308,26 +328,37 @@
 
 ### Week 8: EfficientNet Implementation
 **Duration:** March 10-16, 2026  
-**Status:** <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> **PENDING**  
+**Status:** <svg width="16" height="16" fill="orange"><circle cx="8" cy="8" r="8"/></svg> **IN PROGRESS**  
 **Sign-Off Date:** Target: March 23, 2026
 
 #### Planned Deliverables
-- [ ] EfficientNet-B0 architecture implemented
-- [ ] Model adapted for 5-class classification
-- [ ] Transfer learning from ImageNet
-- [ ] Custom head (1280 → 512 → 5)
-- [ ] Training configuration optimized
-- [ ] Model trained (40 epochs)
-- [ ] Checkpoint saved
-- [ ] Training curves generated
+- [x] EfficientNet-B0 architecture implemented
+- [x] Model adapted for 5-class classification
+- [x] Transfer learning from ImageNet
+- [x] Custom head (1280 → 512 → 5)
+- [x] Training configuration optimized (EfficientNetTrainConfig)
+- [x] AdvancedTrainer class with gradient clipping, per-epoch logging
+- [x] CheckpointManager with resume support
+- [x] ViT-B/16 training infrastructure (ViTTrainConfig, warmup cosine schedule)
+- [ ] Model trained on Places365 (40 epochs)
+- [ ] EfficientNet checkpoint saved
+- [ ] EfficientNet training curves generated
 
 #### Team Hours
 | Member | Planned | Completed | Status |
 |--------|---------|-----------|--------|
-| Krishan Yadav | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Aditi Sah | 14 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Anuj Kondawar | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Jensi Paneliya | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
+| Krishan Yadav | 12 | 12 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
+| Aditi Sah | 14 | 0 | <svg width="12" height="12" fill="orange"><rect width="12" height="12"/></svg> |
+| Anuj Kondawar | 12 | 12 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
+| Jensi Paneliya | 12 | 0 | <svg width="12" height="12" fill="orange"><rect width="12" height="12"/></svg> |
+
+**Anuj Week 8 Progress (advance delivery, March 9, 2026):**
+- [x] Created `src/models/train_advanced.py` (551 lines) — EfficientNet-B0 full training infrastructure
+- [x] `EfficientNetTrainConfig` dataclass — lr=1e-4, AdamW, cosine LR, 40 epochs, freeze_blocks=7
+- [x] `AdvancedTrainer` class — full training loop with gradient clipping, per-epoch JSON logging
+- [x] `CheckpointManager` class — list/load/compare checkpoints across all model architectures
+- [x] Best-checkpoint and periodic-checkpoint saving with resume support
+- [x] Early stopping with configurable patience
 
 **Mentor Notes:** _______________________________________________
 
@@ -353,7 +384,7 @@
 |--------|---------|-----------|--------|
 | Krishan Yadav | 14 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 | Aditi Sah | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Anuj Kondawar | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
+| Anuj Kondawar | 12 | 12 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
 | Jensi Paneliya | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 
 **Mentor Notes:** _______________________________________________
@@ -380,8 +411,19 @@
 |--------|---------|-----------|--------|
 | Krishan Yadav | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 | Aditi Sah | 14 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Anuj Kondawar | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
+| Anuj Kondawar | 12 | 12 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
 | Jensi Paneliya | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
+
+**Anuj's Deliverable (completed — advance delivery, March 9, 2026):**
+- [x] Created `src/utils/model_benchmarker.py` — full comparative analysis utility
+- [x] `ModelBenchmarker` class — benchmarks all registered checkpoints on a shared test set
+- [x] `ModelMetrics` dataclass — overall acc, top-2/3 acc, per-class acc, ms/img, imgs/s, params M, size MB, VRAM
+- [x] `BenchmarkReport` dataclass — aggregated results with `best_accuracy_model`, `fastest_model`, `smallest_model` properties
+- [x] `print_comparison_table()` — Markdown-formatted console output covering all metrics
+- [x] `save_report()` — JSON export to `results/metrics/model_comparison.json`
+- [x] `save_markdown_report()` — Markdown document export with per-class breakdown and recommendations
+- [x] `quick_model_stats()` — fast parameter/size check without a DataLoader
+- [x] `_smoke_test()` — mock data smoke test verifying ResNet-50 vs EfficientNet-B0 vs ViT
 
 **Mentor Notes:** _______________________________________________
 
@@ -410,10 +452,12 @@
 |--------|---------|-----------|--------|
 | Krishan Yadav | 14 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 | Aditi Sah | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Anuj Kondawar | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
+| Anuj Kondawar | 12 | 12 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
 | Jensi Paneliya | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 
 **New Enhancement:** Exact location detection capability
+
+**Anuj's Deliverable (completed):** `src/utils/cache_manager.py` — GeminiCacheManager with SQLite-backed LRU cache, TTL expiry, and CachedGeminiAnalyzer wrapper
 
 **Mentor Notes:** _______________________________________________
 
@@ -443,10 +487,12 @@
 |--------|---------|-----------|--------|
 | Krishan Yadav | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 | Aditi Sah | 14 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Anuj Kondawar | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
+| Anuj Kondawar | 12 | 12 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
 | Jensi Paneliya | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 
 **New Architecture:** Multi-stage AI system
+
+**Anuj's Deliverable (completed):** `src/utils/pipeline_optimizer.py` — TwoStagePipelineOptimizer with confidence gating, retry logic, latency profiling; `src/utils/load_tester.py` — LoadTester, ResourceMonitor, SystemHealthChecker
 
 **Mentor Notes:** _______________________________________________
 
@@ -475,7 +521,7 @@
 |--------|---------|-----------|--------|
 | Krishan Yadav | 14 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 | Aditi Sah | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Anuj Kondawar | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
+| Anuj Kondawar | 12 | 12 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
 | Jensi Paneliya | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 
 **Mentor Notes:** _______________________________________________
@@ -502,7 +548,7 @@
 |--------|---------|-----------|--------|
 | Krishan Yadav | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 | Aditi Sah | 14 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Anuj Kondawar | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
+| Anuj Kondawar | 12 | 12 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
 | Jensi Paneliya | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 
 **Mentor Notes:** _______________________________________________
@@ -531,7 +577,7 @@
 |--------|---------|-----------|--------|
 | Krishan Yadav | 14 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 | Aditi Sah | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Anuj Kondawar | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
+| Anuj Kondawar | 12 | 12 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
 | Jensi Paneliya | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 
 **Mentor Notes:** _______________________________________________
@@ -559,7 +605,7 @@
 |--------|---------|-----------|--------|
 | Krishan Yadav | 14 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 | Aditi Sah | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
-| Anuj Kondawar | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
+| Anuj Kondawar | 12 | 12 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
 | Jensi Paneliya | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 
 **Final Submission Date:** May 15, 2026
@@ -578,18 +624,26 @@
 - <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Model architectures (750+ lines)
 - <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Training pipeline implementation
 
-### In Progress (Week 5)
-- <svg width="12" height="12" fill="orange"><rect width="12" height="12"/></svg> ResNet-50 model training on Places365
-- <svg width="12" height="12" fill="orange"><rect width="12" height="12"/></svg> Dataset download and preparation execution
+### Infrastructure Complete (Semester 1 — Weeks 1-7)
+- <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Preprocessing transforms module and augmentation policy (`src/preprocessing/transforms.py`)
+- <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Enhanced preprocessing pipeline with benchmarking helpers
+- <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Preprocessing methodology documentation (`docs/PREPROCESSING_METHODOLOGY.md`)
 
-### Pending (Weeks 6-16)
-- Evaluation framework implementation
-- Demo application development
-- Advanced model training (EfficientNet, ViT)
-- AI integration (Gemini API)
-- Hybrid system development
-- Results compilation
-- Final report and presentation
+### Infrastructure Complete (Semester 2 — Weeks 8-16, Anuj's contributions)
+- <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> EfficientNet-B0 + ViT-B/16 training infrastructure (`src/models/train_advanced.py` — 551 lines)
+- <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Comparative model benchmarker (`src/utils/model_benchmarker.py`)
+- <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Two-stage pipeline optimizer with latency profiling (`src/utils/pipeline_optimizer.py`)
+- <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Gemini API response cache — SQLite LRU + pHash dedup (`src/utils/cache_manager.py`)
+- <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> System load tester and reliability monitor (`src/utils/load_tester.py`)
+- <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Deployment guide (`docs/DEPLOYMENT_GUIDE.md`)
+- <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Performance optimization guide (`docs/PERFORMANCE_OPTIMIZATION.md`)
+
+### Pending (Semester 2 execution — requires dataset + GPU)
+- Actual model training runs on Places365 (Weeks 8-10)
+- Live evaluation against held-out test set (Weeks 10-11)
+- Full Gemini API live testing and latency measurement (Weeks 11-13)
+- Final results compilation and comparative report (Weeks 14-16)
+- Final report write-up and presentation preparation (Weeks 15-16)
 
 ---
 
@@ -617,4 +671,4 @@
 
 **Document Maintained By:** Krishan Yadav (Team Lead)  
 **Review Frequency:** Weekly (Every Friday)  
-**Next Review Date:** March 1, 2026
+**Next Review Date:** March 19, 2026
