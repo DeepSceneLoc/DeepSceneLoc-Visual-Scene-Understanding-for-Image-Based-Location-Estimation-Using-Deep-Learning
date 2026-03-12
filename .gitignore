@@ -44,7 +44,8 @@ data/downloads/
 *.tar.gz
 *.h5
 *.hdf5
-
+/dataset
+/data
 # Models (too large for git)
 models/checkpoints/
 models/pretrained/

@@ -20,6 +20,7 @@ Usage:
 """
 
 import argparse
+import itertools
 import json
 import os
 import shutil
@@ -211,11 +212,21 @@ def organise_images(
     # Per-category destination dirs
     for cat in LOCATION_MAPPING:
         (output_dir / cat).mkdir(exist_ok=True)
+        counters[cat] = len(list((output_dir / cat).glob("*.jpg")))
+
+    if any(counters[cat] > 0 for cat in LOCATION_MAPPING):
+        print("  Resuming organisation from existing output directory ...")
+        for cat in LOCATION_MAPPING:
+            print(f"    {cat:<12}: {counters[cat]:,} existing images")
 
     # Walk raw_dir recursively — each leaf directory IS the Places365 category
     print(f"\n  Organising images from {raw_dir} ...")
-    for img_path in tqdm(list(raw_dir.rglob("*.jpg")) + list(raw_dir.rglob("*.png")),
-                         desc="Mapping images"):
+    image_iter = itertools.chain(
+        raw_dir.rglob("*.jpg"),
+        raw_dir.rglob("*.jpeg"),
+        raw_dir.rglob("*.png"),
+    )
+    for img_path in tqdm(image_iter, desc="Mapping images"):
         # Derive category from parent folder name
         places_cat = img_path.parent.name
         loc_cat = _map_places365_label(places_cat)
@@ -229,10 +240,11 @@ def organise_images(
             skipped += 1
             continue
 
-        dest = output_dir / loc_cat / img_path.name
-        # If a name collision, prefix with parent dir
+        dest = output_dir / loc_cat / f"{img_path.parent.name}_{img_path.name}"
+
+        # Safe to re-run while extraction is still in progress.
         if dest.exists():
-            dest = output_dir / loc_cat / f"{img_path.parent.name}_{img_path.name}"
+            continue
 
         shutil.copy2(img_path, dest)
         counters[loc_cat] += 1
