@@ -50,30 +50,40 @@ def parse_args():
     p.add_argument("--lr",      type=float, default=0.001)
     p.add_argument("--workers", type=int,   default=4,
                    help="DataLoader workers (set 0 on Windows if you hit spawn errors)")
+    p.add_argument("--patience", type=int, default=5,
+                   help="Early stopping patience in epochs (set <=0 to disable)")
+    p.add_argument("--min-delta", type=float, default=0.001,
+                   help="Minimum val accuracy improvement for early stopping")
     p.add_argument("--no-aug",  action="store_true", help="Disable training augmentation")
     p.add_argument("--resume",  default=None,          help="Path to checkpoint .pth to resume from")
     p.add_argument("--dry-run", action="store_true",   help="5-batch smoke-test, no checkpointing")
     p.add_argument("--eval-only", action="store_true", help="Skip training, only evaluate best_model.pth")
+    p.add_argument("--allow-cpu", action="store_true",
+                   help="Allow CPU execution when CUDA is unavailable (disabled by default)")
     return p.parse_args()
 
 
 # - Device -
-def get_device() -> torch.device:
+def get_device(allow_cpu: bool = False) -> torch.device:
     if torch.cuda.is_available():
         dev = torch.device("cuda")
         name = torch.cuda.get_device_name(0)
         vram = torch.cuda.get_device_properties(0).total_memory / 1024**3
         print(f"  GPU : {name}  ({vram:.1f} GB VRAM)")
     else:
+        if not allow_cpu:
+            print("ERROR: CUDA is not available. GPU-only training is enforced by default.")
+            print("       Use --allow-cpu only for debugging/smoke tests.")
+            sys.exit(1)
         dev = torch.device("cpu")
-        print("  GPU : not available - training on CPU (will be slow)")
+        print("  GPU : not available - training on CPU (override enabled)")
     return dev
 
 
 # - Main -
 def main():
     args = parse_args()
-    device = get_device()
+    device = get_device(allow_cpu=args.allow_cpu)
 
     CLASS_NAMES = ["Coastal", "Forest", "Mountain", "Rural", "Urban"]
     NUM_CLASSES = len(CLASS_NAMES)
@@ -90,6 +100,8 @@ def main():
     print(f"  Batch   : {args.batch}")
     print(f"  LR      : {args.lr}")
     print(f"  Workers : {args.workers}")
+    print(f"  Patience: {args.patience}")
+    print(f"  MinDelta: {args.min_delta}")
     print(f"  Device  : {device}")
     print(f"  Results : {RESULTS_DIR}")
     print(f"  Dry-run : {args.dry_run}")
@@ -198,7 +210,12 @@ def main():
         _patch_trainer_dry_run(trainer, max_batches=5)
 
     num_epochs = max(1, args.epochs - (start_epoch - 1))
-    trainer.train(num_epochs=num_epochs, save_frequency=5)
+    trainer.train(
+        num_epochs=num_epochs,
+        save_frequency=5,
+        early_stopping_patience=args.patience if args.patience > 0 else None,
+        early_stopping_min_delta=args.min_delta,
+    )
 
     # - Post-training evaluation -
     if not args.dry_run:

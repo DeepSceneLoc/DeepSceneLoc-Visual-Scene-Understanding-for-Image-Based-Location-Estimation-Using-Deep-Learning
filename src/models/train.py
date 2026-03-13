@@ -71,6 +71,7 @@ class Trainer:
         
         self.best_val_acc = 0.0
         self.best_epoch = 0
+        self.epochs_no_improve = 0
     
     def train_epoch(self, epoch: int) -> Tuple[float, float]:
         """Train for one epoch"""
@@ -144,13 +145,24 @@ class Trainer:
         
         return epoch_loss, epoch_acc
     
-    def train(self, num_epochs: int, save_frequency: int = 5):
+    def train(
+        self,
+        num_epochs: int,
+        save_frequency: int = 5,
+        early_stopping_patience: Optional[int] = None,
+        early_stopping_min_delta: float = 0.0,
+    ):
         """
         Train the model
         
         Args:
             num_epochs: Number of epochs to train
             save_frequency: Save checkpoint every N epochs
+            early_stopping_patience: Stop if validation accuracy does not improve
+                by at least ``early_stopping_min_delta`` for this many epochs.
+                If None, early stopping is disabled.
+            early_stopping_min_delta: Minimum validation accuracy improvement
+                required to reset patience counter.
         """
         print("="*60)
         print("Starting Training")
@@ -191,15 +203,29 @@ class Trainer:
             print(f"  LR: {current_lr:.6f}")
             
             # Save best model
-            if val_acc > self.best_val_acc:
+            if val_acc > (self.best_val_acc + early_stopping_min_delta):
                 self.best_val_acc = val_acc
                 self.best_epoch = epoch
+                self.epochs_no_improve = 0
                 self.save_checkpoint(epoch, is_best=True)
                 print(f"  [OK] Best model saved (Val Acc: {val_acc:.2f}%)")
+            else:
+                self.epochs_no_improve += 1
             
             # Save periodic checkpoint
             if epoch % save_frequency == 0:
                 self.save_checkpoint(epoch, is_best=False)
+
+            if (
+                early_stopping_patience is not None
+                and self.epochs_no_improve >= early_stopping_patience
+            ):
+                print(
+                    f"  [STOP] Early stopping triggered after {self.epochs_no_improve} "
+                    f"epochs without val improvement >= {early_stopping_min_delta:.4f}."
+                )
+                print("-"*60)
+                break
             
             print("-"*60)
         
