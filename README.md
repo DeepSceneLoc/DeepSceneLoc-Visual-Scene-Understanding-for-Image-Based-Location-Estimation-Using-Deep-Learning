@@ -397,3 +397,24 @@ This is an academic project developed by a dedicated team. For questions or coll
 ---
 
 **Last Updated:** February 26, 2026 | **Version:** 1.0.0 (Semester 1 Complete)
+
+## Model Sharing
+
+We have shared the trained models for DeepSceneLoc on the following platforms:
+
+1. **Google Drive**: [Download Link](#)
+2. **Hugging Face Hub**: [Model Repository](#)
+3. **Amazon S3**: [S3 URL](#)
+4. **GitHub Releases**: [Release Page](#)
+
+### Loading the Model
+
+To load the trained model:
+```python
+import torch
+from models.model import DeepSceneLocResNet50
+
+model = DeepSceneLocResNet50(num_classes=5)
+model.load_state_dict(torch.load("best_model.pth"))
+model.eval()
+```
