@@ -20,6 +20,7 @@ Usage:
 import argparse
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import torch
@@ -78,7 +79,8 @@ def main():
     NUM_CLASSES = len(CLASS_NAMES)
     CHECKPOINT_DIR = "models/checkpoints"
     LOG_DIR = "logs"
-    RESULTS_DIR = "results"
+    RUN_TIMESTAMP = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    RESULTS_DIR = f"results/{RUN_TIMESTAMP}"
 
     print("\n" + "=" * 60)
     print("DeepSceneLoc - ResNet-50 Training")
@@ -89,6 +91,7 @@ def main():
     print(f"  LR      : {args.lr}")
     print(f"  Workers : {args.workers}")
     print(f"  Device  : {device}")
+    print(f"  Results : {RESULTS_DIR}")
     print(f"  Dry-run : {args.dry_run}")
     print("=" * 60 + "\n")
 
