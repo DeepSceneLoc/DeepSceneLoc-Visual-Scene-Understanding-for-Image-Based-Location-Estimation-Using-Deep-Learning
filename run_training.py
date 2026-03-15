@@ -187,6 +187,7 @@ def main():
         ckpt = torch.load(args.resume, map_location=device)
         if "optimizer_state_dict" in ckpt:
             optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+            _move_optimizer_state_to_device(optimizer, device)
         if "scheduler_state_dict" in ckpt:
             scheduler.load_state_dict(ckpt["scheduler_state_dict"])
 
@@ -212,6 +213,7 @@ def main():
     num_epochs = max(1, args.epochs - (start_epoch - 1))
     trainer.train(
         num_epochs=num_epochs,
+        start_epoch=start_epoch,
         save_frequency=5,
         early_stopping_patience=args.patience if args.patience > 0 else None,
         early_stopping_min_delta=args.min_delta,
@@ -256,6 +258,14 @@ def _run_evaluation(model, test_loader, class_names, device, results_dir, log_di
         history_path=str(history_path),
         output_dir=str(Path(results_dir) / "visualizations"),
     )
+
+
+def _move_optimizer_state_to_device(optimizer, device):
+    """Move any tensor-valued optimizer state onto the active device after resume."""
+    for state in optimizer.state.values():
+        for key, value in state.items():
+            if torch.is_tensor(value):
+                state[key] = value.to(device)
 
 
 def _patch_trainer_dry_run(trainer: "Trainer", max_batches: int = 5):

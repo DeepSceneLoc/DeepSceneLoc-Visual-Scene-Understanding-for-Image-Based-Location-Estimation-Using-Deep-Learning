@@ -148,6 +148,7 @@ class Trainer:
     def train(
         self,
         num_epochs: int,
+        start_epoch: int = 1,
         save_frequency: int = 5,
         early_stopping_patience: Optional[int] = None,
         early_stopping_min_delta: float = 0.0,
@@ -157,6 +158,7 @@ class Trainer:
         
         Args:
             num_epochs: Number of epochs to train
+            start_epoch: Epoch number to start from when resuming
             save_frequency: Save checkpoint every N epochs
             early_stopping_patience: Stop if validation accuracy does not improve
                 by at least ``early_stopping_min_delta`` for this many epochs.
@@ -168,14 +170,15 @@ class Trainer:
         print("Starting Training")
         print("="*60)
         print(f"Device: {self.device}")
-        print(f"Epochs: {num_epochs}")
+        print(f"Epochs: {start_epoch} to {start_epoch + num_epochs - 1}")
         print(f"Train batches: {len(self.train_loader)}")
         print(f"Val batches: {len(self.val_loader)}")
         print("="*60)
         
         start_time = time.time()
         
-        for epoch in range(1, num_epochs + 1):
+        end_epoch = start_epoch + num_epochs
+        for epoch in range(start_epoch, end_epoch):
             # Train
             train_loss, train_acc = self.train_epoch(epoch)
             
@@ -197,7 +200,7 @@ class Trainer:
             self.history['lr'].append(current_lr)
             
             # Print epoch summary
-            print(f"\nEpoch {epoch}/{num_epochs}")
+            print(f"\nEpoch {epoch}/{end_epoch - 1}")
             print(f"  Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%")
             print(f"  Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%")
             print(f"  LR: {current_lr:.6f}")
