@@ -27,6 +27,7 @@ import shutil
 import subprocess
 import sys
 import tarfile
+import time
 import zipfile
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -246,7 +247,23 @@ def organise_images(
         if dest.exists():
             continue
 
-        shutil.copy2(img_path, dest)
+        # Large extractions on Windows can briefly lock files (AV/indexer).
+        # Retry a few times instead of aborting the whole full-data pipeline.
+        copied = False
+        for attempt in range(5):
+            try:
+                shutil.copy2(img_path, dest)
+                copied = True
+                break
+            except PermissionError:
+                if attempt == 4:
+                    break
+                time.sleep(0.2 * (attempt + 1))
+
+        if not copied:
+            skipped += 1
+            continue
+
         counters[loc_cat] += 1
 
     # Save stats
