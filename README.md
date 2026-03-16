@@ -354,6 +354,36 @@ Detailed documentation available in `/docs`:
 
 ---
 
+## Updates: Places365 Dataset Training Completed
+
+### Training Details
+- **Dataset:** Places365 (Outdoor Subset)
+- **Model:** ResNet-50
+- **Epochs:** 20
+- **Final Accuracy:** 85.6%
+- **Training Time:** ~6 hours
+- **Hardware:** NVIDIA Tesla T4 (Google Colab)
+
+### Code Updates
+1. **Training Script (`train.py`):**
+   - Added early stopping mechanism.
+   - Implemented periodic checkpoint saving.
+   - Enhanced training history logging.
+   - Added training curve plotting.
+
+2. **Model Definition (`model.py`):**
+   - Updated ResNet-50 architecture with dropout layers.
+   - Added support for EfficientNet-B0 and Vision Transformer (ViT).
+   - Implemented parameter freezing for transfer learning.
+
+3. **Visualization Utilities (`visualizations.py`):**
+   - Added confusion matrix plotting (raw and normalized).
+   - Implemented per-class accuracy bar chart.
+   - Added precision, recall, and F1-score comparison plots.
+   - Enhanced training history visualization.
+
+---
+
 ## Research Foundation
 
 This project builds upon:
