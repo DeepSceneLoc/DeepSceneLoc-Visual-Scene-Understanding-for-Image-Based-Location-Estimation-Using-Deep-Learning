@@ -352,6 +352,82 @@
 
 ---
 
+## Week 8: Training Continuation
+**Duration:** March 8-14, 2026
+**Status:** [x] In Progress
+
+### Deliverables Checklist
+
+#### Krishan Yadav (10 hours planned)
+- [x] Fix optimizer state device mismatch issue.
+- [x] Resume training from checkpoint.
+- [x] Monitor live training progress.
+- [ ] Analyze training metrics.
+
+**Hours Completed:** 6/10 | **Blockers:** None
+
+#### Aditi Sah (6 hours planned)
+- [x] Verify training data integrity.
+- [x] Assist in monitoring training progress.
+- [ ] Document training updates.
+
+**Hours Completed:** 4/6 | **Blockers:** None
+
+#### Anuj Kondawar (6 hours planned)
+- [x] Verify preprocessing pipeline stability.
+- [x] Ensure data augmentation consistency.
+- [ ] Support training monitoring.
+
+**Hours Completed:** 4/6 | **Blockers:** None
+
+#### Jensi Paneliya (6 hours planned)
+- [x] Update documentation with training progress.
+- [ ] Assist in analyzing training metrics.
+- [ ] Prepare updated visualizations.
+
+**Hours Completed:** 2/6 | **Blockers:** None
+
+---
+
+## Week 9: Places365 Training Completion
+**Duration:** March 15-21, 2026
+**Status:** [x] Complete
+
+### Deliverables Checklist
+
+#### Krishan Yadav (12 hours planned)
+- [x] Finalize training on Places365 dataset.
+- [x] Save best model checkpoint.
+- [x] Generate training history plots.
+- [x] Document training details.
+
+**Hours Completed:** 12/12 | **Blockers:** None
+
+#### Aditi Sah (8 hours planned)
+- [x] Verify training data integrity.
+- [x] Assist in generating evaluation metrics.
+- [x] Review training history plots.
+- [x] Document evaluation results.
+
+**Hours Completed:** 8/8 | **Blockers:** None
+
+#### Anuj Kondawar (6 hours planned)
+- [x] Verify preprocessing pipeline consistency.
+- [x] Ensure data augmentation quality.
+- [x] Support training monitoring.
+- [x] Document preprocessing updates.
+
+**Hours Completed:** 6/6 | **Blockers:** None
+
+#### Jensi Paneliya (6 hours planned)
+- [x] Create visualizations for evaluation metrics.
+- [x] Update documentation with training progress.
+- [x] Assist in preparing final report.
+
+**Hours Completed:** 6/6 | **Blockers:** None
+
+---
+
 ## Quick Reference - Weekly Status
 
 | Week | Focus Area | Lead | Status |
@@ -363,6 +439,8 @@
 | 5 | Model Training | Krishan | [x] Complete |
 | 6 | Evaluation & Analysis | Krishan | [x] Complete |
 | 7 | Documentation | Jensi | [x] Complete |
+| 8 | Training Continuation | All | [x] In Progress |
+| 9 | Places365 Training Completion | All | [x] Complete |
 
 ---
 

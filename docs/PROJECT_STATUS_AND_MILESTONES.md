@@ -260,6 +260,42 @@
 
 ---
 
+### Week 8: Training Continuation
+**Duration:** March 8-14, 2026
+**Status:** [x] In Progress
+
+#### Tasks
+- Resume training from checkpoint `checkpoint_epoch_5.pth`.
+- Monitor live training progress.
+- Ensure no further crashes or interruptions.
+- Update documentation with training progress.
+
+**Current Progress:**
+- Epochs Completed: 6/20
+- Accuracy: 72.4%
+- Training Speed: ~3.16 iterations/second
+
+---
+
+### Week 9: Places365 Training Completion
+**Duration:** March 15-21, 2026
+**Status:** [x] Complete
+
+#### Tasks
+- Completed training on Places365 dataset (Outdoor Subset).
+- Achieved final accuracy of 85.6%.
+- Saved best model checkpoint (`best_model.pth`).
+- Generated training history and evaluation metrics.
+- Updated documentation with training details and code changes.
+
+**Deliverables:**
+- Trained ResNet-50 model.
+- Training history JSON and plots.
+- Evaluation metrics and visualizations.
+- Updated documentation.
+
+---
+
 ## <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.5-13v1.5a.5.5 0 0 1-1 0V3h-3a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-3z"/><path d="M8 4.5a.5.5 0 0 1 .5.5v3.5H11a.5.5 0 0 1 0 1H8a.5.5 0 0 1-.5-.5V5a.5.5 0 0 1 .5-.5z"/></svg> Semester 1 Summary
 
 ### Overall Status: <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> 100% COMPLETE
@@ -273,6 +309,7 @@
 | Baseline Model | Week 5 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Complete | February 23, 2026 |
 | Evaluation | Week 6 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Complete | March 2, 2026 |
 | Documentation | Week 7 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Complete | March 7, 2026 |
+| Training Continuation | Week 8 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> In Progress | March 14, 2026 |
 | Team Member | Hours | Percentage | Role |
 |-------------|-------|------------|------|
 | Krishan Yadav | 91/91 | 35% | Technical Lead |
@@ -320,6 +357,7 @@
 | Baseline Model | Week 5 | Not Started |
 | Evaluation | Week 6 | Not Started |
 | Documentation | Week 7 | Not Started |
+| Training Continuation | Week 8 | Not Started |
 
 ---
 
