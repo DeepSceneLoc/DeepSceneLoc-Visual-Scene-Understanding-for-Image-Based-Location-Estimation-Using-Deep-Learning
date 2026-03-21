@@ -1,0 +1,122 @@
+\chapter{Methodology}
+
+\section{Methodological Overview}
+The adopted methodology follows a standard supervised deep-learning workflow: dataset preparation, preprocessing, transfer learning, optimization, and multi-metric evaluation.
+
+\section{Dataset Preparation}
+Images are prepared using project scripts that map source scene categories into five target classes. The processed dataset is organized into train, validation, and test splits to avoid leakage and to ensure fair performance estimation.
+
+\subsection{Split Statistics Used in Baseline Runs}
+The project split file records a balanced benchmark split for deterministic evaluation. Table \ref{tab:split-stats} summarizes the latest available counts.
+
+\begin{table}[htbp]
+\centering
+\caption{Processed dataset split statistics (balanced benchmark subset)}
+\label{tab:split-stats}
+\begin{tabular}{lcccccc}
+\toprule
+Split & Coastal & Forest & Mountain & Rural & Urban & Total \\
+\midrule
+Train & 70 & 70 & 70 & 70 & 70 & 350 \\
+Validation & 15 & 15 & 15 & 15 & 15 & 75 \\
+Test & 15 & 15 & 15 & 15 & 15 & 75 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Target Classes}
+\begin{itemize}
+\item Coastal
+\item Forest
+\item Mountain
+\item Rural
+\item Urban
+\end{itemize}
+
+\section{Preprocessing and Augmentation}
+The image pipeline uses:
+\begin{itemize}
+\item resizing to 224\,$\times$\,224,
+\item tensor normalization using ImageNet mean and standard deviation,
+\item augmentation for training samples (random transformations and color perturbation).
+\end{itemize}
+
+These operations improve robustness to viewpoint and illumination variance.
+
+\subsection{Rationale for Chosen Transformations}
+Transformation design was selected to preserve scene semantics while improving generalization. Resizing standardizes tensor dimensions for pretrained backbones. Normalization aligns feature scale with ImageNet initialization statistics, reducing early optimization instability. Augmentation is intentionally moderate to avoid synthetic artifacts that could distort class boundaries in a five-class taxonomy [6, 8].
+
+\section{Model Training Strategy}
+\subsection{Transfer Learning Setup}
+ResNet-50 pretrained weights are used as initialization. The final classification layer is replaced to produce five output logits [8].
+
+\subsection{Objective Function}
+Given class logits $z_i$, predicted probability $p_i$ for class $i$ is:
+\begin{equation}
+p_i = \frac{e^{z_i}}{\sum_{j=1}^{C} e^{z_j}}
+\end{equation}
+
+The training objective is cross-entropy loss:
+\begin{equation}
+L_{CE} = -\sum_{i=1}^{C} y_i \log(p_i)
+\end{equation}
+where $y_i$ is one-hot ground truth and $C=5$ classes.
+
+\subsection{Optimization}
+An adaptive optimizer with learning-rate scheduling is used. Logged training history indicates an initial learning rate of $10^{-3}$, followed by scheduled reductions to stabilize convergence.
+
+\subsection{Checkpoint and Selection Policy}
+Model selection uses validation behavior rather than training loss alone. Checkpointing strategy preserves best-performing states so that final evaluation reflects generalization quality. This policy reduces the risk of choosing overfitted late-epoch weights and supports transparent model provenance.
+
+\section{Evaluation Protocol}
+The trained model is evaluated on a held-out test set of 1500 images. The following metrics are computed:
+\begin{itemize}
+\item Overall accuracy,
+\item Macro precision,
+\item Macro recall,
+\item Macro F1-score,
+\item Per-class metrics,
+\item Confusion matrix.
+\end{itemize}
+
+Definitions:
+\begin{equation}
+\text{Precision} = \frac{TP}{TP+FP}, \quad
+\text{Recall} = \frac{TP}{TP+FN}
+\end{equation}
+
+\begin{equation}
+F1 = 2\cdot\frac{\text{Precision}\cdot\text{Recall}}{\text{Precision}+\text{Recall}}
+\end{equation}
+
+\subsection{Error Taxonomy Used in Analysis}
+Errors are categorized into:
+\begin{itemize}
+\item \textbf{adjacent-semantic errors} (e.g., Mountain vs Coastal),
+\item \textbf{structure-overlap errors} (e.g., Urban vs Mountain settlements),
+\item \textbf{context-dominance errors} (dominant region differs from true label intent).
+\end{itemize}
+
+This taxonomy transforms confusion results into actionable engineering tasks rather than static tables.
+
+\section{Reproducibility Measures}
+Reproducibility is supported through fixed directory structure, explicit split metadata, training-history logs, and model checkpoint storage.
+
+\section{Execution Mapping Across Minor Project Weeks}
+The implemented workflow aligns with the seven-week minor project cycle:
+\begin{itemize}
+\item Week 1-2: problem framing, literature consolidation, and requirement definition.
+\item Week 3: data preparation scripts and category mapping.
+\item Week 4: preprocessing pipeline and split generation.
+\item Week 5: baseline model setup and training infrastructure.
+\item Week 6: evaluation module, metrics export, and confusion analysis.
+\item Week 7: documentation, demo stabilization, and report consolidation.
+\end{itemize}
+
+\section{Methodological Justification}
+The selected methodology balances performance and feasibility for the minor project timeline. Transfer learning minimizes compute demand while delivering strong semantic classification quality that can support next-stage geolocation refinement.
+
+From a research-method standpoint, the methodology is designed to remain extensible. It can support ablation studies on augmentation strength, freeze-depth policy, scheduler selection, and confidence calibration without changing core data contracts. This forward compatibility is essential for semester-to-semester continuity and for producing defensible comparative findings.
+
+\section{Chapter Summary}
+The methodology provides a complete and reproducible process from raw data to quantitative evaluation, enabling objective assessment of Stage 1 system readiness.

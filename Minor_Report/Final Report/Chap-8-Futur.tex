@@ -1,0 +1,66 @@
+\chapter{Future Work}
+
+\section{Stage 2 Goal}
+The next phase of DeepSceneLoc aims to move from scene-level context prediction to exact-location inference, including landmark, city, and country estimation from a single image.
+
+\section{Planned Technical Extensions}
+\subsection{Hybrid Location Reasoning}
+Scene probabilities from Stage 1 will be used as priors for Stage 2 location inference, reducing search space and improving consistency of final predictions.
+
+\subsection{Model Upgrades}
+Future experiments will include EfficientNet and Vision Transformer variants to evaluate gains in global-context understanding and class boundary separation.
+
+\subsection{Confidence Calibration}
+Calibration techniques such as temperature scaling will be investigated to improve reliability of probability outputs before cross-module integration.
+
+\subsection{Data Expansion}
+Dataset diversity will be increased with additional geographic regions and seasonal variation to improve domain robustness.
+
+\subsection{Embedding-Space Analysis}
+Future work will include embedding-space diagnostics (for example, PCA and t-SNE projections) to inspect class separability and identify persistent overlap zones. This analysis will guide targeted data augmentation and hard-sample mining.
+
+\subsection{Top-$k$ Reliability Analysis}
+Because location reasoning is inherently uncertain, top-$k$ scene reliability will be evaluated alongside top-1 accuracy. This helps Stage 2 consume richer priors and reduce brittle dependence on a single label.
+
+\section{Deployment and Usability Enhancements}
+\begin{itemize}
+\item Optimize inference latency for near real-time usage.
+\item Enhance demo interface with top-$k$ suggestions and uncertainty indicators.
+\item Add automated report generation for experiment runs.
+\end{itemize}
+
+\section{Validation Plan}
+Validation in Stage 2 will include:
+\begin{itemize}
+\item city-level and country-level accuracy,
+\item confidence-weighted correctness analysis,
+\item ablation studies for stage wise contribution.
+\end{itemize}
+
+Validation will also include confidence-calibration curves, error-bucket analysis by ambiguity type, and controlled robustness tests across lighting/weather variants.
+
+\section{Risks and Mitigation}
+\begin{itemize}
+\item \textbf{Risk:} limited exact-location ground truth.
+\item \textbf{Mitigation:} phased benchmarking at region/city granularity.
+\item \textbf{Risk:} API dependency and cost variability.
+\item \textbf{Mitigation:} cached inference and controlled evaluation batches.
+\item \textbf{Risk:} increased compute demand for transformer training.
+\item \textbf{Mitigation:} transfer-learning schedules and selective fine-tuning.
+\end{itemize}
+
+\section{Expected Outcome}
+The extended system is expected to deliver a practical hybrid geolocation framework where semantic understanding and exact-location reasoning operate as a cohesive, interpretable pipeline.
+
+\section{Milestone-Oriented Execution Plan}
+The Stage 2 execution plan is organized into measurable milestones:
+\begin{itemize}
+\item \textbf{Milestone 1:} complete EfficientNet-B0 and ViT benchmark runs with consistent split policy.
+\item \textbf{Milestone 2:} integrate confidence calibration and top-$k$ reliability reporting.
+\item \textbf{Milestone 3:} implement and validate location-reasoning API pipeline.
+\item \textbf{Milestone 4:} produce end to end evaluation with city/country-level scoring.
+\item \textbf{Milestone 5:} finalize dissertation-grade documentation and viva artifacts.
+\end{itemize}
+
+This milestone framing ensures that future work remains auditable and aligned with both academic deadlines and technical quality targets.
+

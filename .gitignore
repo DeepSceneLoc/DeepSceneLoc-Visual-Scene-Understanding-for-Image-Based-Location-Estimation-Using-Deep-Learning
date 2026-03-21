@@ -79,3 +79,39 @@ temp/
 tmp/
 *.tmp
 report_archive/
+.tmp_docx_extract/
+.gradio/
+
+# Python and tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Generic LaTeX artifacts anywhere in repo
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.synctex.gz
+*.toc
+*.xwm
+*.nav
+*.snm
+
+# LaTeX build artifacts (Final Report)
+Minor_Report/Final Report/*.aux
+Minor_Report/Final Report/*.bbl
+Minor_Report/Final Report/*.blg
+Minor_Report/Final Report/*.fdb_latexmk
+Minor_Report/Final Report/*.fls
+Minor_Report/Final Report/*.lof
+Minor_Report/Final Report/*.log
+Minor_Report/Final Report/*.lot
+Minor_Report/Final Report/*.out
+Minor_Report/Final Report/*.synctex.gz
+Minor_Report/Final Report/*.toc
+Minor_Report/Final Report/*.xwm
