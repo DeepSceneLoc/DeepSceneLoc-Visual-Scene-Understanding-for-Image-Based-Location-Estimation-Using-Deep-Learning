@@ -1,0 +1,13 @@
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+Image-based location estimation is a challenging task when metadata such as GPS and EXIF tags are unavailable, noisy, or intentionally removed. This report presents \textbf{DeepSceneLoc}, a deep learning framework that infers location context directly from image content. The project is structured as a two-stage system: Stage 1 performs semantic scene classification, and Stage 2 is designed for exact location refinement using external AI assistance.
+
+In the minor project phase, Stage 1 has been implemented and validated for five scene categories: Urban, Rural, Coastal, Mountain, and Forest. A transfer-learning pipeline based on ResNet-50 was trained on a processed Places365 subset with standard preprocessing (224\,$\times$\,224 resizing, normalization, and augmentation). The training process used an adaptive optimizer, learning-rate scheduling, and checkpoint-based model selection to ensure stable convergence.
+
+Experimental evaluation on 1500 test images achieved an overall accuracy of \textbf{92.33\%}, macro precision of \textbf{0.9245}, macro recall of \textbf{0.9233}, and macro F1-score of \textbf{0.9237}. Class wise analysis shows highest recognition performance for Rural and Forest classes, while most errors occur between visually similar Mountain, Coastal, and Urban scenes. The confusion matrix and per-class metrics confirm that scene semantics provide a reliable first-stage signal for location reasoning.
+
+The developed pipeline, documented metrics, and visualization outputs establish a reproducible baseline for Semester 2 extension toward landmark-level and city-level location inference. Therefore, this work demonstrates the technical feasibility of metadata-free visual location estimation and provides a strong foundation for a complete hybrid geolocation system.
+
+\textbf{Keywords:} deep learning, scene classification, image-based location estimation, transfer learning, ResNet-50, geolocation, visual semantics, computer vision, metadata-free localization, Places365, confusion matrix, semantic scene understanding, location category prediction.
+

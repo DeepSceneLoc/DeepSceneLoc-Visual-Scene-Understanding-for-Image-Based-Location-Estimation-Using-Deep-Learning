@@ -1,0 +1,140 @@
+\chapter{System Requirements Specification}
+
+\section{Introduction}
+This chapter defines software requirements for the implemented Stage 1 system and the integration constraints for future Stage 2 enhancement.
+
+\section{System Overview}
+DeepSceneLoc Stage 1 is a supervised scene classification system that takes an outdoor image as input and predicts one among five scene labels: Coastal, Forest, Mountain, Rural, and Urban. The output includes probability scores and visual artifacts for evaluation.
+
+The system is designed as a foundational semantic module in a two-stage architecture. Therefore, requirements include not only current classification behavior, but also compatibility obligations for Stage 2 location refinement.
+
+\section{Functional Requirements}
+\subsection{Input and Data Handling}
+\begin{itemize}
+\item The system shall ingest labeled image datasets organized by class folders.
+\item The system shall apply deterministic train/validation/test splitting.
+\item The system shall support image resizing and normalization compatible with pretrained backbones.
+\end{itemize}
+
+\subsection{Training}
+\begin{itemize}
+\item The system shall support transfer learning using ResNet-50.
+\item The training module shall log epoch-level loss, accuracy, and learning rate.
+\item The system shall store model checkpoints during training.
+\item The system shall allow configurable hyperparameters through project configuration files.
+\end{itemize}
+
+\subsection{Evaluation and Reporting}
+\begin{itemize}
+\item The system shall compute overall and class wise metrics.
+\item The system shall generate confusion matrices and training curves.
+\item The system shall export evaluation outputs in machine-readable format.
+\end{itemize}
+
+\subsection{Inference}
+\begin{itemize}
+\item The system shall accept a single input image and return predicted class with confidence.
+\item The demo interface shall present class probabilities for interpretability.
+\end{itemize}
+
+\subsection{Model Governance}
+\begin{itemize}
+\item The system shall preserve experiment metadata for each training run.
+\item The system shall retain at least one best-checkpoint artifact per validated run.
+\item The system shall store confusion matrix outputs for post-run analysis.
+\end{itemize}
+
+\section{Non-Functional Requirements}
+\begin{itemize}
+\item \textbf{Performance:} The system should support practical inference latency on commodity GPU/CPU.
+\item \textbf{Reliability:} Training and evaluation outputs should be reproducible under fixed seeds and splits.
+\item \textbf{Scalability:} Data pipeline should support extension to larger datasets and additional classes.
+\item \textbf{Maintainability:} Source code should remain modular across data, model, evaluation, and utility layers.
+\item \textbf{Usability:} A lightweight interface should allow non-expert users to test inference behavior.
+\end{itemize}
+
+\section{Primary Use-Case Scenario}
+\subsection{Use-Case: Scene Inference for Unknown Image}
+\textbf{Actor:} User or evaluator
+
+\textbf{Preconditions:}
+\begin{itemize}
+\item model checkpoint is available,
+\item inference module is active,
+\item input image is readable.
+\end{itemize}
+
+\textbf{Main flow:}
+\begin{itemize}
+\item User uploads image.
+\item System validates format and dimensions.
+\item System applies preprocessing transformations.
+\item Model generates logits and class probabilities.
+\item System returns top prediction and confidence distribution.
+\end{itemize}
+
+\textbf{Alternate flow:}
+\begin{itemize}
+\item If image is invalid, system returns structured error and asks for a valid image.
+\item If checkpoint is missing, system enters fallback mode or aborts with diagnostic message.
+\end{itemize}
+
+\textbf{Postconditions:}
+\begin{itemize}
+\item result is displayed,
+\item inference event may be logged for analysis.
+\end{itemize}
+
+\section{Hardware and Software Requirements}
+\subsection{Hardware}
+\begin{itemize}
+\item GPU-enabled training environment preferred.
+\item Minimum 8 GB RAM and sufficient storage for dataset and checkpoints.
+\end{itemize}
+
+\subsection{Software}
+\begin{itemize}
+\item Python 3.8 or higher.
+\item PyTorch and TorchVision for model development.
+\item NumPy, scikit-learn, Matplotlib for metrics and visualization.
+\item Gradio for demonstration interface.
+\end{itemize}
+
+\section{Constraints}
+\begin{itemize}
+\item Limited project duration in minor phase.
+\item Incomplete landmark-level ground truth for exact location prediction.
+\item Compute and API usage limits for Stage 2 experimentation.
+\end{itemize}
+
+\section{Assumptions}
+\begin{itemize}
+\item Input images belong to outdoor scenes relevant to the five target classes.
+\item Training and test distributions are reasonably aligned after preprocessing.
+\item Pretrained model weights are available for transfer learning.
+\end{itemize}
+
+\section{Future Stage Requirements}
+For Stage 2, the following additional requirements are anticipated:
+\begin{itemize}
+\item Exact-location hypothesis generation (landmark/city/country level).
+\item Confidence calibration between scene and location outputs.
+\item Robust fallback behavior when fine-grained confidence is low.
+\end{itemize}
+
+\section{Acceptance Criteria}
+The Stage 1 system is considered acceptable when the following conditions are met:
+\begin{itemize}
+\item reportable macro metrics are generated from held-out evaluation,
+\item confusion matrix is available and interpretable,
+\item inference demo provides class probabilities,
+\item training artifacts and logs are reproducible,
+\item code modules remain organized and maintainable.
+\end{itemize}
+
+\section{Risk Controls}
+Risk controls embedded in requirements include deterministic split strategy, explicit checkpoint persistence, and multi-metric reporting to avoid misleading single-number conclusions. These controls support consistent progression toward Stage 2 without destabilizing Stage 1 baseline quality.
+
+\section{Chapter Summary}
+The SRS formalizes a reliable baseline system with clear extension points for advanced geolocation capabilities in the next phase.
+

@@ -1,0 +1,82 @@
+\chapter{Literature Review}
+
+\section{Introduction}
+Image geolocation research spans classical visual retrieval, deep scene understanding, and multimodal reasoning. This chapter summarizes representative methods and positions DeepSceneLoc within the current landscape.
+
+\section{Classical Visual Geolocation}
+Early geolocation systems relied on handcrafted descriptors such as SIFT and SURF, followed by matching against large geotagged image databases. Bag-of-Visual-Words and nearest-neighbor indexing enabled scalable retrieval but were sensitive to illumination changes, viewpoint shifts, seasonal variation, and occlusion [9, 13].
+
+While these methods provided foundational retrieval pipelines, they typically struggled in unconstrained real-world scenes where local descriptors alone cannot capture full semantic context.
+
+Another practical limitation of classical systems is indexing dependence. Retrieval quality often drops when the candidate database does not contain visually similar references for the query domain. This creates brittle performance under regional shift, weather shift, and sensor mismatch. Deep learning methods reduce this dependence by learning transferable abstractions from broader training data.
+
+\section{Deep Learning for Scene Understanding}
+Convolutional neural networks (CNNs) transformed scene recognition by learning hierarchical features from data instead of manual descriptor engineering. Architectures such as AlexNet, VGG, ResNet, and EfficientNet demonstrated strong transferability from ImageNet pretraining to domain-specific classification tasks [5, 6].
+
+For scene-centric tasks, datasets such as Places365 proved important because they encode semantic context beyond object-level labels [8]. Transfer learning from these large corpora reduces data requirements and stabilizes optimization for limited-domain projects.
+
+\section{Image-Based Geolocation with Deep Features}
+Recent geolocation methods combine global descriptors, region-level attention, or retrieval-classification hybrids. Systems such as PlaNet, Patch-NetVLAD, and subsequent geocell-based approaches cast geolocation as large-scale classification over Earth partitions [9, 10, 13]. These methods can perform well at continental or country scale but require high data diversity and substantial compute.
+
+For constrained academic projects, broad scene categorization is a practical intermediate objective that captures reliable location priors before attempting fine-grained city or landmark prediction.
+
+This staged formulation aligns with risk-aware engineering. Fine-grained geolocation systems can appear strong on curated benchmarks but fail silently on ambiguous inputs. A coarse semantic stage exposes uncertainty earlier and provides a stable signal for subsequent reasoning modules.
+
+\section{Transformer-Based and Hybrid Methods}
+Vision Transformers (ViT) and hybrid CNN-transformer models have shown strong performance in global context modeling [7]. Their self-attention mechanism can better encode long-range relationships within scenes, which is valuable for geolocation cues distributed across the frame.
+
+However, transformer models generally demand larger datasets, stronger regularization, and higher compute budgets than CNN baselines. Therefore, a staged strategy that starts with ResNet-class models and later explores transformers is operationally sound.
+
+Hybrid systems that combine CNN inductive bias with transformer global context have shown promising behavior in several vision tasks. For DeepSceneLoc, this suggests a future path where Stage 1 can remain computationally efficient while Stage 2 selectively uses heavier models only when confidence is low or ambiguity is high.
+
+\section{Datasets and Benchmarking Considerations}
+Dataset design strongly influences geolocation conclusions. Object-centric datasets may produce high classification scores without meaningful scene semantics, while scene-centric datasets such as Places365 better capture environmental context required for this task. Even with scene-centric datasets, label granularity and regional diversity remain critical.
+
+In this project, a five-class taxonomy was selected to balance practicality and interpretability. This choice simplifies reporting and supports reproducibility, but it also compresses geographic diversity into broader buckets. The report therefore treats class boundaries as probabilistic regions and includes confusion analysis as a first-class diagnostic.
+
+\section{Common Failure Modes in Prior Work}
+Review of related work indicates recurring failure modes:
+\begin{itemize}
+\item overconfidence on ambiguous scenes,
+\item poor calibration under domain shift,
+\item weak interpretability in end to end systems,
+\item insufficient class wise analysis despite high aggregate scores.
+\end{itemize}
+
+DeepSceneLoc addresses these issues by emphasizing macro metrics, confusion tracking, and modular staging that separates semantic classification from exact-location reasoning.
+
+\section{Relevant Evaluation Practices}
+Current best practice for scene/geolocation classification includes:
+\begin{itemize}
+\item Reporting macro precision, recall, and F1-score to avoid bias toward dominant classes.
+\item Class wise confusion analysis to identify visually overlapping categories.
+\item Training-history visualization for convergence and overfitting inspection.
+\item Reproducible split management and checkpoint versioning.
+\end{itemize}
+
+DeepSceneLoc follows these principles in its experimental protocol.
+
+\section{Research Gap}
+Most academic prototypes either stop at broad scene recognition or directly attempt fine-grained geolocation without a robust staged design. A practical gap exists in building integration-ready pipelines where:
+\begin{itemize}
+\item Stage 1 provides stable semantic priors with quantified uncertainty.
+\item Stage 2 consumes those priors for exact-location reasoning.
+\item The entire system remains reproducible under resource constraints.
+\end{itemize}
+
+DeepSceneLoc addresses this gap by delivering a validated Stage 1 baseline as a launch point for exact-location extension.
+
+\section{Synthesis from the DeepSceneLoc Review Paper}
+The project's internal review paper, titled \textit{A Review on Visual Scene Understanding for Semantic Location Estimation Using Deep Learning}, reinforces the practical importance of metadata-free location inference [1]. The review highlights that many large image collections do not preserve reliable GPS or EXIF information, making visual-content-driven estimation a necessary strategy rather than an optional enhancement.
+
+The paper identifies five semantic scene classes as an operationally useful taxonomy for educational and engineering prototypes: \textbf{Coastal, Forest, Mountain, Rural, and Urban} [2, 3, 4]. This class set is consistent with our Stage 1 design and supports interpretable predictions for users who need rapid organization and retrieval of unlabeled image repositories.
+
+A key contribution of the review is the emphasis on measurable system-level outcomes, not only model architecture. The reported outcomes include reduced classification errors, faster category identification, and improved dataset organization when deep learning replaces manual tagging workflows. These claims align with our own deployment goals for report generation, reproducibility, and user-facing demo behavior.
+
+The review also recommends a pipeline perspective in which preprocessing quality, feature extraction, model training, and post-training evaluation are treated as coupled stages. This view motivates the structure adopted in this report: controlled preprocessing, transfer-learning baseline, confusion-driven diagnosis, and staged expansion to finer localization.
+
+Finally, the review's reference list spans core CNN foundations, transformer-scale models, scene-centric datasets, and geo-localization methods [5, 7, 8, 13]. This breadth confirms that DeepSceneLoc is positioned at the intersection of mature visual recognition practice and current location-estimation research, providing a technically sound base for future semester extensions.
+
+\section{Chapter Summary}
+The literature indicates that transfer-learning-based scene understanding remains a strong and efficient foundation for geolocation tasks. Based on this insight, DeepSceneLoc adopts a ResNet-50 baseline in the current phase, while preserving architectural flexibility for future transformer and AI-assisted integration.
+

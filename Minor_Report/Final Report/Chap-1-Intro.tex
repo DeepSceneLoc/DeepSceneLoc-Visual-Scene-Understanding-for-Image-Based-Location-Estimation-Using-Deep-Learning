@@ -1,0 +1,84 @@
+\chapter{Introduction}
+
+\section{Background}
+Rapid growth in visual data has increased demand for systems that can infer geographic context directly from images. In practical cases such as social media uploads, archived photo collections, CCTV frames, and screenshots, metadata is often absent or untrustworthy. Conventional location pipelines depend heavily on GPS tags, map indexing, or manually annotated landmarks, which are not always available [9, 13].
+
+Image-based location estimation addresses this gap by learning semantic and structural cues from raw visual content. Scene elements such as road patterns, building density, vegetation type, mountain silhouettes, and coastline textures provide informative signals about probable locations. Advances in deep learning have made it possible to represent such cues using hierarchical visual features, enabling scalable and automated geolocation inference [6, 8, 13].
+
+\section{Project Context}
+DeepSceneLoc is designed as a two-stage hybrid system:
+\begin{itemize}
+\item Stage 1 (current minor project): semantic scene classification into five broad categories: Urban, Rural, Coastal, Mountain, and Forest.
+\item Stage 2 (planned extension): exact location refinement using AI-assisted reasoning to infer landmark, city, country, and coordinate-level hypotheses.
+\end{itemize}
+
+This report documents the completion of Stage 1 as a reproducible and measurable foundation for Stage 2.
+
+\section{Problem Statement}
+Given a single outdoor image without GPS/EXIF metadata, predict meaningful location context using only visual evidence. The immediate objective is robust scene-category prediction under diverse illumination, viewpoint, and background conditions.
+
+\section{Need for the Study}
+The problem is relevant to multiple applications:
+\begin{itemize}
+\item Digital forensics and media verification.
+\item Autonomous navigation support in GPS-denied regions.
+\item Geospatial indexing for large image repositories.
+\item Context-aware retrieval and recommendation systems.
+\item Educational and research tools for visual geolocation.
+\end{itemize}
+
+Beyond these direct applications, the problem also reflects a broader transition in intelligent systems from metadata dependence to visual reasoning. Many legacy pipelines assume trustworthy GPS tags or curated location metadata. In real deployments, this assumption fails frequently due to privacy-preserving metadata stripping, cross-platform recompression, screenshot capture, and archival migration. A model that can infer location context directly from scene semantics becomes a resilient layer in such environments.
+
+The study is additionally important from a safety and governance perspective. If downstream systems consume location estimates for decision support, uncertainty must be visible and quantifiable. A scene-first approach provides an interpretable middle layer, where engineers can inspect class confidence, confusion pathways, and data drift before deploying finer location logic.
+
+\section{Objectives}
+The main objectives of this minor project are:
+\begin{itemize}
+\item Build an end to end deep learning pipeline for metadata-free scene classification.
+\item Prepare a consistent five-class dataset from Places365-aligned categories.
+\item Train and evaluate a transfer-learning baseline using ResNet-50.
+\item Report quantitative metrics: accuracy, precision, recall, F1-score, and confusion matrix.
+\item Produce analysis artifacts (training curves, class wise plots) for transparent model assessment.
+\item Establish architecture and documentation required for Stage 2 integration.
+\end{itemize}
+
+\section{Scope}
+The current scope includes data processing, supervised training, and evaluation for broad scene categorization. Exact landmark retrieval and coordinate-level inference are intentionally reserved for the next phase. The work focuses on technical feasibility, reproducibility, and baseline quality rather than full geolocation precision.
+
+\section{Contributions}
+Key contributions delivered in this phase are:
+\begin{itemize}
+\item A structured repository with modular code for data preparation, training, and evaluation.
+\item Baseline model checkpoints and logged training history.
+\item Measured performance on a 1500-image test set with macro and class wise statistics.
+\item Visualization outputs for confusion matrices and performance comparisons.
+\item Integration-ready design for extending toward exact location detection.
+\end{itemize}
+
+These contributions are intentionally aligned with academic reproducibility expectations. The project artifacts include data split records, training logs, metric exports, and visual diagnostics, making it possible to independently verify reported outcomes. Instead of treating the model as a black-box benchmark, the report positions it as a transparent and extensible baseline.
+
+\section{Success Criteria and Evaluation Philosophy}
+The project defines success across three layers rather than a single headline score:
+\begin{itemize}
+\item \textbf{Functional success:} the pipeline trains, evaluates, and performs inference reliably.
+\item \textbf{Quantitative success:} macro metrics and class wise behavior remain strong and balanced.
+\item \textbf{Engineering success:} outputs are reproducible, diagnosable, and ready for Stage 2 integration.
+\end{itemize}
+
+This evaluation philosophy reduces the risk of overfitting to one metric and supports scientifically defensible reporting in both report review and viva discussion.
+
+\section{Ethical and Practical Considerations}
+Image-based location inference must be handled responsibly. The current work is designed for academic research and controlled demonstration. It avoids identity-level inference and does not exploit private metadata. Future deployment should include consent-aware usage policy, confidence thresholds for low-certainty outputs, and explicit disclaimers when predictions are probabilistic rather than definitive.
+
+\section{Report Organization}
+The remainder of this report is organized as follows:
+\begin{itemize}
+\item Chapter 2 reviews relevant literature and identifies research gaps.
+\item Chapter 3 defines the software requirements and constraints.
+\item Chapter 4 presents system architecture and design artifacts.
+\item Chapter 5 details methodology, data pipeline, and training strategy.
+\item Chapter 6 describes implementation decisions and module-level execution.
+\item Chapter 7 discusses experimental outcomes and conclusions.
+\item Chapter 8 outlines future work for the full DeepSceneLoc vision.
+\end{itemize}
+
