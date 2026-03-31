@@ -81,6 +81,10 @@ tmp/
 report_archive/
 .tmp_docx_extract/
 .gradio/
+.hf_upload_model/
+.hf_upload_temp/
+model_repo/
+push_model_simple.py
 
 # Python and tooling caches
 .pytest_cache/
