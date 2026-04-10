@@ -87,7 +87,7 @@ graph TB
 - Download 50GB dataset
 - Verify file integrity (check for corruption)
 - Validate category distribution
-- Split: 70% train, 20% validation, 10% test
+- Split: 70% train, 15% validation, 15% test
 - Organize into folder structure
 
 **Output:** Structured dataset in `data/places365/`  
