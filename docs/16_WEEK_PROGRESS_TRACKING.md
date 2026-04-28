@@ -41,7 +41,7 @@
 | Week 5 | <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Complete | Mar 2, 2026 | [____] |
 | Week 6 | <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Complete | Mar 9, 2026 | [____] |
 | Week 7 | <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Complete | Mar 16, 2026 | [____] |
-| Week 8 | <svg width="16" height="16" fill="orange"><circle cx="8" cy="8" r="8"/></svg> In Progress | - | [____] |
+| Week 8 | Complete | April 28, 2026 | [____] |
 | Week 9 | <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> Pending | - | [____] |
 | Week 10 | <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> Pending | - | [____] |
 | Week 11 | <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> Pending | - | [____] |
@@ -57,12 +57,12 @@
 
 | Team Member | Weeks 1-4 | Weeks 5-8 | Weeks 9-12 | Weeks 13-16 | Total |
 |-------------|-----------|-----------|------------|-------------|-------|
-| Krishan Yadav | 41/91 | 55/55 | 0/50 | 0/50 | 96/246 |
+| Krishan Yadav | 41/91 | 55/55 | 44/50 | 0/50 | 140/246 |
 | Aditi Sah | 36/56 | 24/36 | 0/50 | 0/50 | 60/192 |
 | Anuj Kondawar | 57/57 | 27/27 | 48/48 | 48/48 | 180/180 |
 | Jensi Paneliya | 36/56 | 32/44 | 0/50 | 0/50 | 68/200 |
 
-**Overall Progress:** 404/818 hours (49.4%)
+**Overall Progress:** 448/818 hours (54.8%) — Week 8 complete, Week 9 starting
 
 ---
 
@@ -532,9 +532,9 @@ venv\Scripts\python.exe run_training_advanced.py --model vit_b16 ^
 | Anuj Kondawar | 12 | 12 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> |
 | Jensi Paneliya | 12 | 0 | <svg width="12" height="12" fill="gray"><rect width="12" height="12"/></svg> |
 
-**New Architecture:** Multi-stage AI system
-
-**Anuj's Deliverable (completed):** `src/utils/pipeline_optimizer.py` — TwoStagePipelineOptimizer with confidence gating, retry logic, latency profiling; `src/utils/load_tester.py` — LoadTester, ResourceMonitor, SystemHealthChecker
+**Anuj's Deliverable (completed):** `src/utils/pipeline_optimizer.py` — TwoStagePipelineOptimizer with confidence gating, retry logic, latency profiling; `src/utils/load_tester.py` — LoadTester, ResourceMonitor, SystemHealthChecker; `demo_app_hybrid.py` — two-stage Gradio hybrid demo  
+**Krishan's Deliverable (completed):** `webapp/api.py` — FastAPI production server with `/api/analyze` two-stage endpoint; `webapp/templates/index.html` — premium HTML/CSS/JS frontend  
+**Doc Deliverable (completed):** `docs/HYBRID_SETUP_GUIDE.md` — full setup guide for hybrid system (April 28, 2026)
 
 **Mentor Notes:** _______________________________________________
 
@@ -703,13 +703,13 @@ venv\Scripts\python.exe run_training_advanced.py --model vit_b16 ^
 **Checkpoint:** `model_repo/best_model.pth` (295 MB) + `models/checkpoints/best_model.pth`
 
 ### Pending (Semester 2 execution)
-- Full EfficientNet-B0 training on Places365 (40 epochs, GPU session needed)
-- ViT-B/16 training (Week 9, 40 epochs)
-- Live evaluation and embedding analysis (Weeks 9-10)
-- Full Gemini API live testing and latency measurement (Weeks 11-13)
-- Hybrid demo app full testing (`demo_app_hybrid.py` — built, needs GEMINI_API_KEY)
-- Final results compilation and comparative report (Weeks 14-16)
-- Final report write-up and presentation preparation (Weeks 15-16)
+- EfficientNet-B0 training: **COMPLETE** (85.15% val / 84.63% test) — April 28, 2026
+- ViT-B/16 training (Week 9, 40 epochs) — **NEXT** (needs GPU session)
+- Live evaluation and embedding analysis (Weeks 9-10) — infrastructure ready
+- Full Gemini API live testing (Weeks 11-13) — needs GEMINI_API_KEY
+- Hybrid demo app testing — built (`demo_app_hybrid.py`), needs API key to test
+- Final results compilation (Weeks 14-16) — pending ViT training
+- Final report write-up and presentation (Weeks 15-16) — pending
 
 ---
 
@@ -737,4 +737,4 @@ venv\Scripts\python.exe run_training_advanced.py --model vit_b16 ^
 
 **Document Maintained By:** Krishan Yadav (Team Lead)  
 **Review Frequency:** Weekly (Every Friday)  
-**Next Review Date:** March 19, 2026
+**Next Review Date:** May 2, 2026 (Week 9 kick-off)

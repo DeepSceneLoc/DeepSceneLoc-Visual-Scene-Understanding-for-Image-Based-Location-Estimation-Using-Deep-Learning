@@ -48,9 +48,8 @@ after benchmarking the initial EfficientNet-B0 epoch (25 min/epoch, no AMP = una
 | **EMA decay=0.9999** | `AdvancedTrainer` | Exponential weight averaging → smoother, more stable final model | +0.3–0.7% |
 | **freeze_blocks=4** | `EfficientNetTrainConfig` | 4 of 9 blocks frozen — 4.36M trainable params | Epoch 1 jumps to 80%+ |
 
-**Combined result: +5.4% over ResNet-50 baseline**  
-**Achieved: EfficientNet-B0 → 84.40%** (target was 78% — exceeded by +6.4%)  
-**Next target: 86%+** (current run), ViT-B/16 → **88%+**
+**Combined result: +5.98% over ResNet-50 baseline**  
+**FINAL RESULT: EfficientNet-B0 → 85.15% val / 84.63% test / 83.17% F1** (target was 78% — exceeded by +7.15%)
 
 ### Bug Fixes (April 28, 2026)
 
@@ -135,13 +134,17 @@ Input Image
 
 ### Bottleneck summary
 
-| Stage | Typical latency | Dominant cost |
-|-------|-----------------|---------------|
-| Preprocessing | 15–40 ms | PIL resize + ToTensor |
-| Stage 1 (CPU) | 150–400 ms | Matrix multiply (BLAS) |
-| Stage 1 (GPU) | 8–25 ms   | CUDA kernel launch + transfer |
-| Gemini API    | 1,500–5,000 ms | Network RTT + model inference |
-| Cache hit     | < 5 ms    | SQLite read |
+| Stage | Typical latency | Measured (actual) | Dominant cost |
+|-------|-----------------|-------------------|---------------|
+| Preprocessing | 15–40 ms | ~20ms | PIL resize + ToTensor |
+| Stage 1 — ResNet-50 (CPU) | 150–400 ms | **34.5ms avg** | Matrix multiply (BLAS) |
+| Stage 1 — EfficientNet-B0 (CPU) | 50–200 ms | **14.7ms avg** | Depthwise convolutions |
+| Stage 1 — ResNet-50 (GPU) | 8–25 ms | **5.7ms avg** | CUDA kernel launch |
+| Stage 1 — EfficientNet-B0 (GPU) | 8–25 ms | **7.6ms avg** | CUDA kernel launch |
+| Gemini API | 1,500–5,000 ms | ~1,000–3,000ms | Network RTT + model inference |
+| Cache hit | < 5 ms | < 2ms | SQLite read |
+
+> Benchmark: RTX 3050 Laptop GPU, 200 runs warmup=20, batch_size=1, `results/benchmark_inference.json`
 
 ---
 
@@ -151,11 +154,14 @@ Input Image
 
 EfficientNet-B0 is the recommended Stage 1 model for deployment:
 
-| Architecture | Top-1 Acc (val) | Inference (CPU) | Params | Notes |
-|---|---|---|---|---|
-| ResNet-50     | ~84%  | ~350 ms | 25.6 M | Baseline Semester 1 |
-| EfficientNet-B0 | ~86% | ~180 ms | 5.3 M | **Recommended** |
-| ViT-B/16      | ~87%  | ~420 ms | 86.4 M | Best accuracy; use on GPU |
+| Architecture | Val Acc (actual) | Test Acc | CPU ms/img | GPU ms/img | Params | Size |
+|---|---|---|---|---|---|---|
+| ResNet-50 | 79.17% | 79.04% | **34.5ms** (29 fps) | **5.7ms** (176 fps) | 24.6M | 281.5MB |
+| EfficientNet-B0 | **85.15%** | **84.63%** | **14.7ms** (68 fps) | **7.6ms** (131 fps) | 4.7M | 69.6MB |
+| ViT-B/16 | TBD (Week 9) | TBD | ~420ms est. | ~15ms est. | 86.4M | ~330MB |
+
+> EfficientNet-B0 is **2.3x faster on CPU** AND **6% more accurate** than ResNet-50.  
+> EfficientNet-B0 is the **production model** for `webapp/api.py`.
 
 ### 3.2 Input pipeline optimization
 

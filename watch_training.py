@@ -24,7 +24,7 @@ def decode_log(raw: bytes) -> str:
         return raw.decode('utf-16', errors='ignore')
     return raw.replace(b'\x00', b'').decode('utf-8', errors='ignore')
 
-def read_log_head(n_bytes=8000):
+def read_log_head(n_bytes=12000):
     """Read the first N bytes (contains training config header)."""
     try:
         with LOG.open('rb') as f:
@@ -32,7 +32,7 @@ def read_log_head(n_bytes=8000):
     except Exception:
         return []
 
-def read_log_tail(n_lines=500):
+def read_log_tail(n_lines=600):
     """Read the last N lines (contains live tqdm and BEST lines)."""
     try:
         raw   = LOG.read_bytes()
@@ -76,7 +76,7 @@ def get_tqdm_progress(tail_lines):
     return None
 
 def get_bests(tail_lines):
-    """Return list of (val_acc_float) from [BEST] lines in log tail."""
+    """Return list of val_acc floats from [BEST] lines in log tail."""
     bests = []
     for l in tail_lines:
         m = re.search(r'\[BEST\].*val_acc=([\d.]+)', l)
@@ -142,14 +142,8 @@ try:
             ep_tot  = p['el_s'] + p['rem_s']
             bar     = '#' * (p['pct'] // 5) + '-' * (20 - p['pct'] // 5)
             phase   = p['phase']
-
-            if phase == 'Train':
-                ep_left = max(TOTAL_EP - ep_estimate, 0)
-                eta_s   = p['rem_s'] + ep_left * ep_tot
-            else:  # Val
-                ep_left = max(TOTAL_EP - ep_estimate, 0)
-                eta_s   = p['rem_s'] + ep_left * ep_tot
-
+            ep_left = max(TOTAL_EP - ep_estimate, 0)
+            eta_s   = p['rem_s'] + ep_left * ep_tot
             eta_str = (datetime.now() + timedelta(seconds=eta_s)).strftime('%H:%M')
             line = (
                 f"[{ts}]  Ep {ep_estimate:2d}/{TOTAL_EP}  "
@@ -173,7 +167,7 @@ try:
 except KeyboardInterrupt:
     ck_ep, ck_acc = get_best_checkpoint()
     print(f"\n\n{'='*60}")
-    print(f"  Training running in background — do not close its terminal")
+    print(f"  Training running in background -- do not close its terminal")
     print(f"  Best so far  : {ck_acc:.4f}%  at checkpoint epoch={ck_ep}")
     if start_ts:
         elapsed = datetime.now() - start_ts

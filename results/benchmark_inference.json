@@ -1,0 +1,38 @@
+[
+  {
+    "name": "ResNet-50",
+    "device": "cuda",
+    "avg_ms": 5.69,
+    "min_ms": 5.06,
+    "max_ms": 7.81,
+    "fps": 175.7,
+    "params_M": 24.6
+  },
+  {
+    "name": "EfficientNet-B0",
+    "device": "cuda",
+    "avg_ms": 7.63,
+    "min_ms": 6.72,
+    "max_ms": 9.39,
+    "fps": 131.1,
+    "params_M": 4.7
+  },
+  {
+    "name": "ResNet-50",
+    "device": "cpu",
+    "avg_ms": 34.47,
+    "min_ms": 30.88,
+    "max_ms": 52.81,
+    "fps": 29.0,
+    "params_M": 24.6
+  },
+  {
+    "name": "EfficientNet-B0",
+    "device": "cpu",
+    "avg_ms": 14.65,
+    "min_ms": 12.3,
+    "max_ms": 17.67,
+    "fps": 68.3,
+    "params_M": 4.7
+  }
+]
