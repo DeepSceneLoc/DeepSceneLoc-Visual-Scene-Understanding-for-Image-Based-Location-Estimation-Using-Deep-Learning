@@ -327,9 +327,9 @@
 ## SEMESTER 2 (Weeks 8-16)
 
 ### Week 8: EfficientNet Implementation + Modern Training Upgrade
-**Duration:** March 10-16, 2026 (extended activity April 27, 2026)
-**Status:** <svg width="16" height="16" fill="orange"><circle cx="8" cy="8" r="8"/></svg> **IN PROGRESS — Training Running**  
-**Sign-Off Date:** Target: May 4, 2026
+**Duration:** March 10-16, 2026 (extended activity April 27-28, 2026)
+**Status:** COMPLETE
+**Sign-Off Date:** April 28, 2026
 
 #### Planned Deliverables
 - [x] EfficientNet-B0 architecture implemented (`src/models/model_advanced.py` — freeze_blocks, BN+Dropout head)
@@ -361,32 +361,37 @@
 - [x] **NEW: `docs/TRAINING_METHODOLOGY.md`** — full "old → new" changelog with reasoning
 - [x] **NEW: Production webapp** — FastAPI + premium HTML/CSS/JS frontend at localhost:8000
 - [x] **NEW: `watch_training.py`** — live checkpoint monitor polling best.pth every 60s
-- [x] **ACHIEVED: EfficientNet best val acc = 84.40%** (target was 78% — exceeded by +6.4%)
-- [ ] Full EfficientNet training (40 epochs) — **RUNNING NOW** (resumed from 84.32% checkpoint)
-- [ ] Push to 86%+ validation accuracy
+- [x] **ACHIEVED: EfficientNet best val acc = 85.15%** (target was 78% — exceeded by +7.15%)
+- [x] **ACHIEVED: EfficientNet test acc = 84.63%**  Macro F1 = 83.17%
+- [x] Full EfficientNet training COMPLETE (3 training phases, resumed from checkpoints)
+- [x] Best checkpoint: `models/checkpoints/efficientnet/EfficientNet-B0_best.pth` (69.6 MB)
+- [x] ResNet-50 preserved: `models/checkpoints/resnet/best_model.pth` (281.5 MB)
+- [x] `docs/TRAINING_METHODOLOGY.md` — updated with Final Model Comparison table
 
-> **Decision Log (April 27, 2026):** Initial training run was stopped after epoch 1 (took 25 min — 2-3× slower than expected). Root cause: no AMP, batch size 32. Training was restarted with the full modern pipeline.
+> **Decision Log (April 27, 2026):** Initial training run stopped after epoch 1 (25 min, no AMP). Restarted with modern pipeline.
 
-> **Decision Log (April 28, 2026):** 7 bugs found and patched during pipeline stabilization. Key fixes: early stopping false trigger (EMA divergence), post-training evaluation crash, history filename mismatch, deprecated PyTorch API. Pipeline is now fully stable. See `docs/TRAINING_METHODOLOGY.md` for full justification.
+> **Decision Log (April 28, 2026):** 7 bugs patched. Pipeline stable. See `docs/TRAINING_METHODOLOGY.md`.
+
+> **Final Result (April 28, 2026):** EfficientNet-B0 achieved **85.15% val / 84.63% test / 83.17% F1**. Workers fixed to 4 (workers=8 crashes Windows paging file). EfficientNet-B0 is now primary production model.
 
 #### Team Hours
 | Member | Planned | Completed | Status |
 |--------|---------|-----------|--------|
 | Krishan Yadav | 12 | 16 | [DONE] |
 | Aditi Sah | 14 | 0 | [PENDING] |
-| Anuj Kondawar | 12 | 24 | [DONE] |
+| Anuj Kondawar | 12 | 28 | [DONE] |
 | Jensi Paneliya | 12 | 4 | [IN PROGRESS] |
 
-**Week 8 Deliverables (April 27–28, 2026):**
+**Week 8 Final Deliverables (April 27-28, 2026):**
 - [x] Modern training pipeline upgrade (AMP, EMA, MixUp, CutMix, RandAugment, RandomErasing, OneCycleLR)
 - [x] 7 pipeline bugs fixed (early stopping, eval crash, filename mismatch, Unicode, AMP API, workers, matplotlib)
 - [x] Production webapp built — FastAPI backend + premium HTML/CSS/JS frontend
-- [x] `docs/TRAINING_METHODOLOGY.md` — full technique changelog with reasoning
-- [x] `docs/PERFORMANCE_OPTIMIZATION.md` — updated with new training section + bug fixes
-- [x] `docs/16_WEEK_PROGRESS_TRACKING.md` — updated with real results
-- [x] EfficientNet best accuracy ACHIEVED: **84.40%** (target 78%)
-- [x] `watch_training.py` — live training monitor utility%)
-- [x] EfficientNet training restarted with modern pipeline (running in background)
+- [x] `docs/TRAINING_METHODOLOGY.md` — full changelog + Final Model Comparison table
+- [x] `docs/PERFORMANCE_OPTIMIZATION.md` — updated with bug fixes + final metrics
+- [x] EfficientNet-B0 FINAL: **85.15% val** / **84.63% test** / **83.17% F1**
+- [x] Checkpoint cleanup — intermediate weights removed, best weights organized
+- [x] `webapp/api.py` — updated to use EfficientNet-B0 as primary model
+- [x] `demo_app.py` — ResNet-50 preserved as Phase 1 demo (Gradio)
 
 **Mentor Notes:** _______________________________________________
 
@@ -413,7 +418,7 @@
 venv\Scripts\pip.exe install timm
 venv\Scripts\python.exe run_training_advanced.py --model vit_b16 ^
     --data data/processed/places365_mit_full_2026_03_15 ^
-    --epochs 40 --workers 8 --patience 10
+    --epochs 40 --workers 4 --patience 10
 ```
 
 #### Team Hours
@@ -430,17 +435,17 @@ venv\Scripts\python.exe run_training_advanced.py --model vit_b16 ^
 
 ### Week 10: Comparative Model Analysis
 **Duration:** March 24-30, 2026  
-**Status:** <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> **PENDING**  
+**Status:** PARTIALLY COMPLETE (ResNet vs EfficientNet done; ViT pending)
 **Sign-Off Date:** Target: April 6, 2026
 
 #### Planned Deliverables
-- [ ] All 3 models evaluated on same test set
-- [ ] Performance comparison table
-- [ ] Accuracy comparison (ResNet vs EfficientNet vs ViT)
-- [ ] Parameter count analysis
-- [ ] Inference time comparison
-- [ ] Memory usage comparison
-- [ ] Per-class performance comparison
+- [x] ResNet-50 vs EfficientNet-B0 comparison table — `docs/TRAINING_METHODOLOGY.md`
+- [x] Per-class accuracy comparison documented
+- [x] Parameter count analysis: ResNet 25.6M vs EfficientNet 5.3M (79% smaller)
+- [x] Model size comparison: 281.5 MB vs 69.6 MB
+- [ ] ViT-B/16 evaluation (pending training)
+- [ ] 3-model comparison table (ResNet vs EfficientNet vs ViT)
+- [ ] Inference time benchmark (ms/image)
 - [ ] Statistical significance testing
 
 #### Team Hours

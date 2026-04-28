@@ -4,13 +4,15 @@
 **Document Purpose:** Records every training technique change made during Semester 2 (April 27–28, 2026), with precise reasoning for each decision. Written for dissertation documentation and mentor review.
 
 **Authors:** Krishan Yadav (Architecture), Anuj Kondawar (Pipeline)  
-**Last Updated:** April 28, 2026
+**Last Updated:** April 28, 2026 (Final results recorded)
 
 ---
 
 ## Overview
 
-When we reviewed the active EfficientNet-B0 training run (Week 8), we identified that the pipeline was using **2019-era training practices** that left significant accuracy and speed gains on the table. We stopped that run after epoch 1 (which took 25 minutes — a red flag on its own) and upgraded to a modern 2024-standard pipeline. The new run achieves approximately **18 minutes per epoch** on RTX 3050 Laptop (AMP + batch=64, 4 DataLoader workers) and has already reached **84.40% validation accuracy** — surpassing our original 78% target by a wide margin.
+When we reviewed the active EfficientNet-B0 training run (Week 8), we identified that the pipeline was using **2019-era training practices** that left significant accuracy and speed gains on the table. We stopped that run after epoch 1 (which took 25 minutes — a red flag on its own) and upgraded to a modern 2024-standard pipeline. The new run achieves approximately **18 minutes per epoch** on RTX 3050 Laptop (AMP + batch=64, 4 DataLoader workers).
+
+**Final Result (April 28, 2026): EfficientNet-B0 — 85.15% val accuracy / 84.63% test accuracy / 83.17% macro F1** — surpassing the original 78% target by +7.15%.
 
 ---
 
@@ -380,7 +382,9 @@ Get-Content -Wait -Tail 30 training.log
 ResNet-50 (Semester 1 — Old Pipeline):
   Training time per epoch : ~30 min (batch=32, no AMP)
   Total training time     : ~10 hrs (20 epochs)
-  Best val accuracy       : 79.04%
+  Best val accuracy       : 79.17%
+  Test accuracy           : 79.04%
+  Macro F1                : 77.39%
   Label smoothing         : 0.0
   Augmentation            : Basic ColorJitter + Flip
 
@@ -389,9 +393,9 @@ EfficientNet-B0 v1 (Old Pipeline — Stopped After Epoch 1):
   Label smoothing         : 0.0 (wrong — should be 0.1)
   No MixUp, no EMA, no RandAugment
 
-EfficientNet-B0 v2 (Modern Pipeline — ACHIEVED):
-  Training time per epoch : ~18 min (AMP + batch=64 + workers=8)
-  Total training time     : ~12 hrs (40 epochs)
+EfficientNet-B0 v2 (Modern Pipeline — FINAL RESULTS):
+  Training time per epoch : ~10-18 min (AMP + batch=64 + workers=4)
+  Total training runs     : 3 (multi-phase resume strategy)
   Label smoothing         : 0.1
   freeze_blocks           : 4 (trainable params: 4.36M / 4.67M)
   Augmentation            : RandAugment N=2 M=9 + RandomErasing
@@ -399,7 +403,49 @@ EfficientNet-B0 v2 (Modern Pipeline — ACHIEVED):
   EMA decay=0.9999
   OneCycleLR with 10% warmup
   Early stopping patience : 10 epochs
-  Best val accuracy       : 84.40% (ACHIEVED — target was 78%)
-  Current run best        : 84.32% (resumed from checkpoint, epoch 1 of resume run)
-  Next target             : 86%+
+  Best val accuracy       : 85.15%   [FINAL]
+  Test accuracy           : 84.63%   [FINAL]
+  Macro F1                : 83.17%   [FINAL]
+  Model size              : 69.6 MB  (vs 281.5 MB ResNet-50)
 ```
+
+---
+
+## Final Model Comparison
+
+### Overall Metrics
+
+| Metric | ResNet-50 (Phase 1) | EfficientNet-B0 (Phase 2) | Gain |
+|---|---|---|---|
+| **Val Accuracy** | 79.17% | **85.15%** | **+5.98%** |
+| **Test Accuracy** | 79.04% | **84.63%** | **+5.59%** |
+| **Macro Precision** | 78.06% | 83.04% | +4.98% |
+| **Macro Recall** | 76.85% | 83.33% | +6.48% |
+| **Macro F1** | 77.39% | **83.17%** | **+5.78%** |
+| **Total Params** | 25.6M | 5.3M | -79% |
+| **Model Size** | 281.5 MB | **69.6 MB** | -75% |
+
+### Per-Class Accuracy (EfficientNet-B0 Final)
+
+| Class | Test Accuracy | Main Confusion |
+|---|---|---|
+| Coastal | 85.0% | → Urban (5.7%) |
+| Forest | 78.1% | → Rural (7.6%) |
+| Mountain | 79.8% | → Rural (6.3%) |
+| Rural | 85.6% | → Urban (4.9%) |
+| Urban | 88.3% | → Rural (4.7%) |
+
+### Training History (Final Resume Run — 13 Epochs)
+
+| Epoch | Val Acc | Note |
+|---|---|---|
+| 1 | 85.10% | NEW BEST (resumed from 84.79%) |
+| 2 | 84.85% | — |
+| 3 | 84.51% | — |
+| 4-13 | 84.35–84.58% | Plateau — early stopping triggered |
+
+**Best val_acc saved:** 85.15% (checkpoint epoch=3, EMA model)  
+**Checkpoint:** `models/checkpoints/efficientnet/EfficientNet-B0_best.pth` (69.6 MB)  
+**Fallback:** `models/checkpoints/resnet/best_model.pth` (281.5 MB)  
+**Production app:** `webapp/api.py` — loads EfficientNet-B0 by default  
+**Demo app:** `demo_app.py` — loads ResNet-50 (Phase 1 Gradio demo, preserved)

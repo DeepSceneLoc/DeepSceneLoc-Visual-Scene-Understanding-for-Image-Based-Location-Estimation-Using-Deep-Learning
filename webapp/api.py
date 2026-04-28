@@ -71,11 +71,11 @@ CLASS_DESC  = {
 }
 
 CHECKPOINT_PRIORITY = [
-    # Prefer fully trained EfficientNet when it reaches >50% val_acc
-    # For now, ResNet-50 (79.17%) is the production model
-    ("resnet50",        "model_repo/best_model.pth"),
-    ("resnet50",        "models/checkpoints/best_model.pth"),
+    # Phase 2 Production: EfficientNet-B0 (85.15% val, 84.63% test) — PRIMARY
     ("efficientnet_b0", "models/checkpoints/efficientnet/EfficientNet-B0_best.pth"),
+    # Phase 1 Fallback: ResNet-50 (79.17% val) — kept for comparison/fallback
+    ("resnet50",        "models/checkpoints/resnet/best_model.pth"),
+    ("resnet50",        "model_repo/best_model.pth"),
 ]
 
 # ─────────────────────────────────────────────────────────────

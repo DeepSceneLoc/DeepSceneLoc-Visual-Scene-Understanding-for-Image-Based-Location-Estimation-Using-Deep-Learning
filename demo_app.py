@@ -56,7 +56,7 @@ class DemoModel:
             self.model = create_model('resnet50', num_classes=5, pretrained=True)
             # Try to load trained weights if available
             try:
-                checkpoint = torch.load('models/checkpoints/best_model.pth', 
+                checkpoint = torch.load('models/checkpoints/resnet/best_model.pth', 
                                        map_location=self.device)
                 self.model.load_state_dict(checkpoint['model_state_dict'])
                 self.model_status = "[OK] Trained Model Loaded"
