@@ -58,6 +58,10 @@ results/cache/
 *.log
 logs/
 
+# Runtime training artifacts (generated per session, not source-controlled)
+training.log
+
+
 # IDE
 .vscode/
 .idea/

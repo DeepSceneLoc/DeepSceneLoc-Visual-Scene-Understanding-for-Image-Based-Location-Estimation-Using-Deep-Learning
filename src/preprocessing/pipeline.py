@@ -141,68 +141,76 @@ def create_dataloaders(
     batch_size: int = 32,
     num_workers: int = 4,
     image_size: int = 224,
-    augment_train: bool = True
+    augment_train: bool = True,
+    train_transform=None,   # custom transform overrides augment_train
+    val_transform=None,     # custom transform for val/test
+    pin_memory: bool = True,
 ) -> Tuple[DataLoader, DataLoader, DataLoader]:
     """
-    Create train, validation, and test dataloaders
-    
+    Create train, validation, and test dataloaders.
+
+    Key performance flags added (April 2026):
+      - persistent_workers=True : worker processes stay alive between epochs,
+        eliminating the 20-40s Windows worker-respawn delay per epoch.
+      - prefetch_factor=2       : each worker pre-fetches 2 batches ahead,
+        reducing GPU starvation during data loading.
+      - pin_memory=True         : faster CPU->GPU transfer (already present).
+
     Args:
-        data_dir: Root directory containing train/val/test splits
-        batch_size: Batch size for dataloaders
-        num_workers: Number of worker processes
-        image_size: Target image size
-        augment_train: Whether to augment training data
-        
-    Returns:
-        Tuple of (train_loader, val_loader, test_loader)
+        data_dir: Root directory containing train/val/test splits.
+        batch_size: Batch size for dataloaders.
+        num_workers: Number of worker processes (use 0 on Windows if crashes).
+        image_size: Target image size.
+        augment_train: Whether to augment training data (ignored if train_transform given).
+        train_transform: Optional custom transform for train split.
+        val_transform: Optional custom transform for val/test split.
+        pin_memory: Pin memory for faster GPU transfer.
     """
-    # Create transforms
     transforms_obj = DataTransforms(image_size=image_size, augment_train=augment_train)
-    
-    # Create datasets
-    train_dataset = DeepSceneLocDataset(
-        root_dir=data_dir,
-        transform=transforms_obj.get_transform('train'),
-        split='train'
-    )
-    
-    val_dataset = DeepSceneLocDataset(
-        root_dir=data_dir,
-        transform=transforms_obj.get_transform('val'),
-        split='val'
-    )
-    
-    test_dataset = DeepSceneLocDataset(
-        root_dir=data_dir,
-        transform=transforms_obj.get_transform('test'),
-        split='test'
-    )
-    
-    # Create dataloaders
+
+    tr_tfm = train_transform if train_transform is not None else transforms_obj.get_transform('train')
+    va_tfm = val_transform   if val_transform   is not None else transforms_obj.get_transform('val')
+
+    train_dataset = DeepSceneLocDataset(root_dir=data_dir, transform=tr_tfm, split='train')
+    val_dataset   = DeepSceneLocDataset(root_dir=data_dir, transform=va_tfm, split='val')
+    test_dataset  = DeepSceneLocDataset(root_dir=data_dir, transform=va_tfm, split='test')
+
+    # persistent_workers=True keeps workers alive between epochs (no respawn delay)
+    _persistent = num_workers > 0
+    _prefetch   = 2 if num_workers > 0 else None
+
+
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers,
-        pin_memory=True
+        pin_memory=pin_memory,
+        persistent_workers=_persistent,
+        prefetch_factor=_prefetch,
+        drop_last=True,      # avoids uneven last batch with MixUp
     )
-    
+
     val_loader = DataLoader(
         val_dataset,
         batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers,
-        pin_memory=True
+        pin_memory=pin_memory,
+        persistent_workers=_persistent,
+        prefetch_factor=_prefetch,
     )
-    
+
     test_loader = DataLoader(
         test_dataset,
         batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers,
-        pin_memory=True
+        pin_memory=pin_memory,
+        persistent_workers=_persistent,
+        prefetch_factor=_prefetch,
     )
-    
+
     return train_loader, val_loader, test_loader
 
 

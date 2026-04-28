@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepSceneLoc — Visual Scene Understanding & Location Estimation</title>
+  <meta name="description" content="AI-powered image-based location estimation using deep learning. Classifies scenes into 5 categories and identifies exact locations using Gemini Vision AI.">
+  <meta name="theme-color" content="#0a0e1a">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+
+<!-- ── Navbar ─────────────────────────────────────────────── -->
+<nav class="navbar">
+  <a class="nav-logo" href="/">
+    <div class="nav-logo-icon">🌏</div>
+    <span class="nav-logo-text">Deep<span>SceneLoc</span></span>
+  </a>
+
+  <div class="nav-links">
+    <a href="#" class="nav-link active">Analyze</a>
+    <a href="#about" class="nav-link">About</a>
+    <a href="https://github.com/KrishanYadav333/DeepSceneLoc" class="nav-link" target="_blank">GitHub</a>
+    <span class="nav-badge">v2.0</span>
+  </div>
+
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    <span id="nav-status-text">Connecting…</span>
+  </div>
+</nav>
+
+<!-- ── Hero ───────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-tag">
+    🤖 Two-Stage AI System &nbsp;·&nbsp; ResNet-50 + EfficientNet + Gemini Vision
+  </div>
+  <h1>
+    Know Where Any Photo<br>
+    Was Taken — <span class="grad">Instantly</span>
+  </h1>
+  <p>
+    Upload any image. Our hybrid deep learning pipeline first classifies
+    the scene type, then pinpoints the exact location on Earth using Gemini AI —
+    no GPS or metadata needed.
+  </p>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="val">79.17%</div>
+      <div class="lbl">ResNet-50 Val Acc</div>
+    </div>
+    <div class="hero-stat">
+      <div class="val">413K+</div>
+      <div class="lbl">Training Images</div>
+    </div>
+    <div class="hero-stat">
+      <div class="val">5</div>
+      <div class="lbl">Scene Categories</div>
+    </div>
+    <div class="hero-stat">
+      <div class="val">&lt;200ms</div>
+      <div class="lbl">Inference Latency</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Main ───────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- Model info banner -->
+  <div id="model-banner" class="model-banner">
+    <div class="mb-item"><span class="mb-key">Loading model info…</span></div>
+  </div>
+
+  <!-- App grid -->
+  <div class="app-grid">
+
+    <!-- Left: Input -->
+    <div>
+      <div class="card">
+        <div class="card-title"><span class="icon">📸</span> Upload Image</div>
+
+        <div id="drop-zone">
+          <div class="dz-placeholder">
+            <div class="dz-icon">🖼️</div>
+            <div class="dz-title">Drop image here</div>
+            <div class="dz-sub">or click to browse · supports JPG, PNG, WEBP</div>
+            <button class="dz-btn" type="button">Choose File</button>
+            <div class="dz-sub" style="margin-top:6px;font-size:0.7rem">
+              💡 Tip: Paste from clipboard with Ctrl+V
+            </div>
+          </div>
+          <img id="preview-img" alt="Preview">
+        </div>
+        <input type="file" id="file-input" accept="image/*">
+
+        <div class="controls">
+          <!-- Gemini toggle -->
+          <div class="toggle-row">
+            <div class="toggle-label">
+              🌍 Enable Gemini Exact Location
+              <small>Stage 2: identifies exact place, landmarks, GPS coordinates</small>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="gemini-toggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- Analyze button -->
+          <button class="btn-analyze" id="analyze-btn" disabled>
+            <div class="spinner"></div>
+            <span class="btn-text">🔍 Analyze Image</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Categories reference -->
+      <div class="card" style="margin-top:1rem">
+        <div class="card-title"><span class="icon">🗂️</span> Scene Categories</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span>🏖️</span>
+            <div>
+              <strong style="color:var(--coastal)">Coastal</strong>
+              <span style="color:var(--text-muted);margin-left:8px">Beaches, shorelines, ocean views</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span>🌲</span>
+            <div>
+              <strong style="color:var(--forest)">Forest</strong>
+              <span style="color:var(--text-muted);margin-left:8px">Dense woodland, jungle, canopy</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span>⛰️</span>
+            <div>
+              <strong style="color:var(--mountain)">Mountain</strong>
+              <span style="color:var(--text-muted);margin-left:8px">High peaks, alpine, rocky terrain</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span>🌾</span>
+            <div>
+              <strong style="color:var(--rural)">Rural</strong>
+              <span style="color:var(--text-muted);margin-left:8px">Farmland, countryside, villages</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;padding:6px 0">
+            <span>🏙️</span>
+            <div>
+              <strong style="color:var(--urban)">Urban</strong>
+              <span style="color:var(--text-muted);margin-left:8px">Cities, streets, buildings</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Results -->
+    <div class="results-panel">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="card-title" style="padding:1.25rem 1.5rem 0">
+          <span class="icon">📊</span> Analysis Results
+        </div>
+        <div id="results-area" style="padding:1rem 1.5rem 1.5rem">
+          <div class="result-placeholder">
+            <div class="ph-icon">🔬</div>
+            <div>Upload an image to see AI predictions</div>
+            <div style="margin-top:6px;font-size:0.75rem;color:var(--text-muted)">
+              Stage 1 returns in ~50–200ms · Stage 2 (Gemini) in ~1–3s
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="history-panel">
+    <div class="card-title" style="margin-bottom:0">
+      <span class="icon">🕒</span> Recent Analyses
+    </div>
+    <div id="history-grid" class="history-grid"></div>
+  </div>
+
+  <!-- About section -->
+  <div id="about" class="card" style="margin-top:2rem">
+    <div class="card-title"><span class="icon">ℹ️</span> About DeepSceneLoc</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;font-size:0.82rem">
+
+      <div>
+        <div style="font-weight:700;margin-bottom:6px;color:var(--accent-light)">🧠 Pipeline Architecture</div>
+        <div style="color:var(--text-secondary);line-height:1.7">
+          Two-stage hybrid system:<br>
+          <strong>Stage 1</strong> — CNN/ViT scene classifier (5 categories)<br>
+          <strong>Stage 2</strong> — Gemini Vision AI for exact location
+        </div>
+      </div>
+
+      <div>
+        <div style="font-weight:700;margin-bottom:6px;color:var(--accent-light)">📊 Models Trained</div>
+        <div style="color:var(--text-secondary);line-height:1.7">
+          ResNet-50: <strong>79.17%</strong> val accuracy<br>
+          EfficientNet-B0: Training in progress<br>
+          ViT-B/16: Scheduled (Week 9)<br>
+          Dataset: Places365 (413K+ images)
+        </div>
+      </div>
+
+      <div>
+        <div style="font-weight:700;margin-bottom:6px;color:var(--accent-light)">👥 Team</div>
+        <div style="color:var(--text-secondary);line-height:1.7">
+          Krishan Yadav — Architecture Lead<br>
+          Anuj Kondawar — Pipeline Lead<br>
+          Aditi Sah — Evaluation Lead<br>
+          Jensi Paneliya — Demo & UI Lead
+        </div>
+      </div>
+
+      <div>
+        <div style="font-weight:700;margin-bottom:6px;color:var(--accent-light)">🔧 Tech Stack</div>
+        <div style="color:var(--text-secondary);line-height:1.7">
+          PyTorch 2.0 · FastAPI · Vanilla JS<br>
+          torchvision · timm · scikit-learn<br>
+          Google Gemini 1.5 Flash Vision<br>
+          SQLite LRU response cache
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- ── Footer ─────────────────────────────────────────────── -->
+<footer>
+  <div>DeepSceneLoc — Visual Scene Understanding for Image-Based Location Estimation</div>
+  <div style="margin-top:4px;color:var(--text-muted)">
+    BEng Dissertation Project · 2025–2026 · Semester 2 Week 8
+  </div>
+  <div class="footer-links">
+    <a href="https://github.com/KrishanYadav333/DeepSceneLoc" target="_blank">GitHub</a>
+    <a href="/api/status">API Status</a>
+    <a href="/api/models">Models</a>
+  </div>
+</footer>
+
+<!-- Toast container -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Scripts -->
+<script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -4,7 +4,10 @@ Creates plots and visualizations for model evaluation
 Week 6 - Visualization (Supporting: Aditi, Anuj, Jensi)
 """
 
+import matplotlib
+matplotlib.use('Agg')  # save to PNG files only -- no GUI windows, no CPU overhead
 import matplotlib.pyplot as plt
+
 import seaborn as sns
 import numpy as np
 from pathlib import Path
@@ -59,7 +62,6 @@ def plot_confusion_matrix(
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         print(f"Confusion matrix saved to {save_path}")
     
-    plt.show()
     plt.close()
 
 
@@ -106,7 +108,6 @@ def plot_confusion_matrix_normalized(
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         print(f"Normalized confusion matrix saved to {save_path}")
     
-    plt.show()
     plt.close()
 
 
@@ -164,7 +165,6 @@ def plot_per_class_accuracy(
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         print(f"Per-class accuracy plot saved to {save_path}")
     
-    plt.show()
     plt.close()
 
 
@@ -213,7 +213,6 @@ def plot_metrics_comparison(
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         print(f"Metrics comparison plot saved to {save_path}")
     
-    plt.show()
     plt.close()
 
 
@@ -271,7 +270,6 @@ def plot_training_history(
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         print(f"Training history plot saved to {save_path}")
     
-    plt.show()
     plt.close()
 
 
@@ -329,13 +327,13 @@ def create_all_visualizations(
     
     # Training history
     print("5. Creating training history plot...")
-    if Path(history_path).exists():
+    if history_path is not None and Path(history_path).exists():
         plot_training_history(
             history_path,
             save_path=str(output_path / 'training_history.png')
         )
     else:
-        print(f"   Warning: {history_path} not found, skipping training history")
+        print(f"   Skipping training history plot (path not provided or not found)")
     
     print(f"\n[OK] All visualizations saved to {output_dir}")
 

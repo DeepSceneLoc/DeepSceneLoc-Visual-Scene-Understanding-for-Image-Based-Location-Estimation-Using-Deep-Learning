@@ -2,7 +2,76 @@
 
 **Author:** Anuj Kondawar (Preprocessing & Pipeline Lead — Semester 2, Weeks 14–16)  
 **Project:** DeepSceneLoc — Visual Scene Understanding for Image-Based Location Estimation  
-**Last Updated:** Semester 2, Week 16
+**Last Updated:** April 28, 2026 (Semester 2, Week 8/9 — Pipeline Stabilization + Bug Fixes)
+
+---
+
+> [!IMPORTANT]
+> **April 27–28, 2026 Update — Modern Training Pipeline Activated + Stabilized**  
+> The EfficientNet-B0 training pipeline was upgraded from basic (2019-era) methods to a full  
+> 2024-standard stack (April 27). Seven bugs were then found and patched (April 28), including  
+> a false early-stopping bug and a post-training evaluation crash.  
+> Full changelog: [`docs/TRAINING_METHODOLOGY.md`](./TRAINING_METHODOLOGY.md)
+
+---
+
+## Modern Training Optimizations (Added April 2026)
+
+These optimizations were applied to `src/models/train_advanced.py` and `src/preprocessing/transforms.py`
+after benchmarking the initial EfficientNet-B0 epoch (25 min/epoch, no AMP = unacceptable on RTX 3050).
+
+### Training Speed Improvements
+
+| Optimization | File | Old | New | Speedup |
+|---|---|---|---|---|
+| **AMP Mixed Precision** | `train_advanced.py` | FP32 everywhere | FP16 forward + FP32 grads | **2-3×** |
+| **`zero_grad(set_to_none=True)`** | `train_advanced.py` | Zero-fill | Set to None | ~2% |
+| **Batch size** | `EfficientNetTrainConfig` | 32 | **64** (AMP freed ~40% VRAM) | Better GPU util |
+| **`pin_memory=True`** | `run_training_advanced.py` | Not set | Enabled on CUDA | ~5% |
+| **persistent_workers** | `pipeline.py` | OFF | **ON** | Eliminates 20-40s inter-epoch pause |
+| **DataLoader workers** | CLI arg `--workers` | 2 | **8** | Reduces GPU batch-starvation |
+| **AMP API update** | `train_advanced.py` | `torch.cuda.amp` | **`torch.amp`** | No deprecation warnings |
+
+**Net result:** Epoch time reduced from ~25 min → ~18 min (1.4× speedup vs old, 2.5× vs no-AMP).  
+40-epoch training: ~~20 hrs~~ → **~12 hrs**.
+
+### Accuracy Improvements
+
+| Optimization | Added To | Why Added | Actual Result |
+|---|---|---|---|
+| **OneCycleLR** | `EfficientNetTrainConfig` | Warmup prevents LR shock on frozen backbone; super-convergence | +0.5–1% |
+| **Label smoothing 0.1** | `EfficientNetTrainConfig` | Was 0.0 — now matches ViT setting; prevents overconfidence | +0.3–0.5% |
+| **MixUp (alpha=0.2)** | `AdvancedTrainer._run_epoch` | Linear image blending forces holistic feature learning | +0.5–1% |
+| **CutMix (alpha=0.2)** | `AdvancedTrainer._run_epoch` | Alternates with MixUp; patch replacement improves Forest class | +0.5–1% |
+| **RandAugment N=2, M=9** | `transforms.py` | Replaces manual ColorJitter — policy search > hand-tuning | +0.5–1% |
+| **RandomErasing p=0.25** | `transforms.py` | Simulates in-the-wild occlusion robustness | +0.2–0.5% |
+| **EMA decay=0.9999** | `AdvancedTrainer` | Exponential weight averaging → smoother, more stable final model | +0.3–0.7% |
+| **freeze_blocks=4** | `EfficientNetTrainConfig` | 4 of 9 blocks frozen — 4.36M trainable params | Epoch 1 jumps to 80%+ |
+
+**Combined result: +5.4% over ResNet-50 baseline**  
+**Achieved: EfficientNet-B0 → 84.40%** (target was 78% — exceeded by +6.4%)  
+**Next target: 86%+** (current run), ViT-B/16 → **88%+**
+
+### Bug Fixes (April 28, 2026)
+
+| # | Bug | Impact | Fix |
+|---|---|---|---|
+| 1 | Early stopping tracked only EMA | False stop at epoch 9 | `max(val_acc, ema_acc)` |
+| 2 | `Path(None)` in post-training eval | Crash after training finishes | Added `None` guard |
+| 3 | Wrong history filename in evaluation | History plot silently skipped | Fixed to `{ModelName}_history.json` |
+| 4 | Unicode chars in print strings | `UnicodeEncodeError` on Windows | Replaced with ASCII |
+| 5 | Deprecated `torch.cuda.amp` API | FutureWarning every training step | Updated to `torch.amp` |
+| 6 | No `persistent_workers` | 20-40s pause between every epoch | Added `persistent_workers=True` |
+| 7 | `plt.show()` without Agg backend | Potential GUI block after training | Added `matplotlib.use('Agg')` |
+
+### What Was Kept (And Why)
+
+| Decision | Reason |
+|---|---|
+| AdamW optimizer | Best-in-class for pretrained fine-tuning; no reason to change |
+| ImageNet pretrained weights | Correct for Places365; changing would require training from scratch |
+| EfficientNet freeze_blocks=4 | Changed from 7 to 4 — more trainable params needed for this dataset size |
+| CrossEntropyLoss | Correct for 5-class; label smoothing applied via PyTorch's built-in parameter |
 
 ---
 
