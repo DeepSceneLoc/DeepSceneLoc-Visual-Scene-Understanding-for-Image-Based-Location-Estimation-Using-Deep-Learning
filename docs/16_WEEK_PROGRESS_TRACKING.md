@@ -42,7 +42,7 @@
 | Week 6 | <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Complete | Mar 9, 2026 | [____] |
 | Week 7 | <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Complete | Mar 16, 2026 | [____] |
 | Week 8 | Complete | April 28, 2026 | [____] |
-| Week 9 | <svg width="16" height="16" fill="orange"><circle cx="8" cy="8" r="8"/></svg> In Progress | - | [____] |
+| Week 9 | <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> Pending | - | [____] |
 | Week 10 | <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> Pending | - | [____] |
 | Week 11 | <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> Pending | - | [____] |
 | Week 12 | <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> Pending | - | [____] |
@@ -399,7 +399,7 @@
 
 ### Week 9: Vision Transformer Implementation
 **Duration:** March 17-23, 2026  
-**Status:** <svg width="16" height="16" fill="orange"><circle cx="8" cy="8" r="8"/></svg> **IN PROGRESS — Training Running**  
+**Status:** <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> **PENDING — Ready to Start via Script**  
 **Sign-Off Date:** Target: May 11, 2026
 
 #### Planned Deliverables
@@ -409,11 +409,11 @@
 - [x] `ViTTrainConfig` with modern settings (AMP, EMA, MixUp, RandAugment, GradAccum 4×)
 - [x] Training infrastructure ready (`run_training_advanced.py --model vit_b16`)
 - [x] Install `timm` library and verify ViT-B/16 weight loading
-- [ ] Full ViT training on Places365 (40 epochs) — **RUNNING NOW**
+- [ ] Full ViT training on Places365 (40 epochs) — **Ready via start_vit_training.bat**
 - [ ] ViT best checkpoint saved (target val acc ≥ **82%**, raised from 78%)
 - [ ] ViT training curves generated
 
-**Command to run (Running in background):**
+**Command to run (Automated via script):**
 ```bash
 venv\Scripts\pip.exe install timm
 venv\Scripts\python.exe run_training_advanced.py --model vit_b16 ^
