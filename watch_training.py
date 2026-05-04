@@ -11,7 +11,14 @@ from datetime import datetime, timedelta
 
 PROJECT   = Path(__file__).parent
 LOG       = PROJECT / "training.log"
-CKPT      = PROJECT / "models" / "checkpoints" / "efficientnet" / "EfficientNet-B0_best.pth"
+REFRESH   = 15      # seconds between screen refresh
+BATCHES   = 4525    # train batches per epoch
+TOTAL_EP  = 40
+
+def get_checkpoint_path(model_name):
+    if "vit" in model_name.lower():
+        return PROJECT / "models" / "checkpoints" / "vit" / "ViT-B_16_best.pth"
+    return PROJECT / "models" / "checkpoints" / "efficientnet" / "EfficientNet-B0_best.pth"
 REFRESH   = 15      # seconds between screen refresh
 BATCHES   = 4525    # train batches per epoch
 TOTAL_EP  = 40
@@ -44,17 +51,22 @@ def read_log_tail(n_lines=600):
 
 # ── parsers ───────────────────────────────────────────────────────────────────
 
-def get_training_start(head_lines):
-    """Extract training start from Results folder name in header."""
+def get_training_info(head_lines):
+    """Extract training start timestamp and model name from header."""
+    start_ts = None
+    model_name = "EfficientNet-B0"
     for l in head_lines:
-        m = re.search(r'EfficientNet-B0_(\d{8})_(\d{6})', l)
-        if m:
+        m_model = re.search(r'Model\s+:\s+(.+)', l)
+        if m_model:
+            model_name = m_model.group(1).strip()
+            
+        m_ts = re.search(r'(EfficientNet-B0|ViT-B_16)_(\d{8})_(\d{6})', l)
+        if m_ts:
             try:
-                dt = datetime.strptime(m.group(1) + m.group(2), '%Y%m%d%H%M%S')
-                return dt
+                start_ts = datetime.strptime(m_ts.group(2) + m_ts.group(3), '%Y%m%d%H%M%S')
             except Exception:
                 pass
-    return None
+    return start_ts, model_name
 
 def get_tqdm_progress(tail_lines):
     """Return latest tqdm progress dict: phase, pct, done, total, el_s, rem_s, speed."""
@@ -84,24 +96,27 @@ def get_bests(tail_lines):
             bests.append(float(m.group(1)))
     return bests
 
-def get_best_checkpoint():
+def get_best_checkpoint(ckpt_path):
     try:
-        d = torch.load(str(CKPT), map_location='cpu', weights_only=False)
+        d = torch.load(str(ckpt_path), map_location='cpu', weights_only=False)
         return d.get('epoch', 0), round(d.get('val_acc', 0) * 100, 4)
     except Exception:
         return 0, 0.0
 
 # ── main ──────────────────────────────────────────────────────────────────────
 
+# One-time: read header for start timestamp
+head_lines = read_log_head(12000)
+start_ts, model_name   = get_training_info(head_lines)
+
+ckpt_path = get_checkpoint_path(model_name)
+
 print("=" * 72)
-print("  DeepSceneLoc   EfficientNet-B0   Live Watcher v4")
+print(f"  DeepSceneLoc   {model_name}   Live Watcher v4")
 print(f"  training.log  |  Refresh {REFRESH}s  |  Ctrl+C to stop")
 print("=" * 72)
 print()
 
-# One-time: read header for start timestamp
-head_lines = read_log_head(12000)
-start_ts   = get_training_start(head_lines)
 if start_ts:
     print(f"  Training started : {start_ts.strftime('%Y-%m-%d %H:%M:%S')} (local)")
     print()
@@ -116,7 +131,7 @@ try:
         tail      = read_log_tail(600)
         tqdm_info = get_tqdm_progress(tail)
         bests     = get_bests(tail)
-        ck_ep, ck_acc = get_best_checkpoint()
+        ck_ep, ck_acc = get_best_checkpoint(ckpt_path)
         ts        = datetime.now().strftime('%H:%M:%S')
 
         # ── Epoch number ─────────────────────────────────────────────────────
@@ -165,7 +180,7 @@ try:
         time.sleep(REFRESH)
 
 except KeyboardInterrupt:
-    ck_ep, ck_acc = get_best_checkpoint()
+    ck_ep, ck_acc = get_best_checkpoint(ckpt_path)
     print(f"\n\n{'='*60}")
     print(f"  Training running in background -- do not close its terminal")
     print(f"  Best so far  : {ck_acc:.4f}%  at checkpoint epoch={ck_ep}")
