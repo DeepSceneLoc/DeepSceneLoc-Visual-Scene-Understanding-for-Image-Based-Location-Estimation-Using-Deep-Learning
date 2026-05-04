@@ -17,6 +17,12 @@ except ImportError:
     GEMINI_AVAILABLE = False
     print("[WARN] google-generativeai not installed. Run: pip install google-generativeai")
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 
 class GeminiLocationAnalyzer:
     """
