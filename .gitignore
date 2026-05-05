@@ -46,11 +46,14 @@ data/downloads/
 *.hdf5
 /dataset
 /data
+
 # Models (too large for git)
+# Model Checkpoints
 models/checkpoints/
 models/pretrained/
 models/*.pth
 models/*.pt
+!models/checkpoints/vit/ViT-B_16_best.pth
 
 # Results
 results/temp/
@@ -124,3 +127,4 @@ Minor_Report/Final Report/*.synctex.gz
 Minor_Report/Final Report/*.toc
 Minor_Report/Final Report/*.xwm
 resume_vit_training.bat
+start_vit_training.bat

@@ -1,8 +1,8 @@
 # Semester 2 Completion Summary
 ## DeepSceneLoc Project
 
-**Date:** May 4, 2026  
-**Status:** 100% Core Technical Implementation Complete
+**Date:** May 5, 2026  
+**Status:** 100% Core Technical Implementation Complete (FINAL METRICS OBTAINED)
 
 ---
 
@@ -27,8 +27,8 @@ We successfully delivered on this promise by creating a two-stage architecture:
   - **Stochastic Depth (Drop Path 0.1):** Acts as a powerful regularizer to prevent ViT from overfitting.
   - **Test-Time Augmentation (TTA):** Averages predictions over original and horizontally flipped images.
   - **Class-Weighted Loss:** Dynamically accounts for dataset imbalances (e.g., Urban vs Forest).
-  - **Full Auto-Resume:** Ensures safe multi-session training by perfectly restoring Weights, Optimizer, Schedulers, and EMA states.
   - **AMP (Automatic Mixed Precision):** Cuts GPU VRAM usage by 40% and speeds up epoch times by 2-3x.
+- **FINAL RESULTS:** The ViT-B/16 model training successfully completed, triggering early stopping at Epoch 30 (peak validation at Epoch 20: 86.31%). The final full-dataset Test Evaluation yielded a **Macro F1-Score of 0.8412**, easily surpassing the project's threshold of 0.82. All visualizations (Confusion Matrix, Metrics Comparison, Per-Class Accuracies) have been exported.
 
 ---
 
@@ -49,7 +49,6 @@ We successfully delivered on this promise by creating a two-stage architecture:
 ## 4. Final Polish & Documentation (Phase 3)
 
 - **Training Methodology:** `TRAINING_METHODOLOGY.md` was rigorously updated to serve as a perfect foundation for the final dissertation, detailing exactly what was changed from 2019 standards to 2024 standards and *why*.
-- **Scripts:** Added quality-of-life improvements like `auto_resume_vit.bat` and `watch_training.py` for long-running training monitoring.
-- **Performance:** System optimized using `persistent_workers`, `pin_memory`, and `set_to_none=True` for gradients.
+- **Performance:** System optimized using `persistent_workers`, `pin_memory`, and `set_to_none=True` for gradients, reducing memory crashes (OOM) by halving the dataloader worker count where necessary.
 
 **Conclusion:** All technical deliverables for Semester 2 are completed. The project is fully ready for the final Viva preparation, Report generation, and Presentation.
