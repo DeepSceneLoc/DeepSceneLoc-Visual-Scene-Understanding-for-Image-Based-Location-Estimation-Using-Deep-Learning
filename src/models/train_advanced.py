@@ -351,6 +351,7 @@ class AdvancedTrainer:
         val_loader: DataLoader,
         config,
         device: str = "cuda",
+        resume_checkpoint: dict = None,
     ):
         self.model = model.to(device)
         self.train_loader = train_loader
@@ -365,9 +366,19 @@ class AdvancedTrainer:
         self.log_dir.mkdir(parents=True, exist_ok=True)
 
         # Loss
-        self.criterion = nn.CrossEntropyLoss(
-            label_smoothing=config.label_smoothing
-        )
+        try:
+            from src.preprocessing.pipeline import get_class_weights
+            class_weights = get_class_weights(self.train_loader.dataset).to(device)
+            self.criterion = nn.CrossEntropyLoss(
+                weight=class_weights,
+                label_smoothing=config.label_smoothing
+            )
+            print(f"  Loss   : CrossEntropy (Class weights: {class_weights.cpu().numpy().round(2)})")
+        except Exception as e:
+            self.criterion = nn.CrossEntropyLoss(
+                label_smoothing=config.label_smoothing
+            )
+            print(f"  Loss   : CrossEntropy (No class weights: {e})")
 
         # Optimizer -- only trainable params
         self.optimizer = optim.AdamW(
@@ -418,6 +429,21 @@ class AdvancedTrainer:
         }
         self.best_val_acc = 0.0
         self.epochs_no_improve = 0
+        self.start_epoch = 1
+
+        if resume_checkpoint is not None:
+            if "optimizer_state" in resume_checkpoint:
+                self.optimizer.load_state_dict(resume_checkpoint["optimizer_state"])
+            if "scheduler_state" in resume_checkpoint:
+                self.scheduler.load_state_dict(resume_checkpoint["scheduler_state"])
+            if "scaler_state" in resume_checkpoint and self.use_amp:
+                self.scaler.load_state_dict(resume_checkpoint["scaler_state"])
+            if "ema_state" in resume_checkpoint and self.use_ema:
+                self.ema.module.load_state_dict(resume_checkpoint["ema_state"])
+            
+            self.start_epoch = resume_checkpoint.get("epoch", 0) + 1
+            self.best_val_acc = resume_checkpoint.get("val_acc", 0.0)
+            print(f"  [Resume] Full training state restored. Starting at epoch {self.start_epoch}.")
 
         print(f"  AMP    : {'ON' if self.use_amp else 'OFF (CPU)'}")
         print(f"  EMA    : {'ON  (decay=' + str(getattr(config, 'ema_decay', '--')) + ')' if self.use_ema else 'OFF'}")
@@ -426,14 +452,14 @@ class AdvancedTrainer:
 
     # ----------------------------------------------------------
     def _run_epoch(
-        self, loader: DataLoader, train: bool
+        self, loader: DataLoader, epoch: int, train: bool
     ) -> Tuple[float, float]:
         """One epoch with AMP, MixUp/CutMix, gradient accumulation."""
         self.model.train(train)
         total_loss, correct, total = 0.0, 0, 0
         use_mix = train and (self.use_mixup or self.use_cutmix)
 
-        desc = "Train" if train else "Val"
+        desc = f"Ep {epoch}/{self.config.epochs} [{ 'Train' if train else 'Val' }]"
         self.optimizer.zero_grad(set_to_none=True)  # faster than zero_grad()
 
         with torch.set_grad_enabled(train):
@@ -501,7 +527,7 @@ class AdvancedTrainer:
         Kept for backward compat. Returns 0.0."""
         return 0.0
 
-    def _run_val_with_ema(self, loader: DataLoader) -> tuple:
+    def _run_val_with_ema(self, loader: DataLoader, epoch: int) -> tuple:
         """
         Single pass over val loader that SIMULTANEOUSLY evaluates
         both the raw model and the EMA model.
@@ -513,11 +539,11 @@ class AdvancedTrainer:
         if self.use_ema:
             self.ema.module.eval()
 
-        total_loss = 0.0
-        correct_raw = correct_ema = total = 0
+        total_loss, correct_raw, correct_ema, total = 0.0, 0, 0, 0
+        desc = f"Ep {epoch}/{self.config.epochs} [Val]"
 
         with torch.no_grad():
-            for imgs, labels in tqdm(loader, desc="Val", leave=False):
+            for imgs, labels in tqdm(loader, desc=desc, leave=False):
                 imgs   = imgs.to(self.device, non_blocking=True)
                 labels = labels.to(self.device, non_blocking=True)
 
@@ -560,14 +586,14 @@ class AdvancedTrainer:
         print(f"  Grad clip : {self.config.gradient_clip}")
         print(f"{'='*60}\n")
 
-        for epoch in range(1, self.config.epochs + 1):
+        for epoch in range(self.start_epoch, self.config.epochs + 1):
             t0 = time.perf_counter()
 
-            train_loss, train_acc = self._run_epoch(self.train_loader, train=True)
+            train_loss, train_acc = self._run_epoch(self.train_loader, epoch=epoch, train=True)
 
             # Single val pass evaluates both raw model AND EMA simultaneously
             # (was previously TWO full passes over 62K images -- fixed)
-            val_loss, val_acc, ema_acc = self._run_val_with_ema(self.val_loader)
+            val_loss, val_acc, ema_acc = self._run_val_with_ema(self.val_loader, epoch=epoch)
 
             current_lr = self.optimizer.param_groups[0]["lr"]
 

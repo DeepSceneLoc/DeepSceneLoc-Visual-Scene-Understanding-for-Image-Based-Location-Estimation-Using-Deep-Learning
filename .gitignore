@@ -73,7 +73,7 @@ training.log
 .DS_Store
 Thumbs.db
 desktop.ini
-
+start_vit_training.bat
 # Environment variables
 .env
 .env.local
@@ -123,3 +123,4 @@ Minor_Report/Final Report/*.out
 Minor_Report/Final Report/*.synctex.gz
 Minor_Report/Final Report/*.toc
 Minor_Report/Final Report/*.xwm
+resume_vit_training.bat

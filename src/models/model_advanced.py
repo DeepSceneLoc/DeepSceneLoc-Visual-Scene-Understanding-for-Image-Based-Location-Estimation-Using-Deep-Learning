@@ -178,6 +178,7 @@ class DeepSceneLocViTAdvanced(nn.Module):
             "vit_base_patch16_224",
             pretrained=pretrained,
             num_classes=0,          # Remove the ImageNet head -> output is (B, 768)
+            drop_path_rate=0.1,     # Stochastic Depth (Drop Path) for better regularization
         )
 
         # Freeze patch embedding + positional embedding

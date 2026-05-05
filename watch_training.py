@@ -56,14 +56,14 @@ def get_training_info(head_lines):
     start_ts = None
     model_name = "EfficientNet-B0"
     for l in head_lines:
-        m_model = re.search(r'Model\s+:\s+(.+)', l)
-        if m_model:
-            model_name = m_model.group(1).strip()
-            
         m_ts = re.search(r'(EfficientNet-B0|ViT-B_16)_(\d{8})_(\d{6})', l)
         if m_ts:
             try:
                 start_ts = datetime.strptime(m_ts.group(2) + m_ts.group(3), '%Y%m%d%H%M%S')
+                if "ViT" in m_ts.group(1):
+                    model_name = "ViT-B/16"
+                else:
+                    model_name = "EfficientNet-B0"
             except Exception:
                 pass
     return start_ts, model_name
@@ -71,11 +71,14 @@ def get_training_info(head_lines):
 def get_tqdm_progress(tail_lines):
     """Return latest tqdm progress dict: phase, pct, done, total, el_s, rem_s, speed."""
     pattern = re.compile(
-        r'(Train|Val):\s+(\d+)%\|[^|]*\|\s*(\d+)/(\d+)\s+\[(\d+):(\d+)<(\d+):(\d+),\s*([\d.]+)it/s'
+        r'(Train|Val):\s+(\d+)%\|[^|]*\|\s*(\d+)/(\d+)\s+\[(\d+):(\d+)<(\d+):(\d+),\s*([\d.]+)(it/s|s/it)'
     )
     for l in reversed(tail_lines):
         m = pattern.search(l)
         if m:
+            speed = float(m.group(9))
+            if m.group(10) == 's/it' and speed > 0:
+                speed = 1.0 / speed
             return {
                 'phase' : m.group(1),
                 'pct'   : int(m.group(2)),
@@ -83,9 +86,17 @@ def get_tqdm_progress(tail_lines):
                 'total' : int(m.group(4)),
                 'el_s'  : int(m.group(5)) * 60 + int(m.group(6)),
                 'rem_s' : int(m.group(7)) * 60 + int(m.group(8)),
-                'speed' : float(m.group(9)),
+                'speed' : speed,
             }
     return None
+
+def get_current_epoch(tail_lines):
+    """Return the current epoch from log tail."""
+    for l in reversed(tail_lines):
+        m = re.search(r'(?:Epoch|Ep)\s+(\d+)/(\d+)', l)
+        if m:
+            return int(m.group(1)), int(m.group(2))
+    return None, None
 
 def get_bests(tail_lines):
     """Return list of val_acc floats from [BEST] lines in log tail."""
@@ -96,8 +107,17 @@ def get_bests(tail_lines):
             bests.append(float(m.group(1)))
     return bests
 
-def get_best_checkpoint(ckpt_path):
+def get_best_checkpoint(ckpt_path, start_ts=None):
     try:
+        if not ckpt_path.exists():
+            return 0, 0.0
+        
+        # If the checkpoint is older than the current training session, ignore it
+        if start_ts is not None:
+            mtime = datetime.fromtimestamp(ckpt_path.stat().st_mtime)
+            if mtime < start_ts:
+                return 0, 0.0
+
         d = torch.load(str(ckpt_path), map_location='cpu', weights_only=False)
         return d.get('epoch', 0), round(d.get('val_acc', 0) * 100, 4)
     except Exception:
@@ -131,17 +151,21 @@ try:
         tail      = read_log_tail(600)
         tqdm_info = get_tqdm_progress(tail)
         bests     = get_bests(tail)
-        ck_ep, ck_acc = get_best_checkpoint(ckpt_path)
+        ck_ep, ck_acc = get_best_checkpoint(ckpt_path, start_ts)
+        cur_ep, tot_ep = get_current_epoch(tail)
         ts        = datetime.now().strftime('%H:%M:%S')
 
         # ── Epoch number ─────────────────────────────────────────────────────
+        if cur_ep is not None:
+            ep_estimate = cur_ep
+            if tot_ep: TOTAL_EP = tot_ep
+        else:
+            ep_estimate = ck_ep + 1 if ck_ep > 0 else 1
+
         if start_ts:
             elapsed_s   = (datetime.now() - start_ts).total_seconds()
-            EP_SEC      = 500.0   # ~8.3 min/epoch measured
-            ep_estimate = min(int(elapsed_s / EP_SEC) + 1, TOTAL_EP)
             elapsed_str = str(timedelta(seconds=int(elapsed_s)))
         else:
-            ep_estimate = ck_ep + 1
             elapsed_str = '?'
 
         # ── Announce new bests ───────────────────────────────────────────────

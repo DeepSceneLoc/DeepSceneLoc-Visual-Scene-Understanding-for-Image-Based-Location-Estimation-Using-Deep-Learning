@@ -50,10 +50,13 @@ class ModelEvaluator:
         self.all_labels = []
         self.all_probabilities = []
     
-    def evaluate(self) -> Dict:
+    def evaluate(self, use_tta: bool = True) -> Dict:
         """
-        Evaluate model on test set
+        Evaluate model on test set with optional Test-Time Augmentation (TTA).
         
+        Args:
+            use_tta: If True, uses Horizontal Flip TTA to improve accuracy.
+            
         Returns:
             Dictionary containing all evaluation metrics
         """
@@ -71,8 +74,21 @@ class ModelEvaluator:
                 
                 # Forward pass
                 outputs = self.model(inputs)
-                probabilities = torch.softmax(outputs, dim=1)
-                _, predicted = torch.max(outputs, 1)
+                
+                if use_tta:
+                    # Test-Time Augmentation: Original + Horizontal Flip
+                    inputs_flipped = torch.flip(inputs, dims=[3])
+                    outputs_flipped = self.model(inputs_flipped)
+                    
+                    prob_orig = torch.softmax(outputs, dim=1)
+                    prob_flipped = torch.softmax(outputs_flipped, dim=1)
+                    
+                    # Average probabilities
+                    probabilities = (prob_orig + prob_flipped) / 2.0
+                else:
+                    probabilities = torch.softmax(outputs, dim=1)
+                    
+                _, predicted = torch.max(probabilities, 1)
                 
                 # Store results
                 self.all_predictions.extend(predicted.cpu().numpy())

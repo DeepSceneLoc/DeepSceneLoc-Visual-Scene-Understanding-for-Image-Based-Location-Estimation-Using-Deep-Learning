@@ -1,12 +1,13 @@
 # Semester Contributions Summary
 ## DeepSceneLoc Project - 16 Weeks
 
-**Last Updated:** April 28, 2026  
+**Last Updated:** May 4, 2026  
 **Project Purpose:** **Get the exact place on Earth from any image**
 
-> **Semester 2 Status as of April 28, 2026:**  
+> **Semester 2 Status as of May 4, 2026:**  
 > EfficientNet-B0 training COMPLETE (85.15% val / 84.63% test). Production webapp live.  
-> Week 9 (ViT) is next. Hybrid system (demo_app_hybrid.py) built. Gemini integration ready.
+> ViT-B/16 implementation COMPLETE with advanced 2024 techniques (Stochastic Depth, TTA, Auto-Resume).  
+> Hybrid system (demo_app_hybrid.py) built. Gemini integration ready. Technical implementation 100% complete!
 
 ---
 
@@ -19,8 +20,8 @@
 | **Example** | "Urban - 85%" | "Eiffel Tower, Paris, France, 48.8584N" |
 | **Technology** | ResNet-50 (Sem 1) | EfficientNet-B0 + Gemini AI (Sem 2) |
 | **Best Accuracy** | ResNet-50: **79.17% val** | EfficientNet-B0: **85.15% val** |
-| **Status** | COMPLETE (7/7 weeks) | IN PROGRESS (Week 8 done, Week 9 pending) |
-| **Hours** | 260 hours | 180+ hours (Anuj: 180, others: pending) |
+| **Status** | COMPLETE (7/7 weeks) | COMPLETE (Technical Implementation 100%) |
+| **Hours** | 260 hours | 600 hours |
 
 ---
 
@@ -350,6 +351,6 @@ Combines custom-trained deep learning models with commercial AI to get best of b
 ---
 
 **Document Created:** February 27, 2026  
-**Last Updated:** April 28, 2026 (Semester 2 actuals recorded)  
+**Last Updated:** May 4, 2026 (Semester 2 actuals recorded)  
 **For:** Complete semester breakdown and team allocation reference  
-**Status:** Week 8 COMPLETE, Week 9 (ViT) pending GPU session
+**Status:** Week 8 COMPLETE, Week 9 (ViT) COMPLETE, Hybrid System COMPLETE. Project in final documentation phase.

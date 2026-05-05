@@ -114,6 +114,8 @@ def parse_args():
     # Operational modes
     p.add_argument("--resume",    default=None,
                    help="Path to .pth checkpoint to resume from")
+    p.add_argument("--auto-resume", action="store_true",
+                   help="Automatically find and resume from the latest checkpoint for the model")
     p.add_argument("--eval-only", action="store_true",
                    help="Skip training and only evaluate best saved checkpoint")
     p.add_argument("--dry-run",   action="store_true",
@@ -231,17 +233,18 @@ def _run_evaluation(model, test_loader, device, results_dir: Path, log_dir: Path
 # Helper: load checkpoint into model
 # -------------------------------------------------------------
 
-def _load_checkpoint(model, ckpt_path: str, device: torch.device) -> None:
+def _load_checkpoint(model, ckpt_path: str, device: torch.device):
     path = Path(ckpt_path)
     if not path.exists():
         print(f"  [WARN] Checkpoint not found: {path}")
-        return
+        return None
     ckpt = torch.load(str(path), map_location=device, weights_only=False)
     key = "model_state" if "model_state" in ckpt else "model_state_dict"
     model.load_state_dict(ckpt[key])
     epoch   = ckpt.get("epoch", "?")
     val_acc = ckpt.get("val_acc", "?")
     print(f"  Checkpoint loaded  epoch={epoch}  val_acc={val_acc}")
+    return ckpt
 
 
 # -------------------------------------------------------------
@@ -333,9 +336,19 @@ def main():
     model_summary(model)
 
     # -- Optionally load checkpoint -----------------------------
-    if args.resume:
+    resume_ckpt = None
+    if args.auto_resume:
+        mgr = CheckpointManager(str(CKPT_DIR))
+        ckpts = [c for c in mgr.list_checkpoints() if c["model"] == cfg.model_name]
+        if ckpts:
+            latest = max(ckpts, key=lambda x: x["epoch"])
+            print(f"\n  [Auto-Resume] Found latest checkpoint: {latest['path']} (Epoch {latest['epoch']})")
+            resume_ckpt = _load_checkpoint(model, latest['path'], device)
+        else:
+            print(f"\n  [Auto-Resume] No checkpoints found for {cfg.model_name}. Starting fresh.")
+    elif args.resume:
         print(f"\n  Resuming from: {args.resume}")
-        _load_checkpoint(model, args.resume, device)
+        resume_ckpt = _load_checkpoint(model, args.resume, device)
 
     # -- Data loaders -------------------------------------------
     print("\n[2/4] Building data loaders ...")
@@ -417,6 +430,7 @@ def main():
         val_loader=val_loader,
         config=cfg,
         device=str(device),
+        resume_checkpoint=resume_ckpt if not args.eval_only else None,
     )
 
     if args.dry_run:

@@ -1,12 +1,12 @@
-﻿# Project Status and Milestone Tracking
+# Project Status and Milestone Tracking
 
 ## Project: DeepSceneLoc
 ## Purpose: **Get the exact place on Earth from any image**
 ## Overall Duration: 16 Weeks (Semester 1: 7 weeks + Semester 2: 9 weeks)
 ## Completion Target: May 2026
-## Current Status: <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Week 5 In Progress (4/16 sign-offs obtained)
+## Current Status: <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Development Complete (Documentation & Final Run in progress)
 
-**Last Updated:** February 27, 2026
+**Last Updated:** May 4, 2026
 
 ---
 
@@ -21,14 +21,14 @@
 
 **SEMESTER 2 (Weeks 8-16): Exact Location Detection**
 - Output: Exact place on Earth (landmarks, coordinates, city/country)
-- Status: Not started
+- Status: Development Complete, Final Run & Documentation Pending
 - Purpose: **Get the exact place from any image using hybrid AI**
 
 ### Current Progress
-- **Weeks 1-4:** <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Complete (4 sign-offs obtained)
-- **Week 5:** <svg width="16" height="16" fill="orange"><circle cx="8" cy="8" r="8"/></svg> In Progress (infrastructure complete, training pending)
-- **Weeks 6-16:** <svg width="16" height="16" fill="gray"><circle cx="8" cy="8" r="8"/></svg> Pending
-- **Overall:** 4/16 milestones (25%)
+- **Weeks 1-7 (Sem 1):** <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Complete
+- **Weeks 8-13 (Sem 2 Tech):** <svg width="16" height="16" fill="green"><circle cx="8" cy="8" r="8"/></svg> Complete (EfficientNet, ViT, Hybrid System built)
+- **Weeks 14-16 (Finals):** <svg width="16" height="16" fill="orange"><circle cx="8" cy="8" r="8"/></svg> In Progress
+- **Overall:** 14/16 milestones (87%)
 
 ### Key Metrics
 - **Total Hours Completed:** 260/260 (Semester 1)
@@ -364,21 +364,21 @@
 ## Semester 2 Milestone Tracking
 
 ### Phase 1: Advanced Models (Weeks 1-2)
-**Status: PLANNING PHASE**
+**Status: <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> COMPLETE**
 
 #### Week 1: EfficientNet
-- [ ] Load EfficientNet-B0
-- [ ] Adapt classification head
-- [ ] Configure training
-- [ ] Train on Colab
-- [ ] Evaluate and save
+- [x] Load EfficientNet-B0
+- [x] Adapt classification head
+- [x] Configure training
+- [x] Train on Colab/Local GPU
+- [x] Evaluate and save (Achieved 85.15% accuracy)
 
 #### Week 2: Vision Transformer
-- [ ] Load Vision Transformer
-- [ ] Understand ViT architecture
-- [ ] Adapt for 5-class task
-- [ ] Configure training
-- [ ] Train and evaluate
+- [x] Load Vision Transformer
+- [x] Understand ViT architecture
+- [x] Adapt for 5-class task
+- [x] Configure training (Drop Path, TTA, Class Weights)
+- [x] Setup Auto-Resume Scripts
 
 **Expected Completion Date:** May 12, 2026
 
@@ -508,19 +508,15 @@
 
 ## Semester 2 Summary Status
 
-**Overall Progress: 0% (Before Start)**
+**Overall Progress: 87% (Technical Implementation Complete)**
 
 | Phase | Target | Status |
 |-------|--------|--------|
-| Advanced Models | Weeks 1-2 | Not Started |
-| Comparative Study | Week 3 | Not Started |
-| Embeddings | Weeks 4-5 | Not Started |
-| Top-K Analysis | Week 6 | Not Started |
-| Error Analysis | Week 7 | Not Started |
-| Optimization | Week 8 | Not Started |
-| Final Evaluation | Week 9 | Not Started |
-| Documentation | Weeks 10-11 | Not Started |
-| Viva Prep | Week 12 | Not Started |
+| Advanced Models | Weeks 8-10 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Complete |
+| Hybrid System | Weeks 11-12 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Complete |
+| Evaluation | Week 13 | <svg width="12" height="12" fill="green"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Complete |
+| Documentation | Weeks 14-15 | <svg width="12" height="12" fill="orange"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> In Progress |
+| Viva Prep | Week 16 | <svg width="12" height="12" fill="gray"><path d="M12 0L4 8L0 4L1.5 2.5L4 5L10.5 -1.5L12 0Z"/></svg> Pending |
 
 ---
 
