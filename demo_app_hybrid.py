@@ -397,9 +397,11 @@ def build_ui() -> gr.Blocks:
         "✅ Model loaded from checkpoint" if (model is not None and Path(DEFAULT_MODEL_PATH).exists())
         else "⚠️ Demo mode (random weights — upload your checkpoint)"
     )
+    provider = getattr(_gemini_analyzer.analyzer if hasattr(_gemini_analyzer, 'analyzer') else _gemini_analyzer, 'mode', 'AI')
     gemini_status = (
-        "✅ Gemini AI ready (with SQLite cache)" if _gemini_analyzer is not None
-        else "⚠️ Gemini not configured (set GEMINI_API_KEY for exact location detection)"
+        f"✅ Gemini ready ({provider.title()} via OpenRouter)" if provider == "openrouter"
+        else ("✅ Gemini ready (Native SDK)" if _gemini_analyzer is not None
+        else "⚠️ Gemini not configured (set OPENROUTER_API_KEY or GEMINI_API_KEY)")
     )
 
     with gr.Blocks(

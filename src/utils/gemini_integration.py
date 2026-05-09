@@ -15,7 +15,10 @@ try:
     GEMINI_AVAILABLE = True
 except ImportError:
     GEMINI_AVAILABLE = False
-    print("[WARN] google-generativeai not installed. Run: pip install google-generativeai")
+    # Only warn if explicitly using Google SDK
+
+import requests
+import time
 
 try:
     from dotenv import load_dotenv
@@ -31,28 +34,27 @@ class GeminiLocationAnalyzer:
     
     def __init__(self, api_key: Optional[str] = None):
         """
-        Initialize Gemini API
-        
-        Args:
-            api_key: Gemini API key (or set GEMINI_API_KEY environment variable)
+        Initialize Gemini API (Native or OpenRouter)
         """
-        if not GEMINI_AVAILABLE:
-            raise ImportError("google-generativeai not installed")
-        
-        # Get API key from parameter or environment
-        self.api_key = api_key or os.getenv('GEMINI_API_KEY')
-        
-        if not self.api_key:
+        # Load environment
+        self.openrouter_key = os.getenv('OPENROUTER_API_KEY')
+        self.openrouter_model = os.getenv('OPENROUTER_MODEL', 'google/gemini-flash-1.5')
+        self.gemini_api_key = api_key or os.getenv('GEMINI_API_KEY')
+
+        if self.openrouter_key:
+            print(f"[OK] OpenRouter initialized (Model: {self.openrouter_model})")
+            self.mode = "openrouter"
+        elif self.gemini_api_key:
+            if not GEMINI_AVAILABLE:
+                raise ImportError("google-generativeai not installed. Required for native Gemini mode.")
+            genai.configure(api_key=self.gemini_api_key)
+            self.model = genai.GenerativeModel('gemini-1.5-flash')
+            self.mode = "native"
+            print("[OK] Native Gemini AI initialized successfully")
+        else:
             raise ValueError(
-                "Gemini API key not provided. Either pass api_key parameter or "
-                "set GEMINI_API_KEY environment variable"
+                "No API key found. Please set OPENROUTER_API_KEY or GEMINI_API_KEY in .env"
             )
-        
-        # Configure Gemini
-        genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel('gemini-1.5-flash')
-        
-        print("[OK] Gemini AI initialized successfully")
     
     def analyze_location(
         self, 
@@ -89,12 +91,16 @@ class GeminiLocationAnalyzer:
         prompt = self._create_location_prompt(predicted_category, confidence)
         
         try:
-            # Call Gemini API
-            response = self.model.generate_content([prompt, image])
+            if self.mode == "openrouter":
+                result_text = self._analyze_via_openrouter(image, prompt)
+            else:
+                # Call Native Gemini API
+                response = self.model.generate_content([prompt, image])
+                result_text = response.text
             
             # Parse response
-            result = self._parse_gemini_response(response.text, predicted_category)
-            
+            result = self._parse_gemini_response(result_text, predicted_category)
+            result['provider'] = self.mode
             return result
             
         except Exception as e:
@@ -104,7 +110,51 @@ class GeminiLocationAnalyzer:
                 'confidence': 'none',
                 'description': f'Error analyzing image: {str(e)}'
             }
-    
+            
+    def _analyze_via_openrouter(self, image: Image.Image, prompt: str) -> str:
+        """Helper to call OpenRouter API via requests"""
+        # Convert image to base64
+        buffered = BytesIO()
+        image.save(buffered, format="JPEG")
+        img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+
+        headers = {
+            "Authorization": f"Bearer {self.openrouter_key}",
+            "HTTP-Referer": "https://github.com/KrishanYadav333/DeepSceneLoc",
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "model": self.openrouter_model,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{img_base64}"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers=headers,
+            json=payload,
+            timeout=30
+        )
+        
+        if response.status_code != 200:
+            raise Exception(f"OpenRouter Error ({response.status_code}): {response.text}")
+            
+        data = response.json()
+        return data['choices'][0]['message']['content']
+
     def _create_location_prompt(self, category: str = None, confidence: float = None) -> str:
         """Create detailed prompt for Gemini"""
         
