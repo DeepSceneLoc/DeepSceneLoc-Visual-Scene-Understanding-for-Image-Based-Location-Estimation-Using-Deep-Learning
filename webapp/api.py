@@ -79,14 +79,17 @@ CLASS_DESC  = {
 
 CHECKPOINT_PRIORITY = [
     # Phase 2 High-Precision: ViT-B/16 (Highest accuracy) — PRIMARY
-    ("vit_b16",         "model_repo/ViT-B_16_best.pth"),
-    ("vit_b16",         "models/checkpoints/vit/ViT-B_16_epoch030.pth"),
+    ("vit_b16",         "model_repo/ViT-B_16/ViT-B_16_best.pth"),
     
     # Phase 2 Production: EfficientNet-B0 — FALLBACK
-    ("efficientnet_b0", "models/checkpoints/efficientnet/EfficientNet-B0_best.pth"),
-    ("efficientnet_b0", "model_repo/EfficientNet-B0_best.pth"),
+    ("efficientnet_b0", "model_repo/EfficientNet-B0/EfficientNet-B0_best.pth"),
     
     # Phase 1: ResNet-50 — LEGACY
+    ("resnet50",        "model_repo/ResNet50/ResNet50_best_model.pth"),
+    
+    # Local checkpoints (if re-trained)
+    ("vit_b16",         "models/checkpoints/vit/ViT-B_16_epoch030.pth"),
+    ("efficientnet_b0", "models/checkpoints/efficientnet/EfficientNet-B0_best.pth"),
     ("resnet50",        "models/checkpoints/resnet/best_model.pth"),
 ]
 

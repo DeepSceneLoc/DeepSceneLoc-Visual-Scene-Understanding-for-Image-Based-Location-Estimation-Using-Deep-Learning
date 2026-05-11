@@ -54,13 +54,22 @@ class DemoModel:
         # Load model (or create untrained for demo)
         try:
             self.model = create_model('resnet50', num_classes=5, pretrained=True)
-            # Try to load trained weights if available
-            try:
-                checkpoint = torch.load('models/checkpoints/resnet/best_model.pth', 
-                                       map_location=self.device)
-                self.model.load_state_dict(checkpoint['model_state_dict'])
-                self.model_status = "[OK] Trained Model Loaded"
-            except:
+            # Try to load trained weights if available (model_repo > local)
+            checkpoint_paths = [
+                'model_repo/ResNet50/ResNet50_best_model.pth',
+                'models/checkpoints/resnet/best_model.pth',
+            ]
+            loaded = False
+            for ckpt_path in checkpoint_paths:
+                try:
+                    checkpoint = torch.load(ckpt_path, map_location=self.device)
+                    self.model.load_state_dict(checkpoint['model_state_dict'] if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint else checkpoint)
+                    self.model_status = f"[OK] Trained Model Loaded from {ckpt_path}"
+                    loaded = True
+                    break
+                except:
+                    continue
+            if not loaded:
                 self.model_status = "[WARN] Using Pretrained Backbone (Demo Mode)"
         except:
             # Fallback: create simple model for demo

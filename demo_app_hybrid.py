@@ -96,9 +96,24 @@ CLASS_DESCRIPTIONS = {
 }
 
 # ── Default paths
-DEFAULT_MODEL_PATH = os.getenv("MODEL_PATH", "models/checkpoints/efficientnet/EfficientNet-B0_best.pth")
-DEFAULT_ARCH       = os.getenv("MODEL_ARCH",  "efficientnet_b0")
-GEMINI_API_KEY     = os.getenv("GEMINI_API_KEY", "")
+# Primary: model_repo (recommended), Fallback: local checkpoints
+MODEL_SEARCH_PATHS = {
+    "efficientnet_b0": [
+        "model_repo/EfficientNet-B0/EfficientNet-B0_best.pth",
+        "models/checkpoints/efficientnet/EfficientNet-B0_best.pth",
+    ],
+    "vit_b16": [
+        "model_repo/ViT-B_16/ViT-B_16_best.pth",
+        "models/checkpoints/vit/ViT-B_16_epoch030.pth",
+    ],
+    "resnet50": [
+        "model_repo/ResNet50/ResNet50_best_model.pth",
+        "models/checkpoints/resnet/best_model.pth",
+    ],
+}
+DEFAULT_ARCH = os.getenv("MODEL_ARCH", "efficientnet_b0")
+DEFAULT_MODEL_PATH = os.getenv("MODEL_PATH", MODEL_SEARCH_PATHS.get(DEFAULT_ARCH, ["models/checkpoints/efficientnet/EfficientNet-B0_best.pth"])[0])
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 
 # ─────────────────────────────────────────────────────────────
@@ -120,14 +135,34 @@ def _load_model(
             print("[WARN] No model factories available.")
             return None
 
-        p = Path(model_path)
-        if p.exists():
-            ckpt  = torch.load(str(p), map_location=device, weights_only=False)
-            key   = "model_state" if "model_state" in ckpt else "model_state_dict"
-            model.load_state_dict(ckpt[key])
-            print(f"[OK]   Model loaded from {p}")
-        else:
-            print(f"[WARN] Checkpoint not found at {p}. Using random weights (demo mode).")
+        # Try model_path first, then search paths for the architecture
+        search_paths = [model_path] if model_path else []
+        if arch in MODEL_SEARCH_PATHS:
+            search_paths.extend(MODEL_SEARCH_PATHS[arch])
+        
+        loaded = False
+        for p_str in search_paths:
+            p = Path(p_str)
+            if p.exists():
+                try:
+                    ckpt = torch.load(str(p), map_location=device, weights_only=False)
+                    # Support multiple key formats
+                    if "ema_state" in ckpt:
+                        key = "ema_state"
+                    elif "model_state" in ckpt:
+                        key = "model_state"
+                    else:
+                        key = "model_state_dict"
+                    model.load_state_dict(ckpt[key])
+                    print(f"[OK]   Model loaded from {p}")
+                    loaded = True
+                    break
+                except Exception as e:
+                    print(f"[WARN] Failed to load from {p}: {e}, trying next...")
+                    continue
+        
+        if not loaded:
+            print(f"[WARN] No checkpoint found in search paths. Using random weights (demo mode).")
 
         model.to(device).eval()
         return model

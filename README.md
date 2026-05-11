@@ -102,9 +102,15 @@ DeepSceneLoc/
 │   ├── raw/                    # Raw downloaded data
 │   └── processed/              # Processed train/val/test splits
 │
-├── models/                     # Saved models (not in git)
-│   ├── checkpoints/            # Training checkpoints
-│   └── best_model.pth          # Best model
+├── model_repo/                 # Organized model weights & metadata (separate git repo)
+│   ├── ViT-B_16/              # Vision Transformer best weights
+│   ├── EfficientNet-B0/       # EfficientNet-B0 best weights
+│   ├── ResNet50/              # ResNet50 best weights
+│   ├── Other/                 # Other/ensemble models
+│   └── archives/              # Local checkpoint archives (not in git)
+│
+├── models/                     # Training checkpoints (local, not in git)
+│   └── checkpoints/            # Intermediate epoch checkpoints
 │
 ├── results/                    # Results and outputs
 │   ├── visualizations/         # Generated plots
@@ -113,6 +119,25 @@ DeepSceneLoc/
 └── logs/                       # Training logs
     └── training_history.json
 ```
+
+### Model Management
+
+**Model Repository Organization:**
+- **Location:** `model_repo/` (separate git repository)
+- **Contents:** Best weights from each architecture + config/metadata
+- **Checkpoints:** Stored locally in `model_repo/archives/` (git-ignored)
+- **Naming Convention:** `{Architecture}_best.pth` or `{Architecture}_best_model.pth`
+
+**What's Tracked in Git:**
+- ✅ README.md files explaining each model
+- ✅ config.yaml templates
+- ✅ category_mapping.json metadata
+
+**What's NOT Tracked (Local-Only):**
+- ❌ .pth weight files (large binaries, 100MB+)
+- ❌ Epoch checkpoints in `model_repo/archives/`
+- ❌ Gemini API cache files
+- ❌ Training logs and temporary files
 
 ---
 
@@ -223,7 +248,7 @@ _, _, test_loader = create_dataloaders(
 
 # Evaluate
 metrics = load_model_and_evaluate(
-    model_path='models/checkpoints/best_model.pth',
+    model_path='model_repo/ResNet50/ResNet50_best_model.pth',
     model_name='resnet50',
     test_loader=test_loader,
     class_names=['Coastal', 'Forest', 'Mountain', 'Rural', 'Urban']
@@ -240,6 +265,53 @@ create_all_visualizations(
     history_path='logs/training_history.json',
     output_dir='results/visualizations'
 )
+```
+
+---
+
+## 🤖 AI-Powered Location Detection (Semester 2 - Hybrid System)
+
+**Two-Stage Pipeline:**
+1. **Scene Classification** → Identifies 5 scene types (Urban, Rural, Coastal, Mountain, Forest)
+2. **Exact Location Detection** → Uses Gemini API for landmark identification and GPS coordinates
+
+### Setup Gemini API
+
+```bash
+# Set Gemini API key as environment variable
+export GEMINI_API_KEY="your-api-key-here"
+
+# Or add to .env file in project root
+echo "GEMINI_API_KEY=your-api-key-here" >> .env
+```
+
+### Hybrid Location Detection Example
+
+```python
+from webapp.api import hybrid_location_detection
+import json
+
+# Detect scene and exact location
+result = hybrid_location_detection(
+    image_path='path/to/image.jpg',
+    scene_model='model_repo/ViT-B_16/ViT-B_16_best.pth',
+    use_gemini=True
+)
+
+print(json.dumps(result, indent=2))
+# Example output:
+# {
+#   "scene_classification": {
+#     "category": "Urban",
+#     "confidence": 0.95
+#   },
+#   "exact_location": {
+#     "landmark": "Eiffel Tower",
+#     "city": "Paris",
+#     "country": "France",
+#     "gps": {"latitude": 48.8584, "longitude": 2.2945}
+#   }
+# }
 ```
 
 ---
@@ -279,10 +351,12 @@ from PIL import Image
 from torchvision import transforms
 from src.models.model import create_model
 
-# Load model
+# Load model from organized model_repo
 model = create_model('resnet50', num_classes=5, pretrained=False)
-checkpoint = torch.load('models/checkpoints/best_model.pth')
-model.load_state_dict(checkpoint['model_state_dict'])
+
+# Load from model_repo
+checkpoint = torch.load('model_repo/ResNet50/ResNet50_best_model.pth', map_location='cpu')
+model.load_state_dict(checkpoint if isinstance(checkpoint, dict) else {'state_dict': checkpoint})
 model.eval()
 
 # Prepare image
@@ -305,6 +379,11 @@ categories = ['Coastal', 'Forest', 'Mountain', 'Rural', 'Urban']
 print(f"Predicted: {categories[predicted_class]}")
 print(f"Confidence: {probabilities[0][predicted_class].item():.2%}")
 ```
+
+**Available Models in `model_repo/`:**
+- `model_repo/ViT-B_16/ViT-B_16_best.pth` - Vision Transformer
+- `model_repo/EfficientNet-B0/EfficientNet-B0_best.pth` - EfficientNet
+- `model_repo/ResNet50/ResNet50_best_model.pth` - ResNet50
 
 ---
 

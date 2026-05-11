@@ -30,10 +30,11 @@ ENV/
 .ipynb_checkpoints
 *.ipynb_checkpoints/
 
-# PyTorch
+# PyTorch - Local training artifacts
 *.pth
 *.pt
 *.ckpt
+models/checkpoints/       # Local training checkpoints (git-ignored)
 
 # Dataset (too large for git)
 data/raw/
@@ -47,13 +48,11 @@ data/downloads/
 /dataset
 /data
 
-# Models (too large for git)
-# Model Checkpoints
-models/checkpoints/
-models/pretrained/
-models/*.pth
-models/*.pt
-!models/checkpoints/vit/ViT-B_16_best.pth
+# Model Repo weights (not in main repo, in separate model_repo)
+model_repo/*/*.pth
+model_repo/*.pth
+model_repo/checkpoints/
+model_repo/archives/
 
 # Results
 results/temp/
@@ -90,8 +89,13 @@ report_archive/
 .gradio/
 .hf_upload_model/
 .hf_upload_temp/
-model_repo/
 push_model_simple.py
+
+# Gemini and API caches
+.gemini_cache/
+.gemini/
+gemini_cache/
+*gemini*.cache
 
 # Python and tooling caches
 .pytest_cache/
