@@ -478,20 +478,48 @@ def build_ui() -> gr.Blocks:
 """)
 
         # Events
+        def start_analysis():
+            """Disable UI components during analysis"""
+            return gr.update(interactive=False), gr.update(interactive=False), gr.update(interactive=False)
+
         def run_analysis(img, use_gemini):
+            """Core analysis logic with UI unlocking at the end"""
+            if img is None:
+                return (
+                    "⚠️ Please upload an image to analyze.", "—", "", 
+                    gr.update(interactive=True), gr.update(interactive=True), gr.update(interactive=True)
+                )
+            
             s1, s2, maps = analyze_image(img, run_gemini=use_gemini)
             map_md = f"🗺️ [Open in Google Maps]({maps})" if maps else ""
-            return s1, s2, map_md
+            
+            # Return results and re-enable UI
+            return (
+                s1, s2, map_md, 
+                gr.update(interactive=True), gr.update(interactive=True), gr.update(interactive=True)
+            )
 
+        def reset_ui():
+            """Reset all fields and enable inputs"""
+            return (
+                None, "", "", "", 
+                gr.update(interactive=True), gr.update(interactive=True), gr.update(interactive=True)
+            )
+
+        # Event chain for analysis: Lock -> Process -> Unlock
         analyze_btn.click(
+            fn=start_analysis,
+            outputs=[img_input, analyze_btn, clear_btn]
+        ).then(
             fn=run_analysis,
             inputs=[img_input, run_gemini_toggle],
-            outputs=[stage1_out, stage2_out, map_link],
+            outputs=[stage1_out, stage2_out, map_link, img_input, analyze_btn, clear_btn],
             show_progress=True,
         )
+
         clear_btn.click(
-            fn=lambda: (None, "", "", ""),
-            outputs=[img_input, stage1_out, stage2_out, map_link],
+            fn=reset_ui,
+            outputs=[img_input, stage1_out, stage2_out, map_link, img_input, analyze_btn, clear_btn],
         )
 
     return demo

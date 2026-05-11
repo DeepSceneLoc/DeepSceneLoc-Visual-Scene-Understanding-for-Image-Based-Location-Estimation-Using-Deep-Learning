@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/static/css/app.css">
+  <link rel="stylesheet" href="/static/css/app.css?v=2.1">
 </head>
 <body>
 
@@ -102,6 +102,26 @@
         </div>
         <input type="file" id="file-input" accept="image/*">
 
+        <!-- Action Bar -->
+        <div class="action-bar">
+          <button class="action-btn" id="webcam-btn" title="Capture from Webcam">
+            <span class="icon">📸</span>
+            <span class="label">Webcam</span>
+          </button>
+          <button class="action-btn" id="upload-btn" title="Upload new image">
+            <span class="icon">📁</span>
+            <span class="label">Upload</span>
+          </button>
+          <button class="action-btn" id="paste-btn" title="Paste from clipboard">
+            <span class="icon">📋</span>
+            <span class="label">Paste</span>
+          </button>
+          <button class="action-btn" id="logs-btn" title="View system logs">
+            <span class="icon">📜</span>
+            <span class="label">Logs</span>
+          </button>
+        </div>
+
         <div class="controls">
           <!-- Gemini toggle -->
           <div class="toggle-row">
@@ -116,10 +136,37 @@
           </div>
 
           <!-- Analyze button -->
-          <button class="btn-analyze" id="analyze-btn" disabled>
+          <button class="btn-analyze" id="analyze-btn" disabled style="width:100%; margin-top:10px">
             <div class="spinner"></div>
             <span class="btn-text">🔍 Analyze Image</span>
           </button>
+        </div>
+      </div>
+
+      <!-- Example gallery -->
+      <div class="card" style="margin-top:1rem">
+        <div class="card-title" style="margin-bottom:10px"><span class="icon">💡</span> Try Examples</div>
+        <div class="example-grid">
+          <div class="example-item" data-url="/examples/example_coastal.jpg">
+            <img src="/examples/example_coastal.jpg" alt="Coastal">
+            <span>Coastal</span>
+          </div>
+          <div class="example-item" data-url="/examples/example_forest.jpg">
+            <img src="/examples/example_forest.jpg" alt="Forest">
+            <span>Forest</span>
+          </div>
+          <div class="example-item" data-url="/examples/example_mountain.jpg">
+            <img src="/examples/example_mountain.jpg" alt="Mountain">
+            <span>Mountain</span>
+          </div>
+          <div class="example-item" data-url="/examples/example_rural.jpg">
+            <img src="/examples/example_rural.jpg" alt="Rural">
+            <span>Rural</span>
+          </div>
+          <div class="example-item" data-url="/examples/example_urban.jpg">
+            <img src="/examples/example_urban.jpg" alt="Urban">
+            <span>Urban</span>
+          </div>
         </div>
       </div>
 
@@ -254,6 +301,36 @@
     <a href="/api/models">Models</a>
   </div>
 </footer>
+
+<!-- Webcam Modal -->
+<div id="webcam-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>📸 Webcam Capture</h3>
+      <button class="modal-close" id="webcam-close">&times;</button>
+    </div>
+    <div class="webcam-container">
+      <video id="webcam-video" autoplay playsinline></video>
+      <canvas id="webcam-canvas" style="display:none"></canvas>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-analyze" id="capture-btn">📸 Capture & Analyze</button>
+    </div>
+  </div>
+</div>
+
+<!-- Logs Modal -->
+<div id="logs-modal" class="modal">
+  <div class="modal-content" style="max-width: 600px">
+    <div class="modal-header">
+      <h3>📜 System Logs</h3>
+      <button class="modal-close" id="logs-close">&times;</button>
+    </div>
+    <div id="logs-content" class="logs-content">
+      <div class="log-entry info">System initialized. Model: ViT-B/16 Ready.</div>
+    </div>
+  </div>
+</div>
 
 <!-- Toast container -->
 <div id="toast-container" class="toast-container"></div>

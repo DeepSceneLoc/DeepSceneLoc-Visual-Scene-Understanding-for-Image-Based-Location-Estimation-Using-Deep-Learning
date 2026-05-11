@@ -492,3 +492,135 @@ footer {
 .footer-links { display: flex; justify-content: center; gap: 1.5rem; margin-top: 0.5rem; }
 .footer-links a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
 .footer-links a:hover { color: var(--accent-light); }
+
+/* ── Example Gallery ─────────────────────────────────── */
+.example-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 10px;
+}
+.example-item {
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+  text-align: center;
+}
+.example-item:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+.example-item img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+.example-item span {
+  display: block;
+  font-size: 0.65rem;
+  padding: 4px 0;
+  color: var(--text-muted);
+}
+.example-item:hover span {
+  color: var(--accent-light);
+}
+
+/* ── Action Bar ───────────────────────────────────────── */
+.action-bar {
+  display: flex !important;
+  gap: 12px !important;
+  margin-top: 20px !important;
+  padding: 12px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+  justify-content: space-around !important;
+}
+
+.action-btn {
+  all: unset !important; /* Reset all browser defaults */
+  flex: 1;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  cursor: pointer !important;
+  padding: 10px 5px !important;
+  border-radius: 12px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid transparent !important;
+}
+
+.action-btn:hover {
+  background: rgba(99, 102, 241, 0.1) !important;
+  border-color: var(--border-strong) !important;
+  transform: translateY(-2px);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+  background: rgba(99, 102, 241, 0.2) !important;
+}
+
+.action-btn .icon { 
+  font-size: 1.4rem !important;
+  filter: drop-shadow(0 0 5px rgba(255,255,255,0.1));
+}
+
+.action-btn .label { 
+  font-size: 0.68rem !important; 
+  font-weight: 700 !important; 
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: var(--text-secondary) !important;
+}
+
+.action-btn:hover .label {
+  color: var(--accent-light) !important;
+}
+
+/* ── Modals ───────────────────────────────────────────── */
+.modal {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  display: none; align-items: center; justify-content: center;
+  padding: 2rem;
+}
+.modal.visible { display: flex; }
+.modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  width: 100%; max-width: 500px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.modal-header {
+  padding: 1.25rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-close {
+  background: transparent; border: none; color: var(--text-muted);
+  font-size: 1.5rem; cursor: pointer;
+}
+.modal-close:hover { color: var(--danger); }
+.webcam-container { width: 100%; aspect-ratio: 4/3; background: #000; position: relative; }
+.webcam-container video { width: 100%; height: 100%; object-fit: cover; }
+.modal-footer { padding: 1rem; border-top: 1px solid var(--border); }
+
+/* Logs */
+.logs-content {
+  height: 300px; overflow-y: auto; padding: 1rem;
+  font-family: 'Courier New', Courier, monospace; font-size: 0.75rem;
+  background: #000; color: #0f0;
+}
+.log-entry { margin-bottom: 5px; line-height: 1.4; border-bottom: 1px solid #111; padding-bottom: 2px; }
+.log-entry.info { color: #0f0; }
+.log-entry.warn { color: #ff0; }
+.log-entry.err { color: #f00; }

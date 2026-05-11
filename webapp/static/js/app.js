@@ -24,6 +24,7 @@ const CLASS_COLORS = {
 // ─────────────────────────────────────────────────────────────
 let currentFile  = null;
 let analyzeMode  = true;  // true = full hybrid, false = stage-1 only
+let isAnalyzing  = false; // Lock state
 let history      = [];    // [{thumb, top_class, confidence}]
 let modelInfo    = {};
 
@@ -41,6 +42,22 @@ const historyGrid   = document.getElementById("history-grid");
 const modelBanner   = document.getElementById("model-banner");
 const toastCont     = document.getElementById("toast-container");
 
+// Action Bar & Modals
+const webcamBtn     = document.getElementById("webcam-btn");
+const uploadBtn     = document.getElementById("upload-btn");
+const pasteBtn      = document.getElementById("paste-btn");
+const logsBtn       = document.getElementById("logs-btn");
+
+const webcamModal   = document.getElementById("webcam-modal");
+const webcamVideo   = document.getElementById("webcam-video");
+const webcamCanvas  = document.getElementById("webcam-canvas");
+const captureBtn    = document.getElementById("capture-btn");
+const webcamClose   = document.getElementById("webcam-close");
+
+const logsModal     = document.getElementById("logs-modal");
+const logsContent   = document.getElementById("logs-content");
+const logsClose     = document.getElementById("logs-close");
+
 // ─────────────────────────────────────────────────────────────
 // Toast
 // ─────────────────────────────────────────────────────────────
@@ -50,6 +67,7 @@ function toast(msg, type = "info", duration = 3500) {
   el.className = `toast ${type}`;
   el.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
   toastCont.appendChild(el);
+  log(`[Toast] ${msg}`, type);
   setTimeout(() => {
     el.style.transition = "opacity 0.3s";
     el.style.opacity = "0";
@@ -57,10 +75,22 @@ function toast(msg, type = "info", duration = 3500) {
   }, duration);
 }
 
+function log(msg, type = "info") {
+  const entry = document.createElement("div");
+  entry.className = `log-entry ${type}`;
+  const now = new Date().toLocaleTimeString();
+  entry.textContent = `[${now}] ${msg}`;
+  logsContent.prepend(entry);
+}
+
 // ─────────────────────────────────────────────────────────────
 // Image loading
 // ─────────────────────────────────────────────────────────────
 function loadFile(file) {
+  if (isAnalyzing) {
+    toast("Analysis in progress. Please wait.", "warning");
+    return;
+  }
   if (!file?.type?.startsWith("image/")) {
     toast("Please upload an image file (JPG, PNG, WEBP)", "error");
     return;
@@ -114,13 +144,106 @@ geminiToggle.addEventListener("change", () => { analyzeMode = geminiToggle.check
 // Analyze button
 analyzeBtn.addEventListener("click", runAnalysis);
 
+// Example gallery
+document.querySelectorAll(".example-item").forEach(item => {
+  item.addEventListener("click", () => {
+    const url = item.dataset.url;
+    loadFromUrl(url);
+  });
+});
+
+async function loadFromUrl(url) {
+  if (isAnalyzing) return;
+  log(`Loading image from URL: ${url}`);
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const file = new File([blob], url.split("/").pop(), { type: "image/jpeg" });
+    loadFile(file);
+  } catch (err) {
+    toast("Failed to load example", "error");
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Action Bar Handlers
+// ─────────────────────────────────────────────────────────────
+uploadBtn.addEventListener("click", () => fileInput.click());
+
+pasteBtn.addEventListener("click", async () => {
+  try {
+    const items = await navigator.clipboard.read();
+    for (const item of items) {
+      for (const type of item.types) {
+        if (type.startsWith("image/")) {
+          const blob = await item.getType(type);
+          loadFile(new File([blob], "pasted-image.png", { type }));
+          return;
+        }
+      }
+    }
+    toast("No image found in clipboard", "warning");
+  } catch (err) {
+    toast("Clipboard access denied", "error");
+  }
+});
+
+logsBtn.addEventListener("click", () => logsModal.classList.add("visible"));
+logsClose.addEventListener("click", () => logsModal.classList.remove("visible"));
+
+// ─────────────────────────────────────────────────────────────
+// Webcam Handlers
+// ─────────────────────────────────────────────────────────────
+let webcamStream = null;
+
+webcamBtn.addEventListener("click", async () => {
+  try {
+    webcamStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+    webcamVideo.srcObject = webcamStream;
+    webcamModal.classList.add("visible");
+    log("Webcam stream started.");
+  } catch (err) {
+    toast("Webcam access denied", "error");
+  }
+});
+
+function stopWebcam() {
+  if (webcamStream) {
+    webcamStream.getTracks().forEach(track => track.stop());
+    webcamStream = null;
+  }
+  webcamModal.classList.remove("visible");
+  log("Webcam stream stopped.");
+}
+
+webcamClose.addEventListener("click", stopWebcam);
+
+captureBtn.addEventListener("click", () => {
+  const context = webcamCanvas.getContext("2d");
+  webcamCanvas.width = webcamVideo.videoWidth;
+  webcamCanvas.height = webcamVideo.videoHeight;
+  context.drawImage(webcamVideo, 0, 0);
+  
+  webcamCanvas.toBlob((blob) => {
+    const file = new File([blob], "webcam-capture.jpg", { type: "image/jpeg" });
+    stopWebcam();
+    loadFile(file);
+    runAnalysis();
+  }, "image/jpeg", 0.9);
+});
+
 // ─────────────────────────────────────────────────────────────
 // Core: Run analysis
 // ─────────────────────────────────────────────────────────────
 async function runAnalysis() {
-  if (!currentFile) { toast("Upload an image first", "warning"); return; }
+  if (!currentFile || isAnalyzing) { 
+    if (!currentFile) toast("Upload an image first", "warning"); 
+    return; 
+  }
 
+  log(`Starting analysis for: ${currentFile.name}`);
   // Loading state
+  isAnalyzing = true;
   analyzeBtn.classList.add("loading");
   analyzeBtn.disabled = true;
   resultsArea.innerHTML = renderLoading();
@@ -138,13 +261,16 @@ async function runAnalysis() {
     }
 
     const data = await res.json();
+    log(`Analysis success. Top class: ${analyzeMode ? data.stage1.top_class : data.top_class}`, "success");
     renderResults(data, analyzeMode);
     addToHistory(currentFile, data);
     toast("Analysis complete", "success", 2000);
   } catch (err) {
+    log(`Analysis failed: ${err.message}`, "err");
     resultsArea.innerHTML = renderError(err.message);
     toast(`Error: ${err.message}`, "error");
   } finally {
+    isAnalyzing = false;
     analyzeBtn.classList.remove("loading");
     analyzeBtn.disabled = false;
   }

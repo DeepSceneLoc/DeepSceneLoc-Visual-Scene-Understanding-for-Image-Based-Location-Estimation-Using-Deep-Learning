@@ -48,6 +48,13 @@ try:
 except ImportError:
     _ADV_OK = False
 
+# Try ViT advanced model
+try:
+    from src.models.model_advanced import create_advanced_model as _create_vit
+    _VIT_OK = True
+except ImportError:
+    _VIT_OK = False
+
 # Try Gemini
 try:
     from src.utils.gemini_integration import GeminiLocationAnalyzer
@@ -71,11 +78,16 @@ CLASS_DESC  = {
 }
 
 CHECKPOINT_PRIORITY = [
-    # Phase 2 Production: EfficientNet-B0 (85.15% val, 84.63% test) — PRIMARY
+    # Phase 2 High-Precision: ViT-B/16 (Highest accuracy) — PRIMARY
+    ("vit_b16",         "model_repo/ViT-B_16_best.pth"),
+    ("vit_b16",         "models/checkpoints/vit/ViT-B_16_epoch030.pth"),
+    
+    # Phase 2 Production: EfficientNet-B0 — FALLBACK
     ("efficientnet_b0", "models/checkpoints/efficientnet/EfficientNet-B0_best.pth"),
-    # Phase 1 Fallback: ResNet-50 (79.17% val) — kept for comparison/fallback
+    ("efficientnet_b0", "model_repo/EfficientNet-B0_best.pth"),
+    
+    # Phase 1: ResNet-50 — LEGACY
     ("resnet50",        "models/checkpoints/resnet/best_model.pth"),
-    ("resnet50",        "model_repo/best_model.pth"),
 ]
 
 # ─────────────────────────────────────────────────────────────
@@ -104,13 +116,22 @@ def _load_model():
         return
 
     try:
-        if arch == "efficientnet_b0" and _ADV_OK:
+        if arch == "vit_b16" and _VIT_OK:
+            m = _create_vit("vit_b16", num_classes=5, pretrained=False)
+        elif arch == "efficientnet_b0" and _ADV_OK:
             m = create_advanced_model("efficientnet_b0", num_classes=5, pretrained=False)
         else:
             m = create_model("resnet50", num_classes=5, pretrained=False)
 
         ckpt = torch.load(ckpt_path, map_location=device, weights_only=False)
-        key  = "model_state" if "model_state" in ckpt else "model_state_dict"
+        # Support both EMA weights (higher accuracy) and raw model weights
+        if "ema_state" in ckpt:
+            key = "ema_state"
+            print(f"[OK] Using EMA weights from checkpoint")
+        elif "model_state" in ckpt:
+            key = "model_state"
+        else:
+            key = "model_state_dict"
         m.load_state_dict(ckpt[key])
         m.to(device).eval()
 
@@ -133,15 +154,23 @@ def _load_gemini():
     global _gemini
     if not _GEMINI_OK:
         return
-    api_key = os.getenv("GEMINI_API_KEY", "")
-    if not api_key:
+    
+    # Check for OpenRouter first, then fallback to native Gemini
+    openrouter_key = os.getenv("OPENROUTER_API_KEY", "")
+    gemini_key = os.getenv("GEMINI_API_KEY", "")
+    
+    if not openrouter_key and not gemini_key:
+        print("[INFO] Stage 2 (Gemini/OpenRouter) disabled: No API keys found in .env")
         return
+        
     try:
-        base   = GeminiLocationAnalyzer(api_key=api_key)
+        # The GeminiLocationAnalyzer now handles both native and OpenRouter internally
+        base   = GeminiLocationAnalyzer()
         _gemini = CachedGeminiAnalyzer(base, db_path=str(ROOT / "results/gemini_cache.db"))
-        print("[OK] Gemini AI ready with cache")
+        provider = getattr(base, 'mode', 'AI')
+        print(f"[OK] Stage 2 ({provider.title()}) ready with cache")
     except Exception as e:
-        print(f"[WARN] Gemini init failed: {e}")
+        print(f"[WARN] Stage 2 init failed: {e}")
 
 _load_model()
 _load_gemini()
@@ -168,6 +197,11 @@ STATIC_DIR = Path(__file__).parent / "static"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
+# Mount examples
+EXAMPLES_DIR = ROOT / "data" / "examples"
+if EXAMPLES_DIR.exists():
+    app.mount("/examples", StaticFiles(directory=str(EXAMPLES_DIR)), name="examples")
+
 # ─────────────────────────────────────────────────────────────
 # Helper: image → prediction
 # ─────────────────────────────────────────────────────────────
@@ -184,9 +218,20 @@ def _predict(pil_image: Image.Image) -> dict:
         }
 
     tensor = transform(pil_image).unsqueeze(0).to(device)
+
+    # Optional: Test-Time Augmentation with horizontal flip
+    tensor_flipped = torch.flip(tensor, dims=[3])
+
     with torch.no_grad():
-        logits = _model(tensor)
-        probs  = F.softmax(logits, dim=1).squeeze().cpu().numpy()
+        logits       = _model(tensor)
+        logits_flip  = _model(tensor_flipped)
+        # Average logits before softmax (more numerically stable than averaging probs)
+        logits_avg   = (logits + logits_flip) / 2.0
+
+        # Temperature scaling: compensates for label-smoothing-induced underconfidence.
+        # T < 1 sharpens the distribution; tuned to T=0.6 for this model.
+        TEMPERATURE = 0.6
+        probs = F.softmax(logits_avg / TEMPERATURE, dim=1).squeeze().cpu().numpy()
 
     top_idx = int(np.argmax(probs))
     return {
