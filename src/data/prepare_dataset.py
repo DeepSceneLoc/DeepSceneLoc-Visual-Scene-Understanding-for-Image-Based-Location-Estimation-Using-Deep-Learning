@@ -147,8 +147,10 @@ class DatasetSplitter:
         for category in tqdm(categories, desc="Splitting categories"):
             category_name = category.name
             
-            # Get all images in category
-            images = list(category.glob('*.jpg')) + list(category.glob('*.png'))
+            # Get all images in category (case-insensitive)
+            images = []
+            for ext in ('*.jpg', '*.jpeg', '*.png', '*.JPG', '*.JPEG', '*.PNG'):
+                images.extend(category.glob(ext))
             
             # Shuffle
             np.random.shuffle(images)
@@ -204,7 +206,7 @@ class DatasetSplitter:
             total = 0
             
             for category in categories:
-                n_images = len(list(category.glob('*.jpg'))) + len(list(category.glob('*.png')))
+                n_images = sum(len(list(category.glob(ext))) for ext in ('*.jpg', '*.jpeg', '*.png', '*.JPG', '*.JPEG', '*.PNG'))
                 split_stats[category.name] = n_images
                 total += n_images
             
@@ -240,7 +242,9 @@ def verify_dataset(data_dir: str) -> Dict:
     
     for category in tqdm(categories, desc="Verifying dataset"):
         category_name = category.name
-        images = list(category.glob('*.jpg')) + list(category.glob('*.png'))
+        images = []
+        for ext in ('*.jpg', '*.jpeg', '*.png', '*.JPG', '*.JPEG', '*.PNG'):
+            images.extend(category.glob(ext))
         
         valid_images = 0
         for img_path in images:
