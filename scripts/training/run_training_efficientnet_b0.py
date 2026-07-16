@@ -275,7 +275,7 @@ def _patch_trainer_dry_run(trainer: AdvancedTrainer, max_batches: int = 5):
 
     orig_run_epoch = trainer._run_epoch
 
-    def _dry_epoch(loader, train):
+    def _dry_epoch(loader, train=True, epoch=0, **kwargs):
         trainer.model.train(train)
         total_loss = correct = total = 0
 
