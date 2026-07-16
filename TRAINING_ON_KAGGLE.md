@@ -39,20 +39,47 @@ print(f"GPU: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'N
 !pip install timm torchmetrics scikit-learn pyyaml tqdm --quiet
 ```
 
-### Step 5: Prepare Dataset
+### Step 5: Add Dataset
 
-Upload your dataset to Kaggle Datasets or use existing one:
+**Dataset:** [Places2 MIT Dataset](https://www.kaggle.com/datasets/nickj26/places2-mit-dataset)
+
+1. Click **"+ Add data"** in your notebook
+2. Search for: **"nickj26/places2-mit-dataset"**
+3. Click **"Add"**
+
+Or use the direct link: https://www.kaggle.com/datasets/nickj26/places2-mit-dataset
 
 ```python
-# Cell 4: Check data
-!ls -la data/processed/train/
-!ls -la data/processed/val/
-!ls -la data/processed/test/
+# Cell 4: Check data (dataset will be in /kaggle/input/)
+!ls -la /kaggle/input/places2-mit-dataset/
 
-# Should see 5 folders: Coastal, Forest, Mountain, Rural, Urban
+# Your code will access it as:
+# /kaggle/input/places2-mit-dataset/
 ```
 
-### Step 6: Train Models
+**Note:** You'll need to map the Places2 categories to our 5 categories (Coastal, Forest, Mountain, Rural, Urban) or use a pre-filtered subset.
+
+### Step 6: Prepare Data Structure
+
+The Places2 dataset needs to be organized into our 5 categories:
+
+```python
+# Cell 5: Organize data
+# If you have a pre-filtered dataset with only your 5 categories:
+!ls -la /kaggle/input/places2-mit-dataset/data_256/
+
+# Or if you need to filter from full Places2:
+# Run your data preparation script
+!python scripts/prepare_places2_data.py \
+    --input /kaggle/input/places2-mit-dataset/ \
+    --output data/processed
+
+# Verify structure
+!ls -la data/processed/train/
+# Should show: Coastal/ Forest/ Mountain/ Rural/ Urban/
+```
+
+### Step 7: Train Models
 
 **Option A: Train All (Recommended)**
 
