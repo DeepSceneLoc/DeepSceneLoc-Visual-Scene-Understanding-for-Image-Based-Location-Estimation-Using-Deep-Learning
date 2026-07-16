@@ -60,13 +60,11 @@ def main():
             super_cat = mapper.map_category(places_category)
             
             if super_cat is None:
-                # This Places365 category is not needed in our 5-class subset
-                unmapped_count += sum(1 for _ in cat_dir.glob("*.*"))
+                # Skip unmapped categories instantly
+                unmapped_count += 1
                 continue
                 
-            images = []
-            for ext in ('*.jpg', '*.jpeg', '*.png', '*.JPG', '*.JPEG', '*.PNG'):
-                images.extend(cat_dir.glob(ext))
+            images = list(cat_dir.glob('*.jpg'))
                 
             for img_path in images:
                 # Prefix filename with category to prevent collisions from different folders
@@ -74,13 +72,10 @@ def main():
                 dest = out_dir / super_cat / new_filename
                 
                 if not dest.exists():
-                    if args.copy:
+                    try:
+                        os.symlink(img_path.resolve(), dest)
+                    except OSError:
                         shutil.copy2(img_path, dest)
-                    else:
-                        try:
-                            os.symlink(img_path, dest)
-                        except OSError:
-                            shutil.copy2(img_path, dest)
                             
                 stats[super_cat] += 1
                 total_images_processed += 1
