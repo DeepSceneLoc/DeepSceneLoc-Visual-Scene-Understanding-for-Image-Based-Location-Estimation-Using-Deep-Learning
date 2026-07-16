@@ -269,7 +269,7 @@ def _load_checkpoint(model, ckpt_path: str, device: torch.device):
 # Dry-run patch (limit batches)
 # -------------------------------------------------------------
 
-def _patch_trainer_dry_run(trainer: AdvancedTrainer, max_batches: int = 5):
+def _patch_trainer_dry_run(trainer: AdvancedTrainer, max_batches: int = 100):
     """Monkey-patch the trainer to only process max_batches per phase."""
     from tqdm import tqdm
 
