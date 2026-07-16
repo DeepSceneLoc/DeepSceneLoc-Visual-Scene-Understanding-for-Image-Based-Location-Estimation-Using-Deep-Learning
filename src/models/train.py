@@ -29,11 +29,12 @@ class Trainer:
         scheduler: Optional[optim.lr_scheduler._LRScheduler] = None,
         device: str = 'cuda',
         save_dir: str = 'models/checkpoints',
-        log_dir: str = 'logs'
+        log_dir: str = 'logs',
+        multi_gpu: bool = True
     ):
         """
         Initialize trainer
-        
+
         Args:
             model: PyTorch model
             train_loader: Training data loader
@@ -44,8 +45,17 @@ class Trainer:
             device: Device to train on ('cuda' or 'cpu')
             save_dir: Directory to save checkpoints
             log_dir: Directory to save logs
+            multi_gpu: Wrap model in nn.DataParallel when >1 CUDA device is visible
         """
         self.model = model.to(device)
+        self.use_dp = (
+            multi_gpu
+            and torch.device(device).type == 'cuda'
+            and torch.cuda.device_count() > 1
+        )
+        if self.use_dp:
+            print(f"  [DataParallel] Training across {torch.cuda.device_count()} GPUs")
+            self.model = nn.DataParallel(self.model)
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.criterion = criterion
@@ -244,9 +254,10 @@ class Trainer:
     
     def save_checkpoint(self, epoch: int, is_best: bool = False):
         """Save model checkpoint"""
+        model_to_save = self.model.module if self.use_dp else self.model
         checkpoint = {
             'epoch': epoch,
-            'model_state_dict': self.model.state_dict(),
+            'model_state_dict': model_to_save.state_dict(),
             'optimizer_state_dict': self.optimizer.state_dict(),
             'best_val_acc': self.best_val_acc,
             'history': self.history

@@ -304,7 +304,7 @@ def main():
     if args.demo:
         print("\n[DEMO MODE] Creating small pipeline smoke-test dataset ...")
         create_demo_dataset(organised_dir, samples_per_class=args.max_per_class or 50)
-        print("\nDone. Use --data", organised_dir, "when running run_training.py")
+        print("\nDone. Use --data", organised_dir, "when running run_training_resnet50.py")
         return
 
     # ── Download via Kaggle ────────────────────────────────────────────────────

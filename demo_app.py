@@ -41,9 +41,11 @@ class DemoModel:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.categories = CATEGORIES
         
-        # Image preprocessing
+        # Image preprocessing -- aspect-preserving resize + center crop,
+        # matching training geometry (old Resize((224,224)) squashed images).
         self.transform = transforms.Compose([
-            transforms.Resize((224, 224)),
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
             transforms.ToTensor(),
             transforms.Normalize(
                 mean=[0.485, 0.456, 0.406],

@@ -10,11 +10,19 @@ Usage:
     #   .\\venv\\Scripts\\activate   (Windows)
     #   source venv/bin/activate    (Linux/Mac)
 
-    python run_training.py                          # default settings
-    python run_training.py --epochs 20 --batch 32  # explicit
-    python run_training.py --data data/processed    # custom data path
-    python run_training.py --dry-run                # smoke-test (5 batches)
-    python run_training.py --resume models/checkpoints/best_model.pth
+    python run_training_resnet50.py                          # default settings
+    python run_training_resnet50.py --epochs 20 --batch 32  # explicit
+    python run_training_resnet50.py --data data/processed    # custom data path
+    python run_training_resnet50.py --dry-run                # smoke-test (5 batches)
+    python run_training_resnet50.py --resume models/checkpoints/best_model.pth
+
+    # Multi-GPU (e.g. Kaggle T4 x2) -- auto-detected, DataParallel used when
+    # >1 CUDA device is visible. --batch is the TOTAL batch across all GPUs.
+    python run_training_resnet50.py --batch 64                # 32/GPU on T4 x2
+    python run_training_resnet50.py --batch 64 --no-multi-gpu # force single-GPU
+
+    # Full fine-tune with discriminative LR (backbone slow, head fast)
+    python run_training_resnet50.py --batch 128 --epochs 40 --full-finetune
 """
 
 import argparse
@@ -60,6 +68,10 @@ def parse_args():
     p.add_argument("--eval-only", action="store_true", help="Skip training, only evaluate best_model.pth")
     p.add_argument("--allow-cpu", action="store_true",
                    help="Allow CPU execution when CUDA is unavailable (disabled by default)")
+    p.add_argument("--no-multi-gpu", action="store_true",
+                   help="Disable nn.DataParallel even if multiple GPUs are visible")
+    p.add_argument("--full-finetune", action="store_true",
+                   help="Discriminative LR: backbone at lr*0.1, new head at lr (better full fine-tune)")
     return p.parse_args()
 
 
@@ -67,9 +79,13 @@ def parse_args():
 def get_device(allow_cpu: bool = False) -> torch.device:
     if torch.cuda.is_available():
         dev = torch.device("cuda")
-        name = torch.cuda.get_device_name(0)
-        vram = torch.cuda.get_device_properties(0).total_memory / 1024**3
-        print(f"  GPU : {name}  ({vram:.1f} GB VRAM)")
+        n_gpu = torch.cuda.device_count()
+        for i in range(n_gpu):
+            name = torch.cuda.get_device_name(i)
+            vram = torch.cuda.get_device_properties(i).total_memory / 1024**3
+            print(f"  GPU {i} : {name}  ({vram:.1f} GB VRAM)")
+        if n_gpu > 1:
+            print(f"  Detected {n_gpu} GPUs -- DataParallel will be used unless --no-multi-gpu is set")
     else:
         if not allow_cpu:
             print("ERROR: CUDA is not available. GPU-only training is enforced by default.")
@@ -179,7 +195,25 @@ def main():
     # - Training -
     print(f"\n[Step 4/4] Training ...")
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-4)
+    if args.full_finetune:
+        # Discriminative LR: pretrained backbone learns slowly (lr*0.1),
+        # the freshly-initialized head learns at full lr. Prevents the random
+        # head's large early gradients from wrecking pretrained features.
+        head_params, backbone_params = [], []
+        for name, p in model.named_parameters():
+            if not p.requires_grad:
+                continue
+            (head_params if "fc" in name else backbone_params).append(p)
+        optimizer = optim.Adam(
+            [
+                {"params": backbone_params, "lr": args.lr * 0.1},
+                {"params": head_params,     "lr": args.lr},
+            ],
+            weight_decay=1e-4,
+        )
+        print(f"  Discriminative LR: backbone={args.lr*0.1:.1e}  head={args.lr:.1e}")
+    else:
+        optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-4)
     scheduler = StepLR(optimizer, step_size=7, gamma=0.1)
 
     # Restore optimiser/scheduler state when resuming
@@ -201,6 +235,7 @@ def main():
         device=str(device),
         save_dir=CHECKPOINT_DIR,
         log_dir=LOG_DIR,
+        multi_gpu=not args.no_multi_gpu,
     )
     trainer.best_val_acc = best_val_acc
 

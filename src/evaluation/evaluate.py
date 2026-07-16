@@ -50,46 +50,39 @@ class ModelEvaluator:
         self.all_labels = []
         self.all_probabilities = []
     
-    def evaluate(self, use_tta: bool = True) -> Dict:
+    def evaluate(self, use_tta: bool = True, tta_views: int = 2) -> Dict:
         """
         Evaluate model on test set with optional Test-Time Augmentation (TTA).
-        
+
         Args:
-            use_tta: If True, uses Horizontal Flip TTA to improve accuracy.
-            
+            use_tta: If True, averages softmax probs over TTA views.
+            tta_views: Number of views to average.
+                1 = original only,
+                2 = original + horizontal flip (default, backward compatible),
+                >=3 = original + h-flip + small multi-scale (zoom) views.
+
         Returns:
             Dictionary containing all evaluation metrics
         """
         self.model.eval()
-        
+
         print("="*60)
         print("Evaluating Model on Test Set")
         print("="*60)
-        
+
         # Collect predictions
         with torch.no_grad():
             pbar = tqdm(self.test_loader, desc="Evaluating")
             for inputs, labels in pbar:
                 inputs, labels = inputs.to(self.device), labels.to(self.device)
-                
-                # Forward pass
-                outputs = self.model(inputs)
-                
-                if use_tta:
-                    # Test-Time Augmentation: Original + Horizontal Flip
-                    inputs_flipped = torch.flip(inputs, dims=[3])
-                    outputs_flipped = self.model(inputs_flipped)
-                    
-                    prob_orig = torch.softmax(outputs, dim=1)
-                    prob_flipped = torch.softmax(outputs_flipped, dim=1)
-                    
-                    # Average probabilities
-                    probabilities = (prob_orig + prob_flipped) / 2.0
+
+                if use_tta and tta_views >= 2:
+                    probabilities = self._tta_probs(inputs, tta_views)
                 else:
-                    probabilities = torch.softmax(outputs, dim=1)
-                    
+                    probabilities = torch.softmax(self.model(inputs), dim=1)
+
                 _, predicted = torch.max(probabilities, 1)
-                
+
                 # Store results
                 self.all_predictions.extend(predicted.cpu().numpy())
                 self.all_labels.extend(labels.cpu().numpy())
@@ -107,7 +100,49 @@ class ModelEvaluator:
         self._print_results(metrics)
         
         return metrics
-    
+
+    def _tta_probs(self, inputs: torch.Tensor, views: int) -> torch.Tensor:
+        """
+        Average softmax probabilities over several test-time views.
+
+        View set (cumulative):
+          1: original
+          2: + horizontal flip
+          3: + center zoom (crop 87.5% then resize back -- a tighter framing)
+          4: + h-flip of the zoom
+        Extra views beyond 4 fall back to the 4-view set.
+        """
+        probs = torch.softmax(self.model(inputs), dim=1)
+        n = 1
+
+        if views >= 2:
+            flipped = torch.flip(inputs, dims=[3])
+            probs = probs + torch.softmax(self.model(flipped), dim=1)
+            n += 1
+
+        if views >= 3:
+            zoom = self._center_zoom(inputs, keep=0.875)
+            probs = probs + torch.softmax(self.model(zoom), dim=1)
+            n += 1
+
+        if views >= 4:
+            zoom_f = torch.flip(self._center_zoom(inputs, keep=0.875), dims=[3])
+            probs = probs + torch.softmax(self.model(zoom_f), dim=1)
+            n += 1
+
+        return probs / n
+
+    @staticmethod
+    def _center_zoom(inputs: torch.Tensor, keep: float = 0.875) -> torch.Tensor:
+        """Center-crop to ``keep`` fraction then resize back to original size."""
+        _, _, h, w = inputs.shape
+        ch, cw = int(h * keep), int(w * keep)
+        top, left = (h - ch) // 2, (w - cw) // 2
+        cropped = inputs[:, :, top:top + ch, left:left + cw]
+        return torch.nn.functional.interpolate(
+            cropped, size=(h, w), mode="bilinear", align_corners=False
+        )
+
     def _calculate_metrics(self) -> Dict:
         """Calculate all evaluation metrics"""
         

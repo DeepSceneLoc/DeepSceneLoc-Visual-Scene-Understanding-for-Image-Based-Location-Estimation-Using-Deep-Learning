@@ -27,7 +27,7 @@ after benchmarking the initial EfficientNet-B0 epoch (25 min/epoch, no AMP = una
 | **AMP Mixed Precision** | `train_advanced.py` | FP32 everywhere | FP16 forward + FP32 grads | **2-3×** |
 | **`zero_grad(set_to_none=True)`** | `train_advanced.py` | Zero-fill | Set to None | ~2% |
 | **Batch size** | `EfficientNetTrainConfig` | 32 | **64** (AMP freed ~40% VRAM) | Better GPU util |
-| **`pin_memory=True`** | `run_training_advanced.py` | Not set | Enabled on CUDA | ~5% |
+| **`pin_memory=True`** | `run_training_efficientnet_b0.py` | Not set | Enabled on CUDA | ~5% |
 | **persistent_workers** | `pipeline.py` | OFF | **ON** | Eliminates 20-40s inter-epoch pause |
 | **DataLoader workers** | CLI arg `--workers` | 2 | **8** | Reduces GPU batch-starvation |
 | **AMP API update** | `train_advanced.py` | `torch.cuda.amp` | **`torch.amp`** | No deprecation warnings |

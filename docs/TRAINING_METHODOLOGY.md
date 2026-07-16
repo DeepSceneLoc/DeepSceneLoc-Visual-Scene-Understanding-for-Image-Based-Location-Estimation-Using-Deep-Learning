@@ -159,7 +159,7 @@ ViT already had `label_smoothing=0.1`. We aligned EfficientNet to match.
 
 ### What Changed
 **File:** `src/preprocessing/transforms.py` — new function `get_modern_train_transforms`  
-**File:** `run_training_advanced.py` — now calls `get_modern_train_transforms` instead of `get_train_transforms`
+**File:** `run_training_efficientnet_b0.py` — now calls `get_modern_train_transforms` instead of `get_train_transforms`
 
 **Old augmentation stack:**
 ```python
@@ -375,7 +375,7 @@ probabilities = (torch.softmax(outputs, dim=1) + torch.softmax(outputs_flipped, 
 ## Change 14 — Pipeline: Weight-Only Resume → Full Auto-Resume State Recovery
 
 ### What Changed
-**File:** `run_training_advanced.py` and `src/models/train_advanced.py`
+**File:** `run_training_efficientnet_b0.py` and `src/models/train_advanced.py`
 
 ### Why We Changed It
 **Old approach:** Passing `--resume` only loaded the model weights. The learning rate scheduler, optimizer momentum, and epoch counters started over from scratch, which ruined the warmup phases and training stability if stopped and restarted.
@@ -447,14 +447,12 @@ Seven bugs were discovered and fixed during the pipeline stabilization session:
 
 ```bash
 # Full training (production config — April 28, 2026)
-venv\Scripts\python.exe run_training_advanced.py ^
-    --model efficientnet_b0 ^
+venv\Scripts\python.exe run_training_efficientnet_b0.py ^
     --data data/processed/places365_mit_full_2026_03_15 ^
     --epochs 40 --workers 8 --patience 10 --freeze-blocks 4
 
 # Resume from checkpoint (model weights only)
-venv\Scripts\python.exe run_training_advanced.py ^
-    --model efficientnet_b0 ^
+venv\Scripts\python.exe run_training_efficientnet_b0.py ^
     --data data/processed/places365_mit_full_2026_03_15 ^
     --epochs 40 --workers 8 --patience 10 --freeze-blocks 4 ^
     --resume models/checkpoints/efficientnet/EfficientNet-B0_best.pth

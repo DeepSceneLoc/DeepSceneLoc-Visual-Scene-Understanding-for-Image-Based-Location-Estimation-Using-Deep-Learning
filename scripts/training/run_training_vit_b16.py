@@ -1,40 +1,46 @@
 """
-Advanced Model Training Entry Point -- EfficientNet-B0 & ViT-B/16
-DeepSceneLoc -- Semester 2, Weeks 8-9
+Training Entry Point -- Vision Transformer (ViT-B/16)
+DeepSceneLoc -- Semester 2, Week 9
 
 Authors:
     Krishan Yadav  (Model Architecture Lead)
     Anuj Kondawar  (Pipeline & Training Lead)
 
-This script is the single unified entry point for training the Semester 2
-advanced models.  It wraps:
-  - src.models.model_advanced   (EfficientNet / ViT definitions)
-  - src.models.train_advanced   (AdvancedTrainer, EfficientNetTrainConfig, ViTTrainConfig)
+This script is the entry point for training the ViT-B/16
+advanced model. It wraps:
+  - src.models.model_advanced   (ViT definition)
+  - src.models.train_advanced   (AdvancedTrainer, ViTTrainConfig)
   - src.preprocessing.pipeline  (create_dataloaders)
   - src.evaluation.evaluate     (ModelEvaluator)
   - src.utils.visualizations    (create_all_visualizations)
 
 Usage (activate venv first):
-    # EfficientNet-B0 (Week 8)
-    python run_training_advanced.py --model efficientnet_b0
+    # Train
+    python run_training_vit_b16.py
 
-    # Vision Transformer (Week 9)
-    python run_training_advanced.py --model vit_b16
+    # Multi-GPU (e.g. Kaggle T4 x2) -- auto-detected, DataParallel used when
+    # >1 CUDA device visible. --batch is the TOTAL batch across all GPUs.
+    python run_training_vit_b16.py --batch 64                 # 32/GPU on T4 x2
+    python run_training_vit_b16.py --no-multi-gpu             # force single-GPU
+
+    # Max-accuracy full fine-tune on T4 x2 (LLRD + SWA)
+    python run_training_vit_b16.py --batch 96 --epochs 45 \\
+        --full-finetune --swa
 
     # Custom config
-    python run_training_advanced.py --model efficientnet_b0 \\
+    python run_training_vit_b16.py \\
         --epochs 40 --batch 32 --lr 1e-4 --freeze-blocks 7
 
     # Smoke test (2 epochs, 5 batches, no GPU required)
-    python run_training_advanced.py --model efficientnet_b0 --dry-run --allow-cpu
+    python run_training_vit_b16.py --dry-run --allow-cpu
 
     # Evaluate a saved checkpoint
-    python run_training_advanced.py --model efficientnet_b0 --eval-only \\
-        --resume models/checkpoints/efficientnet/EfficientNet-B0_best.pth
+    python run_training_vit_b16.py --eval-only \\
+        --resume models/checkpoints/vit/ViT-B_16_epoch030.pth
 
     # Resume interrupted training
-    python run_training_advanced.py --model efficientnet_b0 \\
-        --resume models/checkpoints/efficientnet/EfficientNet-B0_epoch010.pth
+    python run_training_vit_b16.py \\
+        --resume models/checkpoints/vit/ViT-B_16_epoch010.pth
 """
 
 from __future__ import annotations
@@ -57,13 +63,14 @@ from src.models.model_advanced import create_advanced_model, model_summary
 from src.models.train_advanced import (
     AdvancedTrainer,
     CheckpointManager,
-    EfficientNetTrainConfig,
     ViTTrainConfig,
 )
 from src.preprocessing.pipeline import create_dataloaders
 from src.preprocessing.transforms import get_modern_train_transforms, get_val_transforms
 from src.evaluation.evaluate import ModelEvaluator
 from src.utils.visualizations import create_all_visualizations
+
+MODEL_NAME = "vit_b16"
 
 
 # -------------------------------------------------------------
@@ -72,16 +79,8 @@ from src.utils.visualizations import create_all_visualizations
 
 def parse_args():
     p = argparse.ArgumentParser(
-        description="Train EfficientNet-B0 or ViT-B/16 on the DeepSceneLoc dataset"
+        description="Train ViT-B/16 on the DeepSceneLoc dataset"
     )
-    # Which model
-    p.add_argument(
-        "--model",
-        default="efficientnet_b0",
-        choices=["efficientnet_b0", "vit_b16"],
-        help="Architecture to train (default: efficientnet_b0)",
-    )
-
     # Data
     p.add_argument("--data", default="data/processed",
                    help="Path to processed dataset root (must have train/val/test subfolders)")
@@ -97,7 +96,7 @@ def parse_args():
     p.add_argument("--patience",     type=int,   default=None,
                    help="Early stopping patience (epochs)")
     p.add_argument("--freeze-blocks", type=int,  default=None,
-                   help="Number of backbone/encoder blocks to freeze")
+                   help="Number of encoder blocks to freeze")
     p.add_argument("--label-smoothing", type=float, default=None)
     p.add_argument("--grad-clip",    type=float, default=None)
     p.add_argument("--no-aug",       action="store_true",
@@ -122,6 +121,16 @@ def parse_args():
                    help="Smoke test: 2 epochs x 5 batches (no checkpoint saved)")
     p.add_argument("--allow-cpu", action="store_true",
                    help="Allow CPU execution (disabled by default; slow!)")
+    p.add_argument("--no-multi-gpu", action="store_true",
+                   help="Disable nn.DataParallel even if multiple GPUs are visible")
+
+    # Full fine-tune / regularization (T4x2 upgrade)
+    p.add_argument("--full-finetune", action="store_true",
+                   help="Unfreeze the whole encoder (freeze-blocks=0) + enable LLRD")
+    p.add_argument("--llrd", type=float, default=None,
+                   help="Layer-wise LR decay factor (e.g. 0.65 for ViT). Implied by --full-finetune")
+    p.add_argument("--swa", action="store_true",
+                   help="Enable Stochastic Weight Averaging over the training tail")
 
     return p.parse_args()
 
@@ -133,9 +142,13 @@ def parse_args():
 def get_device(allow_cpu: bool = False) -> torch.device:
     if torch.cuda.is_available():
         dev = torch.device("cuda")
-        name = torch.cuda.get_device_name(0)
-        vram = torch.cuda.get_device_properties(0).total_memory / 1024**3
-        print(f"  GPU  : {name}  ({vram:.1f} GB VRAM)")
+        n_gpu = torch.cuda.device_count()
+        for i in range(n_gpu):
+            name = torch.cuda.get_device_name(i)
+            vram = torch.cuda.get_device_properties(i).total_memory / 1024**3
+            print(f"  GPU {i} : {name}  ({vram:.1f} GB VRAM)")
+        if n_gpu > 1:
+            print(f"  Detected {n_gpu} GPUs -- DataParallel used unless --no-multi-gpu is set")
     else:
         if not allow_cpu:
             print("ERROR: CUDA not available and --allow-cpu not set.")
@@ -152,13 +165,10 @@ def get_device(allow_cpu: bool = False) -> torch.device:
 
 def build_config(args):
     """
-    Create the appropriate training config dataclass, overriding
-    defaults with any CLI arguments the user explicitly provided.
+    Create the ViTTrainConfig, overriding defaults with any CLI
+    arguments the user explicitly provided.
     """
-    if args.model == "efficientnet_b0":
-        cfg = EfficientNetTrainConfig()
-    else:
-        cfg = ViTTrainConfig()
+    cfg = ViTTrainConfig()
 
     # Apply CLI overrides
     if args.epochs          is not None: cfg.epochs                  = args.epochs
@@ -175,6 +185,14 @@ def build_config(args):
     if args.no_mixup:
         cfg.use_mixup  = False
         cfg.use_cutmix = False
+
+    # Full fine-tune + LLRD + SWA
+    if args.full_finetune:
+        cfg.llrd_decay = args.llrd if args.llrd is not None else 0.65
+    elif args.llrd is not None:
+        cfg.llrd_decay = args.llrd
+    if args.swa:
+        cfg.use_swa = True
 
     # dry-run: minimal epochs/patience
     if args.dry_run:
@@ -212,7 +230,7 @@ def _run_evaluation(model, test_loader, device, results_dir: Path, log_dir: Path
     print(f"\n  Metrics -> {metrics_path}")
 
     # Visualisations
-    # History JSON is saved as {ModelName}_history.json (e.g. EfficientNet-B0_history.json)
+    # History JSON is saved as {ModelName}_history.json (e.g. ViT-B_16_history.json)
     # NOT as training_history.json -- was a bug causing history_path to always be None
     model_name_safe = cfg_model_name.replace('/', '_') if cfg_model_name else None
     if model_name_safe:
@@ -303,7 +321,7 @@ def main():
     CKPT_DIR      = Path(cfg.checkpoint_dir)
 
     print("\n" + "=" * 65)
-    print(f"  DeepSceneLoc -- Advanced Model Training (Modern Pipeline)")
+    print(f"  DeepSceneLoc -- ViT-B/16 Training (Modern Pipeline)")
     print(f"  Model     : {cfg.model_name}")
     print(f"  Data      : {args.data}")
     print(f"  Epochs    : {cfg.epochs}  Batch: {cfg.batch_size}")
@@ -324,11 +342,13 @@ def main():
 
     # -- Freeze blocks for model creation
     freeze_blocks = args.freeze_blocks  # None -> use architecture default
+    if args.full_finetune:
+        freeze_blocks = 0               # unfreeze entire encoder
 
     # -- Build model --------------------------------------------
     print("[1/4] Building model ...")
     model = create_advanced_model(
-        model_name=args.model,
+        model_name=MODEL_NAME,
         num_classes=len(CLASS_NAMES),
         pretrained=True,
         freeze_blocks=freeze_blocks if freeze_blocks is not None else -1,
@@ -431,6 +451,7 @@ def main():
         config=cfg,
         device=str(device),
         resume_checkpoint=resume_ckpt if not args.eval_only else None,
+        multi_gpu=not args.no_multi_gpu,
     )
 
     if args.dry_run:

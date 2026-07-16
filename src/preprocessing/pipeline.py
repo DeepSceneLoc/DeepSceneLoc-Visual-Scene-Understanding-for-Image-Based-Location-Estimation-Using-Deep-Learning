@@ -121,9 +121,16 @@ class DataTransforms:
         return transforms.Compose(transform_list)
     
     def _get_test_transform(self):
-        """Get test/validation transforms (no augmentation)"""
+        """Get test/validation transforms (no augmentation).
+
+        Aspect-ratio-preserving resize (shorter side) + center crop, matching
+        the train-time geometry. The old Resize((size, size)) squashed
+        non-square images and mismatched the training distribution.
+        """
+        resize_size = int(round(self.image_size * 256 / 224))
         return transforms.Compose([
-            transforms.Resize((self.image_size, self.image_size)),
+            transforms.Resize(resize_size),
+            transforms.CenterCrop(self.image_size),
             transforms.ToTensor(),
             transforms.Normalize(mean=self.mean, std=self.std)
         ])

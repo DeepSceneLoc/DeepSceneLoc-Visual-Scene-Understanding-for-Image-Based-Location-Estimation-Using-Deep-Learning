@@ -21,7 +21,7 @@
 ### 2. ResNet-50 Full Dataset Training
 - **Status:** Training is currently running on GPU.
 - **Details:**
-  - Command: `python run_training.py --data data/processed/places365 --epochs 20 --batch 32 --workers 4 --patience 5 --min-delta 0.001`
+  - Command: `python run_training_resnet50.py --data data/processed/places365 --epochs 20 --batch 32 --workers 4 --patience 5 --min-delta 0.001`
   - Logs: Live logs are being saved to `logs/full_training_live.log`.
 
 ### 3. EfficientNet Implementation Progress

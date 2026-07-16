@@ -76,7 +76,7 @@ def run_training(data_dir: Path, epochs: int, batch: int, workers: int, patience
     cmd = [
         str(ROOT / "venv" / "Scripts" / "python.exe"),
         "-u",
-        str(ROOT / "run_training.py"),
+        str(ROOT / "run_training_resnet50.py"),
         "--data",
         str(data_dir),
         "--epochs",

@@ -49,7 +49,7 @@ def main():
     )
 
     print(f"\nSplit complete -> {args.out}/{{train,val,test}}/<Category>/")
-    print("  Ready to train:  python run_training.py")
+    print("  Ready to train:  python run_training_resnet50.py")
 
 
 if __name__ == "__main__":

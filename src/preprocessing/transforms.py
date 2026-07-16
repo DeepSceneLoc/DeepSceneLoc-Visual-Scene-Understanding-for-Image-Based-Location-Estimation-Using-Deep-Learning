@@ -178,6 +178,12 @@ def get_val_transforms(
     """
     Build the validation / test transform pipeline (no augmentation).
 
+    Aspect-ratio-preserving: resize the SHORTER side to ``image_size * 256/224``
+    then center-crop to ``image_size``. This mirrors the train-time
+    Resize+RandomCrop geometry so eval sees the same framing as training
+    (the old ``Resize((size, size))`` squashed non-square images, creating a
+    train/eval distribution mismatch that capped accuracy).
+
     Args:
         image_size: Target spatial resolution.
         mean: Channel means for normalization.
@@ -186,8 +192,10 @@ def get_val_transforms(
     Returns:
         A ``torchvision.transforms.Compose`` pipeline.
     """
+    resize_size = int(round(image_size * 256 / 224))
     return T.Compose([
-        T.Resize((image_size, image_size)),
+        T.Resize(resize_size),            # shorter side -> resize_size (keeps aspect)
+        T.CenterCrop(image_size),
         T.ToTensor(),
         T.Normalize(mean=mean, std=std),
     ])

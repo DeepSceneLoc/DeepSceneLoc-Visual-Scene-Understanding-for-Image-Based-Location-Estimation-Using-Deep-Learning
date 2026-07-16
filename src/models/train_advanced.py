@@ -104,6 +104,12 @@ class EfficientNetTrainConfig:
     use_amp: bool = True
     compile_model: bool = False
 
+    # Full fine-tune helpers (April 2026 -- T4x2 upgrade)
+    llrd_decay: Optional[float] = None   # layer-wise LR decay (e.g. 0.75); None = off
+    use_swa: bool = False                # Stochastic Weight Averaging
+    swa_start_frac: float = 0.75         # begin SWA after this fraction of epochs
+    swa_lr: float = 1e-5                 # constant LR during SWA phase
+
     # Data
     image_size: int = 224
     augment_train: bool = True
@@ -167,6 +173,12 @@ class ViTTrainConfig:
     use_amp: bool = True
     compile_model: bool = False
 
+    # Full fine-tune helpers (April 2026 -- T4x2 upgrade)
+    llrd_decay: Optional[float] = None   # layer-wise LR decay (e.g. 0.65 for ViT); None = off
+    use_swa: bool = False
+    swa_start_frac: float = 0.75
+    swa_lr: float = 1e-6
+
     # Data
     image_size: int = 224
     augment_train: bool = True
@@ -202,9 +214,14 @@ def build_scheduler(
     total_steps  = (steps_per_epoch // accum) * total_epochs
 
     if name == "onecycle":
+        # Preserve per-group LRs (LLRD): OneCycleLR accepts a list of max_lr,
+        # one per param group. Without this, a scalar max_lr collapses every
+        # group to the same peak and defeats layer-wise decay.
+        group_lrs = [g["lr"] for g in optimizer.param_groups]
+        max_lr = group_lrs if len(group_lrs) > 1 else config.learning_rate
         return OneCycleLR(
             optimizer,
-            max_lr=config.learning_rate,
+            max_lr=max_lr,
             total_steps=total_steps,
             pct_start=0.1,           # 10% warmup
             anneal_strategy="cos",
@@ -242,8 +259,80 @@ def build_scheduler(
 
 
 # -------------------------------------------------------------
-# EMA (Exponential Moving Average of model weights)
+# Layer-wise LR Decay (LLRD) param groups
 # -------------------------------------------------------------
+
+def _ordered_stages(model: nn.Module) -> List[Tuple[str, List[nn.Parameter]]]:
+    """
+    Return backbone stages ordered SHALLOW -> DEEP, each paired with its
+    parameters, plus the classification head last. Works for both advanced
+    wrappers (DeepSceneLocEfficientNetAdvanced / DeepSceneLocViTAdvanced).
+
+    Shallow layers (generic edges/textures) should learn slowest; the head
+    fastest. LLRD assigns lr * decay^(depth_from_head).
+    """
+    stages: List[Tuple[str, List[nn.Parameter]]] = []
+
+    if hasattr(model, "features"):          # EfficientNet: features[0..9] + head
+        for i, block in enumerate(model.features):
+            stages.append((f"features.{i}", list(block.parameters())))
+        if hasattr(model, "head"):
+            stages.append(("head", list(model.head.parameters())))
+
+    elif hasattr(model, "vit"):             # ViT: patch_embed + blocks[..] + norm + head
+        embed_params: List[nn.Parameter] = list(model.vit.patch_embed.parameters())
+        for attr in ("cls_token", "pos_embed"):
+            p = getattr(model.vit, attr, None)
+            if isinstance(p, nn.Parameter):
+                embed_params.append(p)
+        stages.append(("patch_embed", embed_params))
+        for i, block in enumerate(model.vit.blocks):
+            stages.append((f"vit.blocks.{i}", list(block.parameters())))
+        if hasattr(model.vit, "norm"):
+            stages.append(("vit.norm", list(model.vit.norm.parameters())))
+        if hasattr(model, "head"):
+            stages.append(("head", list(model.head.parameters())))
+
+    else:                                   # fallback: single group of all params
+        stages.append(("all", list(model.parameters())))
+
+    return stages
+
+
+def build_llrd_param_groups(
+    model: nn.Module,
+    base_lr: float,
+    decay: float,
+    weight_decay: float = 0.0,
+) -> List[Dict]:
+    """
+    Build optimizer param groups with layer-wise LR decay.
+
+    The head gets ``base_lr``; each stage one step shallower gets multiplied
+    by ``decay`` (0 < decay < 1). Only trainable params are included, so this
+    composes with any freezing. Norm/bias params keep their group's LR but
+    get no weight decay (standard practice).
+    """
+    stages = _ordered_stages(model)
+    n = len(stages)
+    groups: List[Dict] = []
+
+    for idx, (name, params) in enumerate(stages):
+        # depth from head: head (last) -> 0, shallowest -> n-1
+        depth_from_head = (n - 1) - idx
+        lr = base_lr * (decay ** depth_from_head)
+
+        decay_p = [p for p in params if p.requires_grad and p.ndim >= 2]
+        nodecay_p = [p for p in params if p.requires_grad and p.ndim < 2]
+
+        if decay_p:
+            groups.append({"params": decay_p, "lr": lr, "weight_decay": weight_decay,
+                           "name": f"{name}_decay"})
+        if nodecay_p:
+            groups.append({"params": nodecay_p, "lr": lr, "weight_decay": 0.0,
+                           "name": f"{name}_nodecay"})
+
+    return groups
 
 class ModelEMA:
     """
@@ -352,6 +441,7 @@ class AdvancedTrainer:
         config,
         device: str = "cuda",
         resume_checkpoint: dict = None,
+        multi_gpu: bool = True,
     ):
         self.model = model.to(device)
         self.train_loader = train_loader
@@ -380,13 +470,23 @@ class AdvancedTrainer:
             )
             print(f"  Loss   : CrossEntropy (No class weights: {e})")
 
-        # Optimizer -- only trainable params
-        self.optimizer = optim.AdamW(
-            filter(lambda p: p.requires_grad, model.parameters()),
-            lr=config.learning_rate,
-            weight_decay=config.weight_decay,
-            betas=config.betas,
-        )
+        # Optimizer -- layer-wise LR decay (LLRD) when configured, else a
+        # single group over all trainable params.
+        llrd_decay = getattr(config, "llrd_decay", None)
+        if llrd_decay:
+            param_groups = build_llrd_param_groups(
+                model, base_lr=config.learning_rate,
+                decay=llrd_decay, weight_decay=config.weight_decay,
+            )
+            self.optimizer = optim.AdamW(param_groups, betas=config.betas)
+            print(f"  LLRD   : ON (decay={llrd_decay}, {len(param_groups)} param groups)")
+        else:
+            self.optimizer = optim.AdamW(
+                filter(lambda p: p.requires_grad, model.parameters()),
+                lr=config.learning_rate,
+                weight_decay=config.weight_decay,
+                betas=config.betas,
+            )
 
         # Gradient accumulation
         self.accum_steps = getattr(config, "grad_accum_steps", 1)
@@ -402,7 +502,7 @@ class AdvancedTrainer:
         self.scaler  = torch.amp.GradScaler('cuda', enabled=self.use_amp)
 
 
-        # EMA
+        # EMA -- built from the un-wrapped model (deepcopy must stay a plain module)
         self.use_ema = getattr(config, "use_ema", False)
         self.ema     = ModelEMA(self.model, decay=getattr(config, "ema_decay", 0.9998)) \
                        if self.use_ema else None
@@ -411,6 +511,39 @@ class AdvancedTrainer:
         self.use_mixup  = getattr(config, "use_mixup",  False)
         self.use_cutmix = getattr(config, "use_cutmix", False)
         self.mixup_alpha = getattr(config, "mixup_alpha", 0.4)
+
+        # Multi-GPU -- wrap AFTER EMA/optimizer are bound to the raw module.
+        # DataParallel forwards .parameters()/.state_dict() to the wrapped
+        # module (with a "module." prefix on state_dict keys), so checkpoint
+        # saving must unwrap via .module.
+        self._raw_model = self.model  # keep handle to the un-wrapped module
+        self.use_dp = (
+            multi_gpu
+            and torch.device(device).type == "cuda"
+            and torch.cuda.device_count() > 1
+        )
+        if self.use_dp:
+            print(f"  [DataParallel] Training across {torch.cuda.device_count()} GPUs")
+            self.model = nn.DataParallel(self.model)
+
+        # SWA (Stochastic Weight Averaging) -- averages weights over the tail
+        # of training for flatter minima / better generalization. Built on the
+        # RAW module (DP shares the same param tensors) so the averaged copy
+        # stays a plain module and saves arch-native.
+        self.use_swa = getattr(config, "use_swa", False)
+        if self.use_swa:
+            from torch.optim.swa_utils import AveragedModel, SWALR
+            self.swa_model = AveragedModel(self._raw_model)
+            self.swa_start = max(1, int(config.epochs * getattr(config, "swa_start_frac", 0.75)))
+            self.swa_scheduler = SWALR(
+                self.optimizer, swa_lr=getattr(config, "swa_lr", 1e-5)
+            )
+            self.swa_n = 0
+            print(f"  SWA    : ON (start epoch={self.swa_start}, swa_lr={getattr(config, 'swa_lr', 1e-5)})")
+        else:
+            self.swa_model = None
+            self.swa_start = None
+        self._swa_active = False
 
         # torch.compile (PyTorch 2.0+)
         if getattr(config, "compile_model", False):
@@ -505,8 +638,9 @@ class AdvancedTrainer:
                         if self.use_ema:
                             self.ema.update(self.model)
 
-                        # Step-level scheduler (OneCycleLR)
-                        if self._is_onecycle:
+                        # Step-level scheduler (OneCycleLR). Suspended once the
+                        # SWA phase begins -- SWALR takes over per-epoch.
+                        if self._is_onecycle and not self._swa_active:
                             self.scheduler.step()
 
                 # -- Metrics -----------------------------------
@@ -597,8 +731,16 @@ class AdvancedTrainer:
 
             current_lr = self.optimizer.param_groups[0]["lr"]
 
-            # Step epoch-level schedulers
-            if not self._is_onecycle:
+            # Step epoch-level schedulers. Once the SWA phase starts, SWALR
+            # drives the LR and we accumulate averaged weights instead.
+            if self.use_swa and epoch >= self.swa_start:
+                if not self._swa_active:
+                    self._swa_active = True
+                    print(f"  [SWA] Entering SWA phase at epoch {epoch}")
+                self.swa_model.update_parameters(self._raw_model)
+                self.swa_n += 1
+                self.swa_scheduler.step()
+            elif not self._is_onecycle:
                 self.scheduler.step()
 
             elapsed = time.perf_counter() - t0
@@ -641,25 +783,69 @@ class AdvancedTrainer:
             if epoch % 5 == 0:
                 self._save_checkpoint(epoch, is_best=False)
 
-            # Early stopping
-            if self.epochs_no_improve >= self.config.early_stopping_patience:
+            # Early stopping -- disabled during the SWA phase (we want to run
+            # the full averaging tail, not stop early).
+            if not self._swa_active and self.epochs_no_improve >= self.config.early_stopping_patience:
                 print(f"\nEarly stopping after {epoch} epochs "
                       f"(no improvement for {self.epochs_no_improve} epochs).")
                 break
+
+        # SWA finalization -- recompute BatchNorm running stats over the train
+        # set for the averaged weights (mandatory), evaluate, and save.
+        if self.use_swa and self.swa_n > 0:
+            self._finalize_swa()
 
         # Final saves
         self._save_history()
         self._print_summary()
         return self.history
 
+    # ----------------------------------------------------------
+    def _finalize_swa(self):
+        """Update BN stats for the SWA-averaged model, evaluate, and save it."""
+        from torch.optim.swa_utils import update_bn
+        print(f"\n  [SWA] Finalizing averaged model over {self.swa_n} snapshots ...")
+        # update_bn accepts (input, target) batches and moves data to device;
+        # it runs a forward-only pass to recompute BN running stats.
+        self.swa_model.to(self.device)
+        update_bn(self.train_loader, self.swa_model, device=self.device)
+
+        # Evaluate SWA model on val
+        self.swa_model.eval()
+        correct = total = 0
+        with torch.no_grad():
+            for imgs, labels in self.val_loader:
+                imgs = imgs.to(self.device, non_blocking=True)
+                labels = labels.to(self.device, non_blocking=True)
+                with torch.amp.autocast('cuda', enabled=self.use_amp):
+                    out = self.swa_model(imgs)
+                _, preds = torch.max(out, 1)
+                correct += (preds == labels).sum().item()
+                total += imgs.size(0)
+        swa_acc = correct / max(total, 1)
+        self.history["swa_val_acc"] = swa_acc
+        print(f"  [SWA] Averaged-model val_acc = {swa_acc:.4f}")
+
+        # Save SWA weights (unwrap AveragedModel.module -> arch-native state)
+        path = self.ckpt_dir / f"{self.config.model_name.replace('/', '_')}_swa.pth"
+        torch.save({
+            "epoch": self.config.epochs,
+            "model_state": self.swa_model.module.state_dict(),
+            "val_acc": swa_acc,
+            "config": asdict(self.config),
+            "swa_snapshots": self.swa_n,
+        }, path)
+        print(f"  [SWA] Saved -> {path}")
+
 
     # ----------------------------------------------------------
     def _save_checkpoint(self, epoch: int, is_best: bool):
         suffix = "best" if is_best else f"epoch{epoch:03d}"
         path   = self.ckpt_dir / f"{self.config.model_name.replace('/', '_')}_{suffix}.pth"
+        model_to_save = self.model.module if self.use_dp else self.model
         state = {
             "epoch":           epoch,
-            "model_state":     self.model.state_dict(),
+            "model_state":     model_to_save.state_dict(),
             "optimizer_state": self.optimizer.state_dict(),
             "scheduler_state": self.scheduler.state_dict(),
             "scaler_state":    self.scaler.state_dict() if self.use_amp else {},

@@ -340,7 +340,7 @@
 - [x] AdvancedTrainer class with gradient clipping, per-epoch JSON logging
 - [x] CheckpointManager with resume support
 - [x] ViT-B/16 training infrastructure (ViTTrainConfig, warmup cosine schedule)
-- [x] Unified training entry point (`run_training_advanced.py`)
+- [x] Per-model training entry points (`run_training_efficientnet_b0.py`, `run_training_vit_b16.py`)
 - [x] Dry-run verified on RTX 3050 GPU (smoke test passed)
 - [x] **UPGRADED: AMP (Mixed Precision)** — 2-3× faster, -40% VRAM, epoch: 25 min → 18 min
 - [x] **UPGRADED: OneCycleLR scheduler** — replaced plain cosine; 10% warmup + super-convergence
@@ -407,7 +407,7 @@
 - [x] Freeze first 10/12 transformer encoder blocks
 - [x] Linear warmup (5 epochs) + cosine decay scheduler
 - [x] `ViTTrainConfig` with modern settings (AMP, EMA, MixUp, RandAugment, GradAccum 4×)
-- [x] Training infrastructure ready (`run_training_advanced.py --model vit_b16`)
+- [x] Training infrastructure ready (`run_training_vit_b16.py`)
 - [x] Install `timm` library and verify ViT-B/16 weight loading
 - [ ] Full ViT training on Places365 (40 epochs) — **Ready via start_vit_training.bat**
 - [ ] ViT best checkpoint saved (target val acc ≥ **82%**, raised from 78%)
@@ -416,7 +416,7 @@
 **Command to run (Automated via script):**
 ```bash
 venv\Scripts\pip.exe install timm
-venv\Scripts\python.exe run_training_advanced.py --model vit_b16 ^
+venv\Scripts\python.exe run_training_vit_b16.py ^
     --data data/processed/places365_mit_full_2026_03_15 ^
     --epochs 40 --workers 4 --patience 10
 ```
