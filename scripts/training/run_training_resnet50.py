@@ -36,8 +36,8 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import StepLR
 
-# - Project root on sys.path -
-ROOT = Path(__file__).parent
+# -- Project root on sys.path ---------------------------------
+ROOT = Path(__file__).resolve().parent.parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
