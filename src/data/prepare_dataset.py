@@ -187,9 +187,9 @@ class DatasetSplitter:
             if copy:
                 shutil.copy2(img, dest)
             else:
-                # Create relative symlink if supported
+                # Create absolute symlink so chained symlinks resolve correctly
                 try:
-                    os.symlink(img, dest)
+                    os.symlink(img.resolve(), dest)
                 except OSError:
                     # Fallback to copy if symlink not supported
                     shutil.copy2(img, dest)
