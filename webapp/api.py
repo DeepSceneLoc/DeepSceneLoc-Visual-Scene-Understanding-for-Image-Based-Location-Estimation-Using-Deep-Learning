@@ -99,59 +99,59 @@ CHECKPOINT_PRIORITY = [
 device    = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 transform = get_val_transforms()
 
-_model        = None
-_model_info   = {}
+_models       = []
+_models_info  = []
 _gemini       = None
 
-def _find_best_checkpoint():
-    for arch, rel_path in CHECKPOINT_PRIORITY:
-        p = ROOT / rel_path
-        if p.exists():
-            return arch, str(p)
-    return None, None
+def _load_models():
+    global _models, _models_info
+    
+    architectures = ["resnet50", "efficientnet_b0", "vit_b16"]
+    
+    for arch in architectures:
+        # Find path for this arch
+        ckpt_path = None
+        for a, p_str in CHECKPOINT_PRIORITY:
+            if a == arch:
+                p = ROOT / p_str
+                if p.exists():
+                    ckpt_path = str(p)
+                    break
+                    
+        if not ckpt_path:
+            print(f"[WARN] No checkpoint found for {arch}")
+            continue
+            
+        try:
+            if arch == "vit_b16" and _VIT_OK:
+                m = _create_vit("vit_b16", num_classes=5, pretrained=False)
+            elif arch == "efficientnet_b0" and _ADV_OK:
+                m = create_advanced_model("efficientnet_b0", num_classes=5, pretrained=False)
+            elif arch == "resnet50":
+                m = create_model("resnet50", num_classes=5, pretrained=False)
+            else:
+                continue
 
-def _load_model():
-    global _model, _model_info
-    arch, ckpt_path = _find_best_checkpoint()
+            ckpt = torch.load(ckpt_path, map_location=device, weights_only=False)
+            if "ema_state" in ckpt:
+                key = "ema_state"
+            elif "model_state" in ckpt:
+                key = "model_state"
+            else:
+                key = "model_state_dict"
+            m.load_state_dict(ckpt[key])
+            m.to(device).eval()
 
-    if arch is None:
-        _model_info = {"status": "no_checkpoint", "arch": "none", "val_acc": None}
-        return
-
-    try:
-        if arch == "vit_b16" and _VIT_OK:
-            m = _create_vit("vit_b16", num_classes=5, pretrained=False)
-        elif arch == "efficientnet_b0" and _ADV_OK:
-            m = create_advanced_model("efficientnet_b0", num_classes=5, pretrained=False)
-        else:
-            m = create_model("resnet50", num_classes=5, pretrained=False)
-
-        ckpt = torch.load(ckpt_path, map_location=device, weights_only=False)
-        # Support both EMA weights (higher accuracy) and raw model weights
-        if "ema_state" in ckpt:
-            key = "ema_state"
-            print(f"[OK] Using EMA weights from checkpoint")
-        elif "model_state" in ckpt:
-            key = "model_state"
-        else:
-            key = "model_state_dict"
-        m.load_state_dict(ckpt[key])
-        m.to(device).eval()
-
-        _model = m
-        _model_info = {
-            "status":   "loaded",
-            "arch":     arch,
-            "path":     ckpt_path,
-            "val_acc":  ckpt.get("val_acc") or ckpt.get("best_val_acc"),
-            "epoch":    ckpt.get("epoch"),
-            "device":   str(device),
-            "params":   sum(p.numel() for p in m.parameters()),
-        }
-        print(f"[OK] Model loaded: {arch} from {ckpt_path}")
-    except Exception as e:
-        _model_info = {"status": "error", "error": str(e)}
-        print(f"[ERR] Model load failed: {e}")
+            _models.append(m)
+            _models_info.append({
+                "status":   "loaded",
+                "arch":     arch,
+                "path":     ckpt_path,
+                "val_acc":  ckpt.get("val_acc") or ckpt.get("best_val_acc")
+            })
+            print(f"[OK] Model loaded: {arch} from {ckpt_path}")
+        except Exception as e:
+            print(f"[ERR] Model load failed for {arch}: {e}")
 
 def _load_gemini():
     global _gemini
@@ -175,7 +175,7 @@ def _load_gemini():
     except Exception as e:
         print(f"[WARN] Stage 2 init failed: {e}")
 
-_load_model()
+_load_models()
 _load_gemini()
 
 # ─────────────────────────────────────────────────────────────
@@ -210,37 +210,32 @@ if EXAMPLES_DIR.exists():
 # ─────────────────────────────────────────────────────────────
 
 def _predict(pil_image: Image.Image) -> dict:
-    if _model is None:
-        # Return uniform mock predictions
-        probs = [0.2] * 5
-        return {
-            "probabilities": {n: probs[i] for i, n in enumerate(CLASS_NAMES)},
-            "top_class": "Urban",
-            "confidence": 0.2,
-            "mock": True,
-        }
+    if not _models:
+        raise HTTPException(status_code=500, detail="No AI models are loaded.")
 
     tensor = transform(pil_image).unsqueeze(0).to(device)
-
-    # Optional: Test-Time Augmentation with horizontal flip
     tensor_flipped = torch.flip(tensor, dims=[3])
 
+    all_probs = []
+    TEMPERATURE = 0.6
+    
     with torch.no_grad():
-        logits       = _model(tensor)
-        logits_flip  = _model(tensor_flipped)
-        # Average logits before softmax (more numerically stable than averaging probs)
-        logits_avg   = (logits + logits_flip) / 2.0
-
-        # Temperature scaling: compensates for label-smoothing-induced underconfidence.
-        # T < 1 sharpens the distribution; tuned to T=0.6 for this model.
-        TEMPERATURE = 0.6
-        probs = F.softmax(logits_avg / TEMPERATURE, dim=1).squeeze().cpu().numpy()
-
-    top_idx = int(np.argmax(probs))
+        for m in _models:
+            logits       = m(tensor)
+            logits_flip  = m(tensor_flipped)
+            logits_avg   = (logits + logits_flip) / 2.0
+            
+            p = F.softmax(logits_avg / TEMPERATURE, dim=1).squeeze().cpu().numpy()
+            all_probs.append(p)
+            
+    # Uniform weighting ensemble
+    avg_probs = np.mean(all_probs, axis=0)
+    top_idx = int(np.argmax(avg_probs))
+    
     return {
-        "probabilities": {n: float(probs[i]) for i, n in enumerate(CLASS_NAMES)},
+        "probabilities": {n: float(avg_probs[i]) for i, n in enumerate(CLASS_NAMES)},
         "top_class":    CLASS_NAMES[top_idx],
-        "confidence":   float(probs[top_idx]),
+        "confidence":   float(avg_probs[top_idx]),
         "mock":         False,
     }
 
@@ -267,7 +262,7 @@ async def get_status():
             "vram_gb": round(torch.cuda.get_device_properties(0).total_memory / 1e9, 1),
         }
     return {
-        "model":  _model_info,
+        "models": _models_info,
         "gemini": {
             "available": _gemini is not None,
             "library":   _GEMINI_OK,
@@ -317,7 +312,7 @@ async def predict(file: UploadFile = File(...)):
         "description":  CLASS_DESC.get(top, ""),
         "probabilities": result["probabilities"],
         "latency_ms":   latency_ms,
-        "model":        _model_info.get("arch", "mock"),
+        "model":        "ensemble",
         "mock":         result.get("mock", False),
     }
 
@@ -381,5 +376,5 @@ async def analyze(file: UploadFile = File(...)):
             "latency_ms":  round((t2 - t1) * 1000, 1),
         },
         "total_latency_ms": round((t2 - t0) * 1000, 1),
-        "model": _model_info.get("arch", "mock"),
+        "model": "ensemble",
     }
