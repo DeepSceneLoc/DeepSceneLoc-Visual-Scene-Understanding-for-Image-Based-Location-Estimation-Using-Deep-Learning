@@ -184,7 +184,7 @@ def create_dataloaders(
 
     # persistent_workers=True keeps workers alive between epochs (no respawn delay)
     _persistent = num_workers > 0
-    _prefetch   = 2 if num_workers > 0 else None
+    _prefetch   = 4 if num_workers > 0 else None
 
 
     train_loader = DataLoader(
