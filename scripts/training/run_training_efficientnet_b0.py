@@ -303,7 +303,29 @@ def _patch_trainer_dry_run(trainer: AdvancedTrainer, max_batches: int = 100):
 
         return total_loss / max(total, 1), correct / max(total, 1)
 
+    def _dry_val_with_ema(loader, epoch=0, **kwargs):
+        """Patched validation: limits to max_batches and returns 3-tuple."""
+        trainer.model.eval()
+        total_loss = correct = total = 0
+
+        with torch.no_grad():
+            for i, (imgs, labels) in enumerate(loader):
+                if i >= max_batches:
+                    break
+                imgs, labels = imgs.to(trainer.device), labels.to(trainer.device)
+                outputs = trainer.model(imgs)
+                loss    = trainer.criterion(outputs, labels)
+
+                total_loss += loss.item() * imgs.size(0)
+                _, preds    = torch.max(outputs, 1)
+                correct    += (preds == labels).sum().item()
+                total      += imgs.size(0)
+
+        n = max(total, 1)
+        return total_loss / n, correct / n, 0.0  # ema_acc = 0 for dry-run
+
     trainer._run_epoch = _dry_epoch
+    trainer._run_val_with_ema = _dry_val_with_ema
 
 
 # -------------------------------------------------------------
