@@ -12,7 +12,7 @@ We will create a new, clean Python server (using FastAPI or Flask, running on po
 - **Fusion:** The Python backend will combine the logits/probabilities from these three models to determine the final, highly accurate `sceneCategory` and `confidence`.
 - **Response:** The Python backend will return `{"success": true, "data": {"sceneCategory": "...", "confidence": ...}}` to the Node.js server.
 
-### 2. Node.js Frontend (Port 3000)
+### 2. Node.js Frontend (process.env.PORT || 3000)
 - Receives the `sceneCategory` constraint from the Python backend.
 - **STAGE 2 (LLM):** Executes the Gemini AI prompt, passing it the image and the PyTorch-derived `sceneCategory`.
 - Formats the final geographic coordinates and returns them to the React UI.

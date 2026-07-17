@@ -170,7 +170,6 @@ export default function InteractiveMap({ prediction, isAnalyzing }: InteractiveM
         mapTypeId: googleMapType,
         disableDefaultUI: true,
         tilt: viewMode === "3d" ? 45 : 0,
-        mapId: "DEMO_MAP_ID",
       });
 
       markerInstanceRef.current = new window.google.maps.Marker({
@@ -226,9 +225,9 @@ export default function InteractiveMap({ prediction, isAnalyzing }: InteractiveM
 
   // Open-Source Fallback: Map Type styles & textures
   const getGlobeImageUrl = () => {
-    if (mapType === "satellite") return "//unpkg.com/three-globe/example/img/earth-night.jpg";
-    if (mapType === "vector") return "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg";
-    return "//unpkg.com/three-globe/example/img/earth-day.jpg";
+    if (mapType === "satellite") return "https://unpkg.com/three-globe/example/img/earth-night.jpg";
+    if (mapType === "vector") return "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg";
+    return "https://unpkg.com/three-globe/example/img/earth-day.jpg";
   };
 
   const get2DMapStyle = () => {
