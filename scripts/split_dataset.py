@@ -34,6 +34,9 @@ def main():
     p.add_argument("--seed",  type=int,   default=42)
     p.add_argument("--copy",  action="store_true",
                    help="Copy files instead of symlinking (needed on some Windows configs)")
+    p.add_argument("--workers", type=int, default=32,
+                   help="Parallel copy threads (default: 32; copy is I/O-bound "
+                        "on network storage, so this can exceed CPU core count)")
     args = p.parse_args()
 
     splitter = DatasetSplitter(
@@ -41,6 +44,7 @@ def main():
         val_ratio=args.val,
         test_ratio=args.test,
         seed=args.seed,
+        workers=args.workers,
     )
     splitter.split_dataset(
         data_dir=args.data,

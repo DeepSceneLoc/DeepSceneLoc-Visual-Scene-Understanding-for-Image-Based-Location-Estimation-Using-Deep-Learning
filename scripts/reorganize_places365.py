@@ -40,8 +40,9 @@ def main():
     p.add_argument("--data", required=True, help="Path to data_256 folder (contains a/, b/, c/...)")
     p.add_argument("--out", default="data/processed_raw", help="Output directory")
     p.add_argument("--copy", action="store_true", help="Copy instead of symlink (REQUIRED on Kaggle)")
-    p.add_argument("--workers", type=int, default=16,
-                   help="Parallel copy threads (default: 16)")
+    p.add_argument("--workers", type=int, default=32,
+                   help="Parallel copy threads (default: 32; copy is I/O-bound "
+                        "on network storage, so this can exceed CPU core count)")
     p.add_argument("--max-per-category", type=int, default=None,
                    help="Cap images per super-category for balanced, faster training "
                         "(e.g. 15000). Without this, all images are used (can be 120K+ per cat).")

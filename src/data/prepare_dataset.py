@@ -107,22 +107,24 @@ class Places365Mapper:
 class DatasetSplitter:
     """Splits dataset into train/val/test sets"""
     
-    def __init__(self, train_ratio=0.70, val_ratio=0.15, test_ratio=0.15, seed=42):
+    def __init__(self, train_ratio=0.70, val_ratio=0.15, test_ratio=0.15, seed=42, workers=32):
         """
         Initialize splitter with ratios
-        
+
         Args:
             train_ratio: Proportion for training set
             val_ratio: Proportion for validation set
             test_ratio: Proportion for test set
             seed: Random seed for reproducibility
+            workers: Parallel copy threads (I/O-bound, can exceed CPU core count)
         """
         assert abs(train_ratio + val_ratio + test_ratio - 1.0) < 1e-6
-        
+
         self.train_ratio = train_ratio
         self.val_ratio = val_ratio
         self.test_ratio = test_ratio
         self.seed = seed
+        self.workers = workers
         np.random.seed(seed)
     
     def split_dataset(self, data_dir: str, output_dir: str, copy_files=False):
@@ -198,7 +200,7 @@ class DatasetSplitter:
 
         if copy and len(images) > 100:
             # Parallel copy for large batches (network I/O is latency-bound)
-            with ThreadPoolExecutor(max_workers=16) as pool:
+            with ThreadPoolExecutor(max_workers=self.workers) as pool:
                 list(pool.map(_do_one, images))
         else:
             for img in images:
