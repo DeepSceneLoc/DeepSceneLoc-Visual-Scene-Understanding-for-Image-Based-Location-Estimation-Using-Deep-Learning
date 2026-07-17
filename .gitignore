@@ -143,3 +143,4 @@ resume_vit_training.bat
 start_vit_training.bat
 list_of_models.md
 results/gemini_cache.db
+docs/MODEL_PERFORMANCE_SUMMARY.md
