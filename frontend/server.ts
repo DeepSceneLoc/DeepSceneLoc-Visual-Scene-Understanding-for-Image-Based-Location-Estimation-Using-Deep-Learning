@@ -7,7 +7,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 // Configure body parser with high limit to handle uploaded base64 images
 app.use(express.json({ limit: "15mb" }));
@@ -153,7 +153,7 @@ app.post("/api/analyze-image", async (req, res) => {
     // Prepare Base64 data (strip prefix if exist)
     let processedBase64 = imageBase64;
     let mimeType = "image/jpeg";
-    
+
     if (imageBase64.includes(";base64,")) {
       const parts = imageBase64.split(";base64,");
       const match = parts[0].match(/data:(.*?)$/);
@@ -188,16 +188,16 @@ app.post("/api/analyze-image", async (req, res) => {
           console.warn("PyTorch backend returned an error:", parsedData.error);
         }
       } else {
-         console.warn("PyTorch backend responded with status:", response.status);
+        console.warn("PyTorch backend responded with status:", response.status);
       }
     } catch (modelError: any) {
       console.warn("DeepSceneLoc Live PyTorch Model error. Will gracefully run simulated_pipeline fallback. Error details:", modelError.message);
     }
 
     if (modelSucceeded && modelResponseData) {
-      
+
       let geminiSucceeded = false;
-      let fusedData: any = { 
+      let fusedData: any = {
         sceneCategory: modelResponseData.sceneCategory,
         confidence: modelResponseData.confidence,
         landmarkName: "Generic / Unknown",
@@ -215,7 +215,7 @@ app.post("/api/analyze-image", async (req, res) => {
       if (ai) {
         try {
           console.log(`Querying Gemini with PyTorch constraint: ${modelResponseData.sceneCategory}...`);
-          
+
           const prompt = `You are the final multimodal data fusion module of DeepSceneLoc.
 Our first-stage PyTorch classifier (ResNet-50 / ViT) has analyzed this image and classified the scene category as: "${modelResponseData.sceneCategory}" with a confidence of ${modelResponseData.confidence}%.
 
@@ -287,7 +287,7 @@ Return schema properties:
             console.log("Gemini fusion succeeded.");
           }
         } catch (geminiError: any) {
-           console.warn("Gemini fusion error. Falling back to PyTorch base prediction.", geminiError.message);
+          console.warn("Gemini fusion error. Falling back to PyTorch base prediction.", geminiError.message);
         }
       }
 
