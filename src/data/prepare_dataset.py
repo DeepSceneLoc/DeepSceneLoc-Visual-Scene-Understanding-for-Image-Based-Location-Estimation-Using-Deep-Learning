@@ -181,21 +181,28 @@ class DatasetSplitter:
         print(f"Train: {self.train_ratio:.1%}, Val: {self.val_ratio:.1%}, Test: {self.test_ratio:.1%}")
     
     def _copy_images(self, images: List[Path], dest_dir: Path, copy: bool):
-        """Copy or symlink images to destination"""
-        for img in images:
+        """Copy or symlink images to destination (parallel when copying)."""
+        from concurrent.futures import ThreadPoolExecutor
+
+        def _do_one(img: Path):
             dest = dest_dir / img.name
-            # Remove stale file/symlink from a previous run
             if dest.exists() or dest.is_symlink():
                 dest.unlink()
             if copy:
                 shutil.copy2(img, dest)
             else:
-                # Create absolute symlink so chained symlinks resolve correctly
                 try:
                     os.symlink(img.resolve(), dest)
                 except OSError:
-                    # Fallback to copy if symlink not supported
                     shutil.copy2(img, dest)
+
+        if copy and len(images) > 100:
+            # Parallel copy for large batches (network I/O is latency-bound)
+            with ThreadPoolExecutor(max_workers=16) as pool:
+                list(pool.map(_do_one, images))
+        else:
+            for img in images:
+                _do_one(img)
     
     def _save_split_stats(self, output_path: Path):
         """Save statistics about the split"""

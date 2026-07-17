@@ -3,14 +3,19 @@ Reorganize Raw Places365 Dataset
 Extracts images from the alphabetized Places365 hierarchical folder structure
 and pools them into the 5 DeepSceneLoc super-categories.
 
+Uses parallel file I/O (16 threads) for fast copying on network-mounted
+storage like Kaggle's /kaggle/input/.
+
 Usage:
     python scripts/reorganize_places365.py --data /kaggle/input/.../train_256_places365standard/data_256 --out data/processed_raw
+    python scripts/reorganize_places365.py --data ... --out data/processed_raw --copy --workers 16
 """
 
 import argparse
 import os
 import shutil
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from tqdm import tqdm
 
@@ -20,11 +25,21 @@ if str(ROOT) not in sys.path:
 
 from src.data.prepare_dataset import Places365Mapper
 
+def _copy_file(src: Path, dest: Path):
+    """Copy a single file (called from thread pool)."""
+    try:
+        shutil.copy2(src, dest)
+        return True
+    except Exception:
+        return False
+
 def main():
     p = argparse.ArgumentParser(description="Reorganize hierarchical Places365 to flat super-categories")
     p.add_argument("--data", required=True, help="Path to data_256 folder (contains a/, b/, c/...)")
     p.add_argument("--out", default="data/processed_raw", help="Output directory")
-    p.add_argument("--copy", action="store_true", help="Copy instead of symlink")
+    p.add_argument("--copy", action="store_true", help="Copy instead of symlink (REQUIRED on Kaggle)")
+    p.add_argument("--workers", type=int, default=16,
+                   help="Parallel copy threads (default: 16, higher = faster on network mounts)")
     args = p.parse_args()
 
     data_dir = Path(args.data)
@@ -43,16 +58,14 @@ def main():
 
     print(f"Scanning {data_dir} for Places365 categories...")
     
-    # The structure is data_256/<letter>/<category>/<images>
-    # e.g., data_256/a/airport/image_001.jpg
-    
+    # Phase 1: Build file list (fast — no I/O, just path enumeration)
+    file_tasks = []  # list of (src_path, dest_path, super_cat)
     stats = {scat: 0 for scat in super_categories}
     unmapped_count = 0
-    total_images_processed = 0
 
-    letter_folders = [d for d in data_dir.iterdir() if d.is_dir() and len(d.name) == 1]
+    letter_folders = sorted([d for d in data_dir.iterdir() if d.is_dir() and len(d.name) == 1])
     
-    for letter_dir in tqdm(letter_folders, desc="Processing alphabet folders"):
+    for letter_dir in tqdm(letter_folders, desc="Scanning categories"):
         category_folders = [d for d in letter_dir.iterdir() if d.is_dir()]
         
         for cat_dir in category_folders:
@@ -60,36 +73,50 @@ def main():
             super_cat = mapper.map_category(places_category)
             
             if super_cat is None:
-                # Skip unmapped categories instantly
                 unmapped_count += 1
                 continue
                 
             images = list(cat_dir.glob('*.jpg'))
                 
             for img_path in images:
-                # Prefix filename with category to prevent collisions from different folders
                 new_filename = f"{places_category}_{img_path.name}"
                 dest = out_dir / super_cat / new_filename
                 
                 if not dest.exists():
-                    if args.copy:
-                        shutil.copy2(img_path, dest)
-                    else:
-                        try:
-                            os.symlink(img_path.resolve(), dest)
-                        except OSError:
-                            shutil.copy2(img_path, dest)
-                            
+                    file_tasks.append((img_path, dest))
+                
                 stats[super_cat] += 1
-                total_images_processed += 1
+
+    total_files = len(file_tasks)
+    print(f"\nFound {sum(stats.values())} images, {total_files} need to be {'copied' if args.copy else 'linked'}.")
+
+    # Phase 2: Copy/symlink files
+    if args.copy and total_files > 0:
+        print(f"Copying {total_files} files with {args.workers} parallel threads...")
+        done = 0
+        with ThreadPoolExecutor(max_workers=args.workers) as executor:
+            futures = {executor.submit(_copy_file, src, dst): (src, dst) 
+                       for src, dst in file_tasks}
+            with tqdm(total=total_files, desc="Copying files", unit="file") as pbar:
+                for future in as_completed(futures):
+                    done += 1
+                    pbar.update(1)
+        print(f"  Copied {done} files.")
+    elif total_files > 0:
+        # Symlink mode (fast, but slow I/O during training on network mounts)
+        for src, dst in tqdm(file_tasks, desc="Creating symlinks"):
+            try:
+                os.symlink(src.resolve(), dst)
+            except OSError:
+                shutil.copy2(src, dst)
 
     print("\nReorganization Complete!")
     print(f"Output directory: {out_dir}")
     print("\nImages per super-category:")
     for scat, count in stats.items():
         print(f"  {scat}: {count} images")
-    print(f"\nIgnored (unmapped) images: {unmapped_count}")
-    print(f"Total mapped images: {total_images_processed}")
+    print(f"\nIgnored (unmapped) categories: {unmapped_count}")
+    print(f"Total mapped images: {sum(stats.values())}")
 
 if __name__ == "__main__":
     main()
