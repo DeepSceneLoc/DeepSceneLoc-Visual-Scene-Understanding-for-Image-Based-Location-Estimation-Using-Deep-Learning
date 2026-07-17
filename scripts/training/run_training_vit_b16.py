@@ -31,8 +31,8 @@ Usage (activate venv first):
     python run_training_vit_b16.py \\
         --epochs 40 --batch 32 --lr 1e-4 --freeze-blocks 7
 
-    # Smoke test (2 epochs, 5 batches, no GPU required)
-    python run_training_vit_b16.py --dry-run --allow-cpu
+    # Smoke test (2 epochs, 5 batches)
+    python run_training_vit_b16.py --dry-run
 
     # Evaluate a saved checkpoint
     python run_training_vit_b16.py --eval-only \\
@@ -152,7 +152,7 @@ def get_device(allow_cpu: bool = False) -> torch.device:
     else:
         if not allow_cpu:
             print("ERROR: CUDA not available and --allow-cpu not set.")
-            print("       Use --allow-cpu only for smoke tests / debugging.")
+            print("       Use --allow-cpu only for debugging.")
             sys.exit(1)
         dev = torch.device("cpu")
         print("  GPU  : not available -- running on CPU (--allow-cpu enabled)")

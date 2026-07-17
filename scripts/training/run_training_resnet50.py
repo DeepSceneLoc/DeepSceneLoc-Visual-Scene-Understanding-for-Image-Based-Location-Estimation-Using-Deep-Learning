@@ -89,7 +89,7 @@ def get_device(allow_cpu: bool = False) -> torch.device:
     else:
         if not allow_cpu:
             print("ERROR: CUDA is not available. GPU-only training is enforced by default.")
-            print("       Use --allow-cpu only for debugging/smoke tests.")
+            print("       Use --allow-cpu only for debugging.")
             sys.exit(1)
         dev = torch.device("cpu")
         print("  GPU : not available - training on CPU (override enabled)")
