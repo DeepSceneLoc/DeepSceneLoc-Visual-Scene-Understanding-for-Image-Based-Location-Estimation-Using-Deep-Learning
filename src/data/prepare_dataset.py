@@ -184,6 +184,9 @@ class DatasetSplitter:
         """Copy or symlink images to destination"""
         for img in images:
             dest = dest_dir / img.name
+            # Remove stale file/symlink from a previous run
+            if dest.exists() or dest.is_symlink():
+                dest.unlink()
             if copy:
                 shutil.copy2(img, dest)
             else:
