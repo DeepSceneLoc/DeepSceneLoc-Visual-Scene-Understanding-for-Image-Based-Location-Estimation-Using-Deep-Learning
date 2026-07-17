@@ -72,10 +72,13 @@ def main():
                 dest = out_dir / super_cat / new_filename
                 
                 if not dest.exists():
-                    try:
-                        os.symlink(img_path.resolve(), dest)
-                    except OSError:
+                    if args.copy:
                         shutil.copy2(img_path, dest)
+                    else:
+                        try:
+                            os.symlink(img_path.resolve(), dest)
+                        except OSError:
+                            shutil.copy2(img_path, dest)
                             
                 stats[super_cat] += 1
                 total_images_processed += 1
