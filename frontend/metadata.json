@@ -1,0 +1,6 @@
+{
+  "name": "DeepSceneLoc",
+  "description": "Visual Scene Understanding for Image-Based Location Estimation Using Deep Learning",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
