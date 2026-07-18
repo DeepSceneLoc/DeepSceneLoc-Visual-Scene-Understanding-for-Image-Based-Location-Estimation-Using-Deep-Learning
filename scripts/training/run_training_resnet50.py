@@ -34,7 +34,7 @@ from pathlib import Path
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.optim.lr_scheduler import StepLR
+from torch.optim.lr_scheduler import CosineAnnealingLR
 
 # -- Project root on sys.path ---------------------------------
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -43,7 +43,7 @@ if str(ROOT) not in sys.path:
 
 from src.models.model import create_model
 from src.models.train import Trainer
-from src.preprocessing.pipeline import create_dataloaders, test_preprocessing_pipeline
+from src.preprocessing.pipeline import create_dataloaders, test_preprocessing_pipeline, get_class_weights
 from src.evaluation.evaluate import ModelEvaluator
 from src.utils.visualizations import create_all_visualizations
 
@@ -58,8 +58,14 @@ def parse_args():
     p.add_argument("--lr",      type=float, default=0.001)
     p.add_argument("--workers", type=int,   default=4,
                    help="DataLoader workers (set 0 on Windows if you hit spawn errors)")
-    p.add_argument("--patience", type=int, default=5,
+    p.add_argument("--patience", type=int, default=8,
                    help="Early stopping patience in epochs (set <=0 to disable)")
+    p.add_argument("--no-amp", action="store_true",
+                   help="Disable AMP mixed precision (default: ON on GPU)")
+    p.add_argument("--label-smoothing", type=float, default=0.1,
+                   help="Label smoothing for CrossEntropyLoss (0 to disable)")
+    p.add_argument("--no-class-weights", action="store_true",
+                   help="Disable inverse-frequency class weighting in the loss")
     p.add_argument("--min-delta", type=float, default=0.001,
                    help="Minimum val accuracy improvement for early stopping")
     p.add_argument("--no-aug",  action="store_true", help="Disable training augmentation")
@@ -194,7 +200,20 @@ def main():
 
     # - Training -
     print(f"\n[Step 4/4] Training ...")
-    criterion = nn.CrossEntropyLoss()
+    # Inverse-frequency class weights: Rural/Urban dominate the training set
+    # ~3x over Forest/Coastal, which pulled ambiguous predictions toward the
+    # majority classes (see confusion analysis). Weighting the loss rebalances.
+    if args.no_class_weights:
+        class_weights = None
+        criterion = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing)
+    else:
+        class_weights = get_class_weights(train_loader.dataset).to(device)
+        criterion = nn.CrossEntropyLoss(
+            weight=class_weights, label_smoothing=args.label_smoothing
+        )
+        print(f"  Class weights ({', '.join(CLASS_NAMES)}): "
+              f"{[round(w, 2) for w in class_weights.tolist()]}")
+    print(f"  Label smoothing: {args.label_smoothing}")
     if args.full_finetune:
         # Discriminative LR: pretrained backbone learns slowly (lr*0.1),
         # the freshly-initialized head learns at full lr. Prevents the random
@@ -214,7 +233,9 @@ def main():
         print(f"  Discriminative LR: backbone={args.lr*0.1:.1e}  head={args.lr:.1e}")
     else:
         optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-4)
-    scheduler = StepLR(optimizer, step_size=7, gamma=0.1)
+    # Cosine decay over the full run: gentler than StepLR's abrupt /10 at
+    # epoch 7, which previously triggered immediate overfit + early stop.
+    scheduler = CosineAnnealingLR(optimizer, T_max=args.epochs, eta_min=1e-6)
 
     # Restore optimiser/scheduler state when resuming
     if args.resume and Path(args.resume).exists():
@@ -236,6 +257,7 @@ def main():
         save_dir=CHECKPOINT_DIR,
         log_dir=LOG_DIR,
         multi_gpu=not args.no_multi_gpu,
+        use_amp=not args.no_amp,
     )
     trainer.best_val_acc = best_val_acc
 

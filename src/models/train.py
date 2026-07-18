@@ -30,7 +30,8 @@ class Trainer:
         device: str = 'cuda',
         save_dir: str = 'models/checkpoints',
         log_dir: str = 'logs',
-        multi_gpu: bool = True
+        multi_gpu: bool = True,
+        use_amp: bool = True,
     ):
         """
         Initialize trainer
@@ -46,6 +47,8 @@ class Trainer:
             save_dir: Directory to save checkpoints
             log_dir: Directory to save logs
             multi_gpu: Wrap model in nn.DataParallel when >1 CUDA device is visible
+            use_amp: Mixed-precision (autocast + GradScaler) on CUDA. T4 tensor
+                cores make this ~2-3x faster than plain FP32.
         """
         self.model = model.to(device)
         self.use_dp = (
@@ -62,6 +65,8 @@ class Trainer:
         self.optimizer = optimizer
         self.scheduler = scheduler
         self.device = device
+        self.use_amp = use_amp and torch.device(device).type == 'cuda'
+        self.scaler = torch.amp.GradScaler('cuda', enabled=self.use_amp)
         
         # Create directories
         self.save_dir = Path(save_dir)
@@ -93,18 +98,20 @@ class Trainer:
         pbar = tqdm(self.train_loader, desc=f"Epoch {epoch} [Train]")
         for inputs, labels in pbar:
             inputs, labels = inputs.to(self.device), labels.to(self.device)
-            
+
             # Zero gradients
-            self.optimizer.zero_grad()
-            
-            # Forward pass
-            outputs = self.model(inputs)
-            loss = self.criterion(outputs, labels)
-            
-            # Backward pass
-            loss.backward()
-            self.optimizer.step()
-            
+            self.optimizer.zero_grad(set_to_none=True)
+
+            # Forward pass (AMP autocast)
+            with torch.amp.autocast('cuda', enabled=self.use_amp):
+                outputs = self.model(inputs)
+                loss = self.criterion(outputs, labels)
+
+            # Backward pass (AMP-safe scaling)
+            self.scaler.scale(loss).backward()
+            self.scaler.step(self.optimizer)
+            self.scaler.update()
+
             # Statistics
             running_loss += loss.item() * inputs.size(0)
             _, predicted = torch.max(outputs.data, 1)
@@ -133,10 +140,11 @@ class Trainer:
             pbar = tqdm(self.val_loader, desc=f"Epoch {epoch} [Val]")
             for inputs, labels in pbar:
                 inputs, labels = inputs.to(self.device), labels.to(self.device)
-                
-                # Forward pass
-                outputs = self.model(inputs)
-                loss = self.criterion(outputs, labels)
+
+                # Forward pass (AMP autocast)
+                with torch.amp.autocast('cuda', enabled=self.use_amp):
+                    outputs = self.model(inputs)
+                    loss = self.criterion(outputs, labels)
                 
                 # Statistics
                 running_loss += loss.item() * inputs.size(0)
