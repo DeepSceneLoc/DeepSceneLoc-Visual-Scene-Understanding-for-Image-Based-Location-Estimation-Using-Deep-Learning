@@ -59,7 +59,7 @@ export default function InteractiveMap({ prediction, isAnalyzing }: InteractiveM
   // Default coordinate if no prediction is selected (Eiffel Tower, Paris)
   const lat = prediction ? prediction.latitude : 48.8584;
   const lng = prediction ? prediction.longitude : 2.2945;
-  const isUnknown = prediction ? (prediction.latitude === 0 && prediction.longitude === 0) : false;
+  const isUnknown = prediction ? (prediction.latitude === 0 && prediction.longitude === 0) : true;
 
   const areaName = prediction ? `${prediction.landmarkName}, ${prediction.city}` : "Eiffel Tower, Paris";
   const countryName = prediction ? prediction.country : "France";
@@ -358,7 +358,7 @@ export default function InteractiveMap({ prediction, isAnalyzing }: InteractiveM
       }`}
     >
       {/* 1. GOOGLE MAPS RENDERING VIEWPORT */}
-      {isGoogleMapsLoaded ? (
+      {isGoogleMapsLoaded && !isUnknown ? (
         <div className="absolute inset-0 w-full h-full">
           <div 
             ref={googleStreetViewContainerRef} 
@@ -523,7 +523,7 @@ export default function InteractiveMap({ prediction, isAnalyzing }: InteractiveM
               RESOLVED SIGNAL
             </span>
             <span className="text-[9px] font-mono text-slate-500 bg-slate-800/80 px-1.5 py-0.5 rounded uppercase">
-              {prediction ? prediction.sceneCategory : "Mountain"}
+              {prediction ? prediction.sceneCategory : "Awaiting"}
             </span>
           </div>
 
@@ -545,11 +545,11 @@ export default function InteractiveMap({ prediction, isAnalyzing }: InteractiveM
               <>
                 <div className="mt-1">
                   <p className="text-slate-500 text-[9px]">ELEVATION</p>
-                  <p className="text-emerald-400 font-medium truncate">{prediction.elevation || "1,885m"}</p>
+                  <p className="text-emerald-400 font-medium truncate">{prediction.elevation || "N/A"}</p>
                 </div>
                 <div className="mt-1">
                   <p className="text-slate-500 text-[9px]">BEST CAMERA SEASON</p>
-                  <p className="text-blue-400 font-medium truncate">{prediction.bestSeason || "June to Sept"}</p>
+                  <p className="text-blue-400 font-medium truncate">{prediction.bestSeason || "N/A"}</p>
                 </div>
               </>
             )}
@@ -563,7 +563,7 @@ export default function InteractiveMap({ prediction, isAnalyzing }: InteractiveM
           <Sparkles className="w-3.5 h-3.5 text-blue-400" />
           <span>MATCH QUALITY:</span>
           <span className="font-bold text-emerald-400">
-            {prediction ? `${prediction.aiConfidence}%` : "91.8%"}
+            {prediction ? `${prediction.aiConfidence}%` : "---%"}
           </span>
         </div>
 

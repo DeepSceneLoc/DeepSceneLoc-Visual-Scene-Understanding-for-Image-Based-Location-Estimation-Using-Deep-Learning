@@ -535,5 +535,5 @@ EfficientNet-B0 v2 (Modern Pipeline — FINAL RESULTS):
 **Best val_acc saved:** 85.15% (checkpoint epoch=3, EMA model)  
 **Checkpoint:** `models/checkpoints/efficientnet/EfficientNet-B0_best.pth` (69.6 MB)  
 **Fallback:** `models/checkpoints/resnet/best_model.pth` (281.5 MB)  
-**Production app:** `webapp/api.py` — loads EfficientNet-B0 by default  
+**Production app:** `backend.py` — loads the full ensemble (ResNet-50, EfficientNet-B0, ViT-B16) by default  
 **Demo app:** `demo_app.py` — loads ResNet-50 (Phase 1 Gradio demo, preserved)

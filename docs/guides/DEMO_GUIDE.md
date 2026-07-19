@@ -12,9 +12,10 @@
 
 | Demo | Model | Interface | Port | Purpose |
 |---|---|---|---|---|
+| `start_fullstack.bat` | ResNet-50 + EfficientNet-B0 + ViT-B16 | React Frontend + FastAPI Backend | 3000 / 5000 | Primary Production Fullstack Application |
 | `demo_app.py` | ResNet-50 | Gradio | 7860 | Phase 1 Semester demo |
-| `webapp/api.py` | EfficientNet-B0 | FastAPI + HTML | 8000 | Phase 2 Production |
-| `demo_app_hybrid.py` | EfficientNet-B0 + Gemini AI | Gradio | 7861 | Two-stage location detection |
+| `backend.py` | ResNet-50 + EfficientNet-B0 + ViT-B16 | FastAPI Backend + Stage 2 Gemini AI | 5000 | Production Inference Backend |
+| `demo_app_hybrid.py` | EfficientNet-B0 + Gemini AI | Gradio | 7861 | Two-stage location detection (Gradio) |
 
 ---
 
@@ -44,45 +45,49 @@ venv\Scripts\python.exe demo_app.py
 
 ---
 
-## Demo 2: Phase 2 — Production Webapp (EfficientNet-B0) ← PRIMARY
+## Demo 2: Production React + FastAPI Fullstack (Ensemble) ← PRIMARY
 
-**The main Phase 2 production application. Use this for mentor demos.**
+**The main production application. Use this for mentor demos.**
 
+### Launch automatically:
+Double-click `start_fullstack.bat` in the project root.
+
+### Launch manually:
 ```bash
-# Run the FastAPI server
-venv\Scripts\python.exe -m uvicorn webapp.api:app --host 0.0.0.0 --port 8000 --reload
+# Terminal 1: Run the FastAPI backend
+venv\Scripts\python.exe backend.py
+
+# Terminal 2: Run the React frontend
+cd frontend
+npm run dev
 ```
 
-**Access:** http://localhost:8000  
-**Model:** EfficientNet-B0 (69.6 MB) — `models/checkpoints/efficientnet/EfficientNet-B0_best.pth`  
-**Accuracy:** 85.15% validation / 84.63% test / 83.17% macro F1
+**Access:** http://localhost:3000  
+**Models loaded:** 
+- ResNet-50 — `model_repo/ResNet50/ResNet50_best_model.pth`
+- EfficientNet-B0 — `model_repo/EfficientNet-B0/EfficientNet-B0_best.pth`
+- ViT-B/16 — `model_repo/ViT-B_16/ViT-B_16_best.pth`
+
+**Accuracy:** ~88% validation / test (ensemble average)
 
 **Features:**
-- Premium dark-mode HTML/CSS/JS interface
-- Drag-and-drop image upload
-- Real-time prediction with confidence bars
-- Per-class probability visualization
-- Model info (architecture, accuracy, inference speed)
-- REST API for integration (`POST /api/predict`)
+- Premium React/Vite interactive maps dashboard (moving 3D globe fallback)
+- Real-time prediction with averaged probability ensemble
+- Stage 2 Location Grounding using Gemini 3.1 Flash-Lite (under 3s response)
+- Fully centralized env config in root `.env`
 
-**API Endpoints:**
+**API Endpoints (FastAPI on Port 5000):**
 ```
-GET  /              → Frontend
-GET  /api/status    → Model + GPU health
-GET  /api/models    → Available checkpoints
-POST /api/predict   → Scene classification (returns JSON)
-POST /api/analyze   → Scene + Gemini location (requires GEMINI_API_KEY)
+GET  /health              → Model + GPU health
+POST /api/analyze-image   → Scene + Gemini location (requires GEMINI_API_KEY)
 ```
 
 **Quick API test:**
 ```bash
-curl -X POST http://localhost:8000/api/predict \
-  -F "file=@your_image.jpg"
+curl -X POST http://localhost:5000/api/analyze-image \
+  -H "Content-Type: application/json" \
+  -d "{\"imageBase64\": \"data:image/jpeg;base64,...\"}"
 ```
-
-**Originally Planned:** FastAPI + ResNet-50  
-**Actual:** FastAPI + EfficientNet-B0 (swapped April 28, 2026 after training completed)  
-**Reason:** EfficientNet-B0 achieved 85.15% vs ResNet-50's 79.17% — 5.6% improvement.
 
 ---
 
@@ -133,15 +138,14 @@ Landmarks: TKTS Booth, One Times Square, Broadway
 
 ---
 
-## Model Checkpoint Locations
-
-```
 models/
 ├── checkpoints/
 │   ├── efficientnet/
 │   │   └── EfficientNet-B0_best.pth   # Primary (69.6 MB, 85.15% val)
-│   └── resnet/
-│       └── best_model.pth             # Fallback (281.5 MB, 79.17% val)
+│   ├── resnet/
+│   │   └── best_model.pth             # Fallback (281.5 MB, 79.17% val)
+│   └── vit/
+│       └── ViT-B_16_best.pth          # Transformer checkpoint (350+ MB)
 ```
 
 ---
@@ -162,13 +166,9 @@ models/
 ## Running All Three Simultaneously
 
 ```bash
-# Terminal 1: Production webapp (port 8000)
-venv\Scripts\python.exe -m uvicorn webapp.api:app --port 8000
+# Terminal 1: Production FastAPI Backend (port 5000)
+venv\Scripts\python.exe backend.py
 
-# Terminal 2: Phase 1 demo (port 7860)
-venv\Scripts\python.exe demo_app.py
-
-# Terminal 3: Hybrid demo (port 7861)
-$env:GEMINI_API_KEY="your-key"
-venv\Scripts\python.exe demo_app_hybrid.py
+# Terminal 2: React Frontend (port 3000)
+cd frontend && npm run dev
 ```

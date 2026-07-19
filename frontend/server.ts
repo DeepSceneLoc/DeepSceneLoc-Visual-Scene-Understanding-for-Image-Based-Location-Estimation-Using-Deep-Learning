@@ -1,13 +1,17 @@
 import express from "express";
-import path from "path";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const app = express();
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const PORT = process.env.FRONTEND_PORT ? parseInt(process.env.FRONTEND_PORT, 10) : 3000;
 
 // Configure body parser with high limit to handle uploaded base64 images
 app.use(express.json({ limit: "15mb" }));
@@ -196,20 +200,22 @@ app.post("/api/analyze-image", async (req, res) => {
 
     if (modelSucceeded && modelResponseData) {
 
-      let geminiSucceeded = false;
+      let geminiSucceeded = !!(modelResponseData.landmarkName && modelResponseData.landmarkName !== "Generic / Unknown" && modelResponseData.landmarkName !== "Unknown");
       let fusedData: any = {
         sceneCategory: modelResponseData.sceneCategory,
         confidence: modelResponseData.confidence,
-        landmarkName: "Generic / Unknown",
-        city: "Unknown",
-        country: "Unknown",
-        latitude: 0,
-        longitude: 0,
-        reasoning: "DeepSceneLoc PyTorch classification successful. Gemini multimodal fusion was skipped or failed.",
-        elevation: "N/A",
-        bestSeason: "N/A",
-        geologicalAge: "N/A"
+        landmarkName: modelResponseData.landmarkName || "Generic / Unknown",
+        city: modelResponseData.city || "Unknown",
+        country: modelResponseData.country || "Unknown",
+        latitude: typeof modelResponseData.latitude === "number" ? modelResponseData.latitude : 0,
+        longitude: typeof modelResponseData.longitude === "number" ? modelResponseData.longitude : 0,
+        reasoning: modelResponseData.reasoning || "DeepSceneLoc PyTorch classification successful. Gemini multimodal fusion was skipped or failed.",
+        elevation: modelResponseData.elevation || "N/A",
+        bestSeason: modelResponseData.bestSeason || "N/A",
+        geologicalAge: modelResponseData.geologicalAge || "N/A",
+        aiConfidence: modelResponseData.aiConfidence || 95.5
       };
+
 
       // Stage 2: Fuse with Gemini AI for dynamic location guessing
       if (ai) {
@@ -235,7 +241,7 @@ Return schema properties:
 - geologicalAge: Basic geographic age or era (e.g. "Paleogene Bedrock" or "N/A")`;
 
           const response = await ai.models.generateContent({
-            model: "gemini-3.5-flash",
+            model: "gemini-3.1-flash-lite",
             contents: [
               {
                 inlineData: {
@@ -332,7 +338,7 @@ async function run() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`DeepSceneLoc Backend active on port http://localhost:${PORT}`);
+    console.log(`DeepSceneLoc Frontend active on port http://localhost:${PORT}`);
   });
 }
 

@@ -112,42 +112,39 @@ venv\Scripts\python.exe demo_app_hybrid.py
 
 ## Production API (FastAPI)
 
-The production webapp at `webapp/api.py` includes the full two-stage pipeline.
+The production webapp at `backend.py` includes the full two-stage pipeline.
 
 ### Start Server
 ```bash
-venv\Scripts\python.exe -m uvicorn webapp.api:app --host 0.0.0.0 --port 8000 --reload
+venv\Scripts\python.exe -m uvicorn backend:app --host 0.0.0.0 --port 5000
 ```
 
 ### Two-Stage Endpoint
 ```bash
 # Full analysis (Stage 1 + Stage 2)
-curl -X POST http://localhost:8000/api/analyze \
-  -F "file=@image.jpg"
+curl -X POST http://localhost:5000/api/analyze-image \
+  -H "Content-Type: application/json" \
+  -d "{\"imageBase64\": \"data:image/jpeg;base64,...\"}"
 ```
 
 ### Response Format
 ```json
 {
-  "stage1": {
-    "top_class": "Urban",
-    "confidence": 0.87,
-    "emoji": "🏙️",
-    "probabilities": {"Coastal": 0.03, "Forest": 0.02, "Mountain": 0.01, "Rural": 0.07, "Urban": 0.87},
-    "latency_ms": 7.6
-  },
-  "stage2": {
-    "exact_location": "Times Square, Manhattan, New York",
+  "success": true,
+  "data": {
+    "sceneCategory": "Urban",
+    "confidence": 87.0,
+    "landmarkName": "Times Square, Manhattan, New York",
     "country": "United States",
     "city": "New York",
     "region": "New York State",
     "latitude": 40.758,
     "longitude": -73.9855,
-    "landmarks": ["TKTS Booth", "One Times Square", "Broadway"],
-    "confidence": "high",
-    "latency_ms": 1240.0
-  },
-  "total_latency_ms": 1247.6
+    "reasoning": "High-altitude terrain with exposed rock formations...",
+    "elevation": "3,200m",
+    "bestSeason": "July to September",
+    "geologicalAge": "Precambrian Granite Core"
+  }
 }
 ```
 
@@ -224,7 +221,7 @@ Test system stability under concurrent requests:
 ```bash
 venv\Scripts\python.exe -c "
 from src.utils.load_tester import LoadTester
-tester = LoadTester(base_url='http://localhost:8000')
+tester = LoadTester(base_url='http://localhost:5000')
 results = tester.run_load_test(n_requests=50, concurrency=5, image_path='data/sample.jpg')
 print(results.summary())
 "

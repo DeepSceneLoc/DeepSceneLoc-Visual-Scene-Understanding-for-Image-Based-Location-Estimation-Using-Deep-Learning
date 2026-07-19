@@ -19,7 +19,7 @@ Connect your React frontend's "Show Demo" section to use your **trained DeepScen
 ### After (Integrated)
 ```
 ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-│   Frontend   │  HTTP   │    Flask     │ PyTorch │ DeepSceneLoc │
+│   Frontend   │  HTTP   │   FastAPI    │ PyTorch │ DeepSceneLoc │
 │   (React)    │────────▶│   Backend    │────────▶│    Models    │
 │   Port 3000  │◀────────│   Port 5000  │◀────────│  (Trained)   │
 └──────────────┘         └──────────────┘         └──────────────┘
@@ -27,19 +27,14 @@ Connect your React frontend's "Show Demo" section to use your **trained DeepScen
 
 ## 📁 Files Created
 
-### 1. `webapp/backend_api.py` ⭐
-**Python Flask API server**
+### 1. `backend.py` ⭐
+**Python FastAPI API server**
 
 **What it does:**
-- Loads your trained DeepSceneLoc models
+- Loads your trained DeepSceneLoc ensemble models (ResNet-50, EfficientNet-B0, ViT-B16)
 - Accepts images from frontend (base64)
 - Returns predictions in frontend-compatible format
-- Provides location details (city, country, coordinates)
-
-**Key features:**
-- Model loading priority (EfficientNet → ViT → ResNet)
-- Aspect-preserving transforms (matching training)
-- Location database for rich responses
+- Interfaces with Gemini 3.1 Flash-Lite for sub-3-second Stage 2 location predictions
 - CORS enabled for React frontend
 
 ### 2. `FRONTEND_INTEGRATION_GUIDE.md` 📚
@@ -56,17 +51,17 @@ Includes:
 **Windows launcher script**
 
 Double-click to start:
-- Python backend (Flask on port 5000)
+- Python backend (FastAPI on port 5000)
 - React frontend (Vite on port 3000)
 
 ## 🔧 How to Use
 
 ### Quick Start
 
-1. **Install Flask dependencies:**
+1. **Install requirements:**
    ```bash
    .venv\Scripts\activate
-   pip install flask flask-cors
+   pip install -r requirements.txt
    ```
 
 2. **Start both servers:**
@@ -77,7 +72,7 @@ Double-click to start:
    Or manually:
    ```bash
    # Terminal 1: Backend
-   python webapp/backend_api.py
+   python backend.py
    
    # Terminal 2: Frontend
    cd frontend
@@ -86,10 +81,9 @@ Double-click to start:
 
 3. **Update Frontend API URL:**
    
-   In `frontend/server.ts`, change the analyze-image endpoint to point to your Flask backend:
-   
+   In `frontend/server.ts`, the analyze-image endpoint is configured to point to your FastAPI backend:
+
    ```typescript
-   // Line ~100-ish
    const response = await fetch("http://localhost:5000/api/analyze-image", {
      method: "POST",
      headers: { "Content-Type": "application/json" },
@@ -122,7 +116,7 @@ const uploadImage = async (file) => {
 }
 ```
 
-### 2. Express proxies to Flask (or direct)
+### 2. Express proxies to FastAPI (or direct)
 ```typescript
 // server.ts
 app.post("/api/analyze-image", async (req, res) => {
@@ -134,33 +128,13 @@ app.post("/api/analyze-image", async (req, res) => {
 });
 ```
 
-### 3. Flask processes with DeepSceneLoc
+### 3. FastAPI processes with DeepSceneLoc & Gemini
 ```python
-# backend_api.py
-@app.route('/api/analyze-image', methods=['POST'])
-def analyze_image():
-    # Decode image
-    image = decode_base64(request.json['imageBase64'])
-    
-    # Predict
-    category, confidence = predictor.predict(image)
-    
-    # Get location details
-    location = LOCATION_DATABASE[category][0]
-    
-    # Return result
-    return jsonify({
-        'success': True,
-        'source': 'deepsceneloc_model',
-        'data': {
-            'sceneCategory': category,
-            'confidence': confidence * 100,
-            'landmarkName': location['landmarkName'],
-            'latitude': location['latitude'],
-            'longitude': location['longitude'],
-            ...
-        }
-    })
+# backend.py
+@app.post('/api/analyze-image')
+async def analyze_image(request: AnalysisRequest):
+    # Decodes image, evaluates ensemble model, calls Gemini 3.1 Flash-Lite
+    ...
 ```
 
 ### 4. React displays results
