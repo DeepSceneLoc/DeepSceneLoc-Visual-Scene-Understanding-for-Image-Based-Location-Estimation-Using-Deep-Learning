@@ -169,6 +169,12 @@ export default function InteractiveMap({ prediction, isAnalyzing }: InteractiveM
         zoom: isUnknown ? 2 : (viewMode === "3d" ? 17 : 14),
         mapTypeId: googleMapType,
         disableDefaultUI: true,
+        fullscreenControl: false,
+        rotateControl: false,
+        streetViewControl: false,
+        zoomControl: false,
+        mapTypeControl: false,
+        scaleControl: false,
         tilt: viewMode === "3d" ? 45 : 0,
       });
 
@@ -189,6 +195,14 @@ export default function InteractiveMap({ prediction, isAnalyzing }: InteractiveM
     } else {
       mapInstanceRef.current.setMapTypeId(googleMapType);
       mapInstanceRef.current.setTilt(viewMode === "3d" ? 45 : 0);
+      mapInstanceRef.current.setOptions({
+        fullscreenControl: false,
+        rotateControl: false,
+        streetViewControl: false,
+        zoomControl: false,
+        mapTypeControl: false,
+        scaleControl: false,
+      });
       
       if (!isUnknown) {
         mapInstanceRef.current.panTo(mapCenter);
@@ -217,12 +231,17 @@ export default function InteractiveMap({ prediction, isAnalyzing }: InteractiveM
           zoom: 1,
           addressControl: false,
           linksControl: true,
-          panControl: true,
+          panControl: false,
           zoomControl: false,
+          fullscreenControl: false,
           enableCloseButton: false,
         });
       } else {
         panoramaInstanceRef.current.setPosition(positionToUse);
+        panoramaInstanceRef.current.setOptions({
+          panControl: false,
+          fullscreenControl: false,
+        });
       }
     };
 
@@ -588,8 +607,9 @@ export default function InteractiveMap({ prediction, isAnalyzing }: InteractiveM
         </div>
       </div>
 
-      {/* Right Telemetry Badges */}
-      <div className="absolute right-20 bottom-4 z-10 flex flex-col gap-2 items-end">
+      {/* Bottom Right Telemetry & Control Panel */}
+      <div className="absolute right-20 bottom-4 z-10 flex flex-row items-center gap-2">
+        {/* Match Quality */}
         <div className="bg-slate-900/95 border border-slate-800 text-[10px] font-mono py-2 px-3 rounded-lg shadow-md text-slate-300 flex items-center gap-2 backdrop-blur-md">
           <Sparkles className="w-3.5 h-3.5 text-blue-400" />
           <span>MATCH QUALITY:</span>
@@ -601,7 +621,7 @@ export default function InteractiveMap({ prediction, isAnalyzing }: InteractiveM
         {prediction && prediction.geologicalAge && (
           <div className="bg-slate-900/95 border border-slate-800 text-[10px] font-mono py-2 px-3 rounded-lg shadow-md text-slate-300 flex items-center gap-2 backdrop-blur-md">
             <Info className="w-3.5 h-3.5 text-slate-500" />
-            <span className="truncate max-w-[130px]">{prediction.geologicalAge}</span>
+            <span>{prediction.geologicalAge}</span>
           </div>
         )}
       </div>
