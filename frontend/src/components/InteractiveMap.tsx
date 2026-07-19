@@ -59,7 +59,7 @@ export default function InteractiveMap({ prediction, isAnalyzing }: InteractiveM
   // Default coordinate if no prediction is selected (Eiffel Tower, Paris)
   const lat = prediction ? prediction.latitude : 48.8584;
   const lng = prediction ? prediction.longitude : 2.2945;
-  const isUnknown = prediction ? (prediction.latitude === 0 && prediction.longitude === 0) : true;
+  const isUnknown = prediction ? (prediction.latitude === 0 && prediction.longitude === 0) : false;
 
   const areaName = prediction ? `${prediction.landmarkName}, ${prediction.city}` : "Eiffel Tower, Paris";
   const countryName = prediction ? prediction.country : "France";
@@ -207,19 +207,50 @@ export default function InteractiveMap({ prediction, isAnalyzing }: InteractiveM
   useEffect(() => {
     if (!isGoogleMapsLoaded || !googleStreetViewContainerRef.current || viewMode !== "streetview" || !window.google) return;
 
-    if (!panoramaInstanceRef.current) {
-      panoramaInstanceRef.current = new window.google.maps.StreetViewPanorama(googleStreetViewContainerRef.current, {
-        position: { lat, lng },
-        pov: { heading: 165, pitch: 0 },
-        zoom: 1,
-        addressControl: false,
-        linksControl: true,
-        panControl: true,
-        zoomControl: false,
-        enableCloseButton: false,
-      });
-    } else {
-      panoramaInstanceRef.current.setPosition({ lat, lng });
+    const targetPos = { lat, lng };
+
+    const initializeOrUpdatePanorama = (positionToUse: { lat: number, lng: number }) => {
+      if (!panoramaInstanceRef.current) {
+        panoramaInstanceRef.current = new window.google.maps.StreetViewPanorama(googleStreetViewContainerRef.current, {
+          position: positionToUse,
+          pov: { heading: 165, pitch: 0 },
+          zoom: 1,
+          addressControl: false,
+          linksControl: true,
+          panControl: true,
+          zoomControl: false,
+          enableCloseButton: false,
+        });
+      } else {
+        panoramaInstanceRef.current.setPosition(positionToUse);
+      }
+    };
+
+    // Use StreetViewService to find the nearest panorama within 1000m
+    try {
+      const svService = new window.google.maps.StreetViewService();
+      svService.getPanorama(
+        {
+          location: targetPos,
+          radius: 1000, // 1km search radius
+          source: window.google.maps.StreetViewSource.OUTDOOR
+        },
+        (data: any, status: any) => {
+          if (status === window.google.maps.StreetViewStatus.OK && data && data.location && data.location.latLng) {
+            console.log("[StreetView] Snapping to nearest panorama:", data.location.latLng.toString());
+            initializeOrUpdatePanorama({
+              lat: data.location.latLng.lat(),
+              lng: data.location.latLng.lng()
+            });
+          } else {
+            console.warn("[StreetView] No panorama found within 1km, falling back to exact coordinate.");
+            initializeOrUpdatePanorama(targetPos);
+          }
+        }
+      );
+    } catch (err) {
+      console.error("[StreetView] StreetViewService query failed, loading default coordinate:", err);
+      initializeOrUpdatePanorama(targetPos);
     }
   }, [isGoogleMapsLoaded, viewMode, lat, lng]);
 
