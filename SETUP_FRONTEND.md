@@ -6,48 +6,26 @@
 
 ```bash
 # Activate virtual environment
-.venv\Scripts\activate
+venv\Scripts\activate
 
-# Install Flask for API backend
-pip install flask flask-cors
+# Install all backend requirements
+pip install -r requirements.txt
 ```
 
-### Step 2: Update Frontend to Use DeepSceneLoc API
+### Step 2: Verify Frontend Proxy Configuration
 
-**Option A: Direct Connection (Simplest)**
+The React frontend has been configured to read the API keys and endpoints dynamically from the root `.env` file. 
 
-Edit `frontend/src/App.tsx`, find the `evaluateUploadedImage` function (~line 280) and update the API endpoint:
+The `frontend/server.ts` Express server automatically proxies `/api/analyze-image` requests directly to the FastAPI backend running on port 5000:
 
 ```typescript
-// OLD
-const response = await fetch("/api/analyze-image", {
-
-// NEW - Point to Flask backend
+// frontend/server.ts
 const response = await fetch("http://localhost:5000/api/analyze-image", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(req.body)
+});
 ```
-
-Also update `handlePresetSelect` function (~line 250) the same way.
-
-**Option B: Proxy Through Express (Alternative)**
-
-Edit `frontend/server.ts` and replace the `/api/analyze-image` route (~line 95):
-
-```typescript
-// Replace the entire app.post("/api/analyze-image", async (req, res) => { ... })
-// with this proxy:
-
-app.post("/api/analyze-image", async (req, res) => {
-  try {
-    // Proxy to Flask backend
-    const response = await fetch("http://localhost:5000/api/analyze-image", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(req.body)
-    });
-    
-    const result = await response.json();
-    res.json(result);
-  } catch (error: any) {
     console.error("Backend proxy error:", error);
     res.status(500).json({
       success: false,
@@ -68,19 +46,18 @@ start_fullstack.bat
 **Manual (Any OS):**
 ```bash
 # Terminal 1 - Backend
-python webapp/backend_api.py
+python backend.py
 
 # Terminal 2 - Frontend
 cd frontend
 npm install  # First time only
 npm run dev
 ```
-
 ## ✅ Verify Setup
 
 1. **Backend Check:**
    - Open: `http://localhost:5000/health`
-   - Should see: `{"status": "healthy", "model": "deepsceneloc", ...}`
+   - Should see: `{"status": "healthy", "models_loaded": 3, "gemini_active": true, ...}`
 
 2. **Frontend Check:**
    - Open: `http://localhost:3000`

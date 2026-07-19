@@ -22,7 +22,7 @@ Your frontend integrates with a **FastAPI backend** (`backend.py`) that loads th
 
 ```bash
 # Activate your virtual environment
-.venv\Scripts\activate  # Windows
+venv\Scripts\activate  # Windows
 
 # Install required dependencies
 pip install -r requirements.txt
