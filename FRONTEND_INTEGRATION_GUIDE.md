@@ -3,17 +3,17 @@
 
 ## Overview
 
-Your frontend currently uses **Gemini AI** for location predictions. This guide shows you how to connect it to your **actual DeepSceneLoc trained models**.
+Your frontend integrates with a **FastAPI backend** (`backend.py`) that loads the PyTorch ensemble models (ResNet-50, EfficientNet-B0, ViT-B16) and falls back to **Gemini 3.1 Flash-Lite** for Stage 2 location details.
 
 ## Architecture
 
 ```
 ┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
-│  React Frontend │  HTTP   │  Flask Backend  │  PyTorch│  DeepSceneLoc   │
+│  React Frontend │  HTTP   │ FastAPI Backend │  PyTorch│  DeepSceneLoc   │
 │   (Port 3000)   │────────▶│   (Port 5000)   │────────▶│     Models      │
 │                 │◀────────│                 │◀────────│                 │
 └─────────────────┘         └─────────────────┘         └─────────────────┘
-  frontend/                  webapp/backend_api.py       models/checkpoints/
+  frontend/                  backend.py                 model_repo/
 ```
 
 ## Setup Steps
@@ -22,66 +22,46 @@ Your frontend currently uses **Gemini AI** for location predictions. This guide 
 
 ```bash
 # Activate your virtual environment
-.venv\Scripts\activate  # Windows
+venv\Scripts\activate  # Windows
 
-# Install Flask and CORS
-pip install flask flask-cors
+# Install required dependencies
+pip install -r requirements.txt
 ```
 
 ### Step 2: Start the Python Backend
 
 ```bash
 # From project root
-python webapp/backend_api.py
+python backend.py
 ```
 
 You should see:
 ```
-DeepSceneLoc Backend API Server
 ============================================================
-Device: cuda  (or cpu)
-Categories: Coastal, Forest, Mountain, Rural, Urban
+Loading DeepSceneLoc Ensemble Models on: cuda  (or cpu)
 ============================================================
-
-Starting Flask server on http://localhost:5000
+[OK] ResNet-50 loaded successfully.
+[OK] EfficientNet-B0 loaded successfully.
+[OK] ViT-B16 loaded successfully.
+[OK] Native Gemini AI initialized successfully
+[OK] Stage 2 location analyzer ready. Mode: native
+INFO:     Started server process [...]
 ```
 
-### Step 3: Update Frontend to Use New Backend
+### Step 3: Verify Frontend Proxy Configuration
 
-**Option A: Change API URL (Recommended)**
+The React frontend has been configured to read the API keys and endpoints dynamically from the root `.env` file. 
 
-Edit `frontend/server.ts`, line ~100:
+The `frontend/server.ts` Express server automatically proxies `/api/analyze-image` requests directly to the FastAPI backend running on port 5000:
 
 ```typescript
-// OLD (uses Gemini AI)
-const response = await fetch("/api/analyze-image", {
-
-// NEW (uses DeepSceneLoc)
+// frontend/server.ts
 const response = await fetch("http://localhost:5000/api/analyze-image", {
-```
-
-**Option B: Proxy Through Express**
-
-In `frontend/server.ts`, add a proxy route:
-
-```typescript
-// Add this before your existing /api/analyze-image route
-app.post("/api/analyze-image-deepsceneloc", async (req, res) => {
-  try {
-    const response = await fetch("http://localhost:5000/api/analyze-image", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(req.body)
-    });
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(req.body)
 });
 ```
-
-Then in your React code, change the endpoint.
 
 ### Step 4: Start Frontend
 
@@ -175,14 +155,20 @@ You can expand this in `backend_api.py` → `LOCATION_DATABASE`
 netstat -ano | findstr :5000
 
 # Or use a different port
-# Edit backend_api.py, change port=5000 to port=5001
+# Edit backend.py, change uvicorn port argument
 ```
 
 ### CORS errors
 
-Make sure `flask-cors` is installed:
-```bash
-pip install flask-cors
+Make sure CORS middleware is enabled in `backend.py`. It is set up by default to allow origins:
+```python
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 ```
 
 ### Model not found

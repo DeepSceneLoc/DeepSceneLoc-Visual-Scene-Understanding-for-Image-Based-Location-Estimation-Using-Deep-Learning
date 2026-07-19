@@ -161,7 +161,7 @@ EfficientNet-B0 is the recommended Stage 1 model for deployment:
 | ViT-B/16 | TBD (Week 9) | TBD | ~420ms est. | ~15ms est. | 86.4M | ~330MB |
 
 > EfficientNet-B0 is **2.3x faster on CPU** AND **6% more accurate** than ResNet-50.  
-> EfficientNet-B0 is the **production model** for `webapp/api.py`.
+> EfficientNet-B0, ResNet-50, and ViT-B16 form the **production ensemble** for `backend.py`.
 
 ### 3.2 Input pipeline optimization
 

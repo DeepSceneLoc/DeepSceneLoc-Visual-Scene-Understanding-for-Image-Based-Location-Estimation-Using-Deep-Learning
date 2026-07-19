@@ -2,15 +2,13 @@
 
 ## ✅ Status: RUNNING
 
-### Backend API (Python Flask)
+### Backend API (Python FastAPI)
 - **Status:** ✅ Running
 - **URL:** http://localhost:5000
-- **Mode:** Mock predictions (PyTorch DLL issue on local machine)
+- **Mode:** Ensemble PyTorch Models (ResNet-50, EfficientNet-B0, ViT-B16) + Stage 2 Gemini Location Analyzer
 - **Health Check:** http://localhost:5000/health
 
-**Note:** Using mock predictions because of local PyTorch DLL error. 
-The mock returns realistic predictions to test the frontend UI.
-For real predictions, run on Kaggle or fix PyTorch installation.
+**Note:** Runs real-time local model inference and uses Gemini 3.1 Flash-Lite for sub-3-second Stage 2 coordinate grounding when `GEMINI_API_KEY` is provided in `.env`.
 
 ### Frontend (React + Vite)
 - **Status:** ✅ Starting...
@@ -46,18 +44,18 @@ http://localhost:3000
 
 ```
 ┌─────────────────┐         ┌─────────────────┐
-│  React Frontend │  HTTP   │  Flask Backend  │
+│  React Frontend │  HTTP   │ FastAPI Backend │
 │   Port 3000     │────────▶│   Port 5000     │
-│                 │◀────────│   (Mock Mode)   │
+│                 │◀────────│  (backend.py)   │
 └─────────────────┘         └─────────────────┘
 ```
 
-## ⚠️ Mock Mode
+## ⚡ Production Ensemble Mode
 
-Currently using **mock predictions** because:
-- Local PyTorch has DLL error
-- This lets you test the frontend UI
-- Predictions are realistic but random
+Currently using the **DeepSceneLoc production ensemble** because:
+- Loads ResNet-50, EfficientNet-B0, and ViT-B16 checkpoints
+- Performs Test-Time Augmentation (TTA) with horizontal flipping for max accuracy
+- Ensembles predictions by averaging class probabilities
 
 **To get real predictions:**
 
@@ -161,7 +159,7 @@ taskkill /PID <PID> /F
 
 ### Restart Backend
 ```bash
-python webapp/backend_api_mock.py
+python backend.py
 ```
 
 ### Restart Frontend
@@ -209,19 +207,19 @@ VITE v5.x.x ready in xxx ms
 
 ### Backend error
 ```bash
-# Check if Flask is running
+# Check if FastAPI is running
 curl http://localhost:5000/health
 ```
 
 ### Image upload not working
 - Check browser console (F12)
-- Verify backend is running
-- Check CORS errors
+- Verify backend is running and Gemini API Key is configured in `.env`
+- Check for 503/404/network errors in Python terminal output
 
 ### Port already in use
 Change ports:
-- Backend: Edit `backend_api_mock.py` → `port=5001`
-- Frontend: Edit `vite.config.ts` → `port: 3001`
+- Backend: Edit `backend.py` -> `port=5001` or set PORT in `.env`
+- Frontend: Edit `vite.config.ts` -> `port: 3001`
 
 ---
 

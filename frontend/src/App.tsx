@@ -56,22 +56,6 @@ export default function App() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Default Prediction for initial rendering (Moraine Lake)
-  const defaultPrediction: PipelineOutput = {
-    sceneCategory: "Mountain",
-    confidence: 96.48,
-    landmarkName: "Moraine Lake",
-    city: "Banff",
-    country: "Canada",
-    latitude: 51.3215,
-    longitude: -116.1860,
-    aiConfidence: 94.2,
-    reasoning: "The image exhibits a bright turquoise glacially-fed lake surrounded by the rugged, steep grey shale pyramids of the Valley of the Ten Peaks in Alberta. The dense coniferous subalpine forest of Engelmann spruce and alpine larch climbing the lower moraine slopes is highly indicative of the Canadian Rocky Mountains transition zone.",
-    elevation: "1,885m",
-    bestSeason: "June to September",
-    geologicalAge: "Late Pleistocene"
-  };
-
   useEffect(() => {
     // Fetch presets on load
     fetch("/api/presets")
@@ -84,7 +68,6 @@ export default function App() {
       .catch(err => console.error("Could not fetch analytical presets", err));
 
     // Initialize with default state (empty now)
-    // setCurrentPrediction(defaultPrediction);
   }, []);
 
   useEffect(() => {
@@ -857,7 +840,7 @@ export default function App() {
                 ) : (
                   // Initial Drop Area Empty State
                   <div className="py-6">
-                    <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4 transition-transform group-hover:scale-105">
+                    <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4 mx-auto transition-transform group-hover:scale-105">
                       <Upload className="w-8 h-8" />
                     </div>
                     <h4 className="font-extrabold text-gray-900 text-lg leading-tight">Drag and drop visual scene assets</h4>

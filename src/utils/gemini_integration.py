@@ -47,8 +47,8 @@ class GeminiLocationAnalyzer:
         elif self.gemini_api_key:
             if not GEMINI_AVAILABLE:
                 raise ImportError("google-generativeai not installed. Required for native Gemini mode.")
-            genai.configure(api_key=self.gemini_api_key)
-            self.model = genai.GenerativeModel('gemini-1.5-flash')
+            genai.configure(api_key=self.gemini_api_key, transport='rest')
+            self.model = genai.GenerativeModel('gemini-3.1-flash-lite')
             self.mode = "native"
             print("[OK] Native Gemini AI initialized successfully")
         else:
@@ -87,19 +87,50 @@ class GeminiLocationAnalyzer:
             }
         """
         
-        # Create detailed prompt for location identification
+        # Create compact JSON prompt
         prompt = self._create_location_prompt(predicted_category, confidence)
+        
+        # Compress image to reduce payload size (max 800px wide)
+        img_to_send = image.copy()
+        max_size = 800
+        if img_to_send.width > max_size:
+            ratio = max_size / img_to_send.width
+            img_to_send = img_to_send.resize(
+                (max_size, int(img_to_send.height * ratio)),
+                Image.LANCZOS
+            )
         
         try:
             if self.mode == "openrouter":
-                result_text = self._analyze_via_openrouter(image, prompt)
+                result_text = self._analyze_via_openrouter(img_to_send, prompt)
+                result = self._parse_gemini_response(result_text, predicted_category)
             else:
-                # Call Native Gemini API
-                response = self.model.generate_content([prompt, image])
-                result_text = response.text
-            
-            # Parse response
-            result = self._parse_gemini_response(result_text, predicted_category)
+                # Call Native Gemini API with JSON mode and 120s safety timeout
+                response = self.model.generate_content(
+                    [prompt, img_to_send],
+                    generation_config={
+                        "response_mime_type": "application/json",
+                        "temperature": 0.1,
+                        "max_output_tokens": 300,
+                    },
+                    request_options={"timeout": 120}
+                )
+                import json as _json
+                raw = response.text.strip()
+                parsed = _json.loads(raw)
+                result = {
+                    'exact_location': parsed.get('exact_location', 'Unknown'),
+                    'latitude': parsed.get('latitude'),
+                    'longitude': parsed.get('longitude'),
+                    'country': parsed.get('country', 'Unknown'),
+                    'city': parsed.get('city', 'Unknown'),
+                    'region': parsed.get('region', 'Unknown'),
+                    'confidence': parsed.get('confidence', 'low'),
+                    'place_type': parsed.get('place_type', 'generic'),
+                    'landmarks': parsed.get('landmarks', []),
+                    'description': parsed.get('description', ''),
+                    'category_hint': predicted_category
+                }
             result['provider'] = self.mode
             return result
             
@@ -146,7 +177,7 @@ class GeminiLocationAnalyzer:
             "https://openrouter.ai/api/v1/chat/completions",
             headers=headers,
             json=payload,
-            timeout=30
+            timeout=120
         )
         
         if response.status_code != 200:
@@ -156,51 +187,37 @@ class GeminiLocationAnalyzer:
         return data['choices'][0]['message']['content']
 
     def _create_location_prompt(self, category: str = None, confidence: float = None) -> str:
-        """Create detailed prompt for Gemini"""
+        """Create a compact JSON-mode prompt that minimises output tokens for speed."""
         
-        prompt = """Analyze this image and provide the EXACT location identification.
-
-Your task is to identify:
-1. **EXACT LOCATION**: The specific place, landmark, or location name
-2. **COORDINATES**: Best estimate of latitude and longitude (if identifiable)
-3. **LOCATION DETAILS**: Country, city, region
-4. **CONFIDENCE**: How confident are you? (high/medium/low)
-5. **DESCRIPTION**: What makes you confident in this identification?
-
-"""
-        
+        hint = ""
         if category:
-            prompt += f"\n**HINT**: A scene classifier predicted this is a '{category}' scene"
+            hint = f" The scene has already been classified as '{category}'"
             if confidence:
-                prompt += f" with {confidence:.1%} confidence."
+                hint += f" with {confidence:.0%} confidence."
         
-        prompt += """
-
-**RESPONSE FORMAT** (provide as structured text):
-
-EXACT_LOCATION: [Specific place name, landmark, or "Cannot determine exact location"]
-LATITUDE: [number or "unknown"]
-LONGITUDE: [number or "unknown"]
-COUNTRY: [country name or "unknown"]
-CITY: [city name or "unknown"]
-REGION: [geographic region or "unknown"]
-CONFIDENCE: [high/medium/low]
-PLACE_TYPE: [landmark/city/natural_feature/generic_scene]
-LANDMARKS: [List any recognizable landmarks, comma-separated]
-
-DESCRIPTION:
-[Detailed explanation of what you see and why you identified this location. Include:
-- Distinctive features that led to identification
-- Architectural, natural, or cultural clues
-- If you cannot determine exact location, explain what type of place it appears to be
-- Your reasoning process]
-
-Be specific if you recognize the place. If you cannot determine the exact location, provide as much detail as possible about the type of place, region, and characteristics."""
-
+        prompt = (
+            f"You are a precise geospatial extraction assistant.{hint}\n"
+            "Analyze this image and return ONLY a valid JSON object — no markdown, no extra text.\n"
+            "If the image is too generic to pinpoint, use 0 for lat/lng and 'Unknown' for names.\n\n"
+            "Required JSON schema:\n"
+            "{\n"
+            '  "exact_location": "string — landmark or location name",\n'
+            '  "latitude": number,\n'
+            '  "longitude": number,\n'
+            '  "country": "string",\n'
+            '  "city": "string",\n'
+            '  "region": "string",\n'
+            '  "confidence": "high|medium|low",\n'
+            '  "place_type": "landmark|city|natural_feature|generic_scene",\n'
+            '  "landmarks": ["list", "of", "visible", "landmarks"],\n'
+            '  "description": "max 2 sentences describing key visual evidence for identification"\n'
+            "}"
+        )
         return prompt
     
     def _parse_gemini_response(self, response_text: str, category: str = None) -> Dict:
         """Parse Gemini's structured response into dictionary"""
+        import re
         
         result = {
             'exact_location': 'Unknown',
@@ -223,42 +240,63 @@ Be specific if you recognize the place. If you cannot determine the exact locati
             description_lines = []
             
             for line in lines:
-                line = line.strip()
+                line_stripped = line.strip()
                 
                 if description_started:
                     description_lines.append(line)
                     continue
                 
-                if line.startswith('EXACT_LOCATION:'):
-                    result['exact_location'] = line.split(':', 1)[1].strip()
-                elif line.startswith('LATITUDE:'):
-                    lat_str = line.split(':', 1)[1].strip()
-                    try:
-                        result['latitude'] = float(lat_str)
-                    except:
-                        result['latitude'] = None
-                elif line.startswith('LONGITUDE:'):
-                    lon_str = line.split(':', 1)[1].strip()
-                    try:
-                        result['longitude'] = float(lon_str)
-                    except:
-                        result['longitude'] = None
-                elif line.startswith('COUNTRY:'):
-                    result['country'] = line.split(':', 1)[1].strip()
-                elif line.startswith('CITY:'):
-                    result['city'] = line.split(':', 1)[1].strip()
-                elif line.startswith('REGION:'):
-                    result['region'] = line.split(':', 1)[1].strip()
-                elif line.startswith('CONFIDENCE:'):
-                    result['confidence'] = line.split(':', 1)[1].strip().lower()
-                elif line.startswith('PLACE_TYPE:'):
-                    result['place_type'] = line.split(':', 1)[1].strip().lower()
-                elif line.startswith('LANDMARKS:'):
-                    landmarks_str = line.split(':', 1)[1].strip()
-                    if landmarks_str and landmarks_str.lower() != 'none':
-                        result['landmarks'] = [l.strip() for l in landmarks_str.split(',')]
-                elif line.startswith('DESCRIPTION:'):
+                # Clean up line for matching (remove asterisks, bolding, leading bullet chars)
+                clean_match = line_stripped.replace('**', '').replace('*', '').strip()
+                clean_match = re.sub(r'^[-\+\#\s\d\.]+\s*', '', clean_match).strip()
+                
+                if clean_match.upper().startswith('DESCRIPTION:'):
                     description_started = True
+                    desc_part = clean_match.split(':', 1)
+                    if len(desc_part) > 1 and desc_part[1].strip():
+                        description_lines.append(desc_part[1].strip())
+                    continue
+                
+                if ':' in clean_match:
+                    key, val = clean_match.split(':', 1)
+                    key = key.strip().upper().replace(' ', '_')
+                    val = val.strip()
+                    
+                    if key == 'EXACT_LOCATION':
+                        result['exact_location'] = val
+                    elif key == 'LATITUDE':
+                        try:
+                            coord_match = re.search(r'[-+]?\d*\.\d+|\d+', val)
+                            if coord_match:
+                                num = float(coord_match.group())
+                                if 'S' in val.upper():
+                                    num = -abs(num)
+                                result['latitude'] = num
+                        except:
+                            result['latitude'] = None
+                    elif key == 'LONGITUDE':
+                        try:
+                            coord_match = re.search(r'[-+]?\d*\.\d+|\d+', val)
+                            if coord_match:
+                                num = float(coord_match.group())
+                                if 'W' in val.upper():
+                                    num = -abs(num)
+                                result['longitude'] = num
+                        except:
+                            result['longitude'] = None
+                    elif key == 'COUNTRY':
+                        result['country'] = val
+                    elif key == 'CITY':
+                        result['city'] = val
+                    elif key == 'REGION':
+                        result['region'] = val
+                    elif key == 'CONFIDENCE':
+                        result['confidence'] = val.lower()
+                    elif key == 'PLACE_TYPE':
+                        result['place_type'] = val.lower()
+                    elif key == 'LANDMARKS':
+                        if val and val.lower() != 'none':
+                            result['landmarks'] = [l.strip() for l in val.split(',')]
             
             result['description'] = '\n'.join(description_lines).strip()
             

@@ -4,8 +4,8 @@ echo DeepSceneLoc Full Stack Launcher
 echo ========================================
 echo.
 
-echo Starting Python Backend (Flask)...
-start "DeepSceneLoc Backend" cmd /k "cd /d %~dp0 && .venv\Scripts\activate && python webapp\backend_api.py"
+echo Starting Python Backend (FastAPI)...
+start "DeepSceneLoc Backend" cmd /k "cd /d %~dp0 && venv\Scripts\activate && uvicorn backend:app --host 0.0.0.0 --port 5000"
 
 timeout /t 3 /nobreak > nul
 
